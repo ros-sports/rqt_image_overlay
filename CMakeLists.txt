@@ -22,6 +22,9 @@ ament_target_dependencies(image_overlay_lib
   rclcpp
   pluginlib)
 
+# This flag must be set for the foxy branch to compile
+target_compile_definitions(image_overlay_lib PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+
 # Build image_overlay executable
 add_executable(image_overlay
   src/main.cpp)
