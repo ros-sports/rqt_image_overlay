@@ -7,19 +7,56 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(pluginlib REQUIRED)
 
+# Include hpp files
+include_directories(
+  include
+)
+
+# Build image_overlay_lib
+add_library(image_overlay_lib
+  src/image_overlay_node.cpp)
+ament_target_dependencies(image_overlay_lib
+  rclcpp
+  pluginlib)
+
+# Build image_overlay executable
+add_executable(image_overlay
+  src/main.cpp)
+target_link_libraries(image_overlay
+  image_overlay_lib)
+
+# Install - headers
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
+# Install - executables
+install(TARGETS
+  image_overlay
+  DESTINATION lib/${PROJECT_NAME})
+
+# Install - libraries
+install(
+  TARGETS image_overlay_lib
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+# Test
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+# Export includes
+ament_export_include_directories(
+  include
+)
 
 ament_package()
