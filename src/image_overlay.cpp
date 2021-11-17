@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "image_overlay/image_overlay_node.hpp"
+#include "image_overlay/image_overlay.hpp"
+#include "pluginlib/class_list_macros.hpp"
 
-ImageOverlayNode::ImageOverlayNode()
-: Node("ImageOverlayNode")
+ImageOverlay::ImageOverlay()
+: rqt_gui_cpp::Plugin()
 {
 }
+
+
+PLUGINLIB_EXPORT_CLASS(ImageOverlay, rqt_gui_cpp::Plugin)

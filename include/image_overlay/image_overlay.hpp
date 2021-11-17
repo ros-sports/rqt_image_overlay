@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__IMAGE_OVERLAY_NODE_HPP_
-#define IMAGE_OVERLAY__IMAGE_OVERLAY_NODE_HPP_
+#ifndef IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
+#define IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
 
-#include "rclcpp/rclcpp.hpp"
+#include "rqt_gui_cpp/plugin.h"
 
-class ImageOverlayNode : public rclcpp::Node
+class ImageOverlay : public rqt_gui_cpp::Plugin
 {
+  Q_OBJECT
+
 public:
-  ImageOverlayNode();
+  ImageOverlay();
+
 };
 
-#endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_NODE_HPP_
+#endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_

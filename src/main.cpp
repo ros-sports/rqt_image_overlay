@@ -14,7 +14,6 @@
 
 #include <memory>
 #include "pluginlib/class_loader.hpp"
-#include "image_overlay/image_overlay_node.hpp"
 #include "image_overlay/image_overlay_plugin.hpp"
 
 int main(int argc, char * argv[])
@@ -28,6 +27,9 @@ int main(int argc, char * argv[])
   (void) argv;
 
   pluginlib::ClassLoader<ImageOverlayPlugin> plugin_loader("image_overlay", "ImageOverlayPlugin");
+  for (auto str : plugin_loader.getDeclaredClasses()) {
+    printf("%s", str.c_str());
+  }
 
   try {
     std::shared_ptr<ImageOverlayPlugin> triangle = plugin_loader.createSharedInstance(

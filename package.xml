@@ -11,11 +11,13 @@
 
   <depend>rclcpp</depend>
   <depend>pluginlib</depend>
+  <depend>rqt_gui_cpp</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
+    <rqt_gui plugin="${prefix}/plugin.xml"/>
   </export>
 </package>

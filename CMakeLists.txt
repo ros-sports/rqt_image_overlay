@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(pluginlib REQUIRED)
+find_package(rqt_gui_cpp REQUIRED)
 
 # Include hpp files
 include_directories(
@@ -16,11 +17,13 @@ include_directories(
 )
 
 # Build image_overlay_lib
-add_library(image_overlay_lib
-  src/image_overlay_node.cpp)
+add_library(image_overlay_lib SHARED
+  src/image_overlay.cpp)
 ament_target_dependencies(image_overlay_lib
   rclcpp
-  pluginlib)
+  rqt_gui_cpp)
+
+pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 
 # This flag must be set for the foxy branch to compile
 target_compile_definitions(image_overlay_lib PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
@@ -28,8 +31,9 @@ target_compile_definitions(image_overlay_lib PUBLIC "PLUGINLIB__DISABLE_BOOST_FU
 # Build image_overlay executable
 add_executable(image_overlay
   src/main.cpp)
-target_link_libraries(image_overlay
-  image_overlay_lib)
+ament_target_dependencies(image_overlay
+  rclcpp
+  pluginlib)
 
 # Install - headers
 install(
