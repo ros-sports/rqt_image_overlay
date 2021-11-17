@@ -23,7 +23,6 @@ class ImageOverlay : public rqt_gui_cpp::Plugin
 
 public:
   ImageOverlay();
-
 };
 
 #endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_

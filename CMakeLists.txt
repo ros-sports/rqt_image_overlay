@@ -11,44 +11,31 @@ find_package(rclcpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
 
-# Include hpp files
-include_directories(
-  include
-)
-
-# Build image_overlay_lib
-add_library(image_overlay_lib SHARED
-  src/image_overlay.cpp)
-ament_target_dependencies(image_overlay_lib
+# Build image_overlay
+set(SOURCES src/image_overlay.cpp)
+qt5_wrap_cpp(SOURCES include/image_overlay/image_overlay.hpp)  # Must do this for qt's Meta-Object Compiler.
+add_library(image_overlay SHARED
+  ${SOURCES})
+target_include_directories(image_overlay PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(image_overlay
   rclcpp
   rqt_gui_cpp)
 
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 
 # This flag must be set for the foxy branch to compile
-target_compile_definitions(image_overlay_lib PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-
-# Build image_overlay executable
-add_executable(image_overlay
-  src/main.cpp)
-ament_target_dependencies(image_overlay
-  rclcpp
-  pluginlib)
+target_compile_definitions(image_overlay PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 # Install - headers
 install(
   DIRECTORY include/
-  DESTINATION include
-)
-
-# Install - executables
-install(TARGETS
-  image_overlay
-  DESTINATION lib/${PROJECT_NAME})
+  DESTINATION include)
 
 # Install - libraries
 install(
-  TARGETS image_overlay_lib
+  TARGETS image_overlay
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -62,8 +49,13 @@ if(BUILD_TESTING)
 endif()
 
 # Export includes
-ament_export_include_directories(
-  include
+ament_export_include_directories(include)
+
+ament_export_libraries(
+  image_overlay
+)
+ament_export_targets(
+  export_${PROJECT_NAME}
 )
 
 ament_package()
