@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <map>
+#include <algorithm>
+#include <vector>
+#include <string>
 #include "image_overlay/image_overlay.hpp"
 #include "pluginlib/class_list_macros.hpp"
 #include "image_transport/image_transport.hpp"
@@ -50,7 +54,7 @@ void ImageOverlay::updateTopicList()
   image_transport::ImageTransport it(node_);
   std::vector<std::string> declared = it.getDeclaredTransports();
   for (std::vector<std::string>::const_iterator it = declared.begin(); it != declared.end(); it++) {
-    //qDebug("ImageView::updateTopicList() declared transport '%s'", it->c_str());
+    // qDebug("ImageView::updateTopicList() declared transport '%s'", it->c_str());
     QString transport = it->c_str();
 
     // strip prefix from transport name
@@ -109,14 +113,16 @@ QSet<QString> ImageOverlay::getTopics(
 
         // add raw topic
         topics.insert(topic);
-        //qDebug("ImageOverlay::getTopics() raw topic '%s'", topic.toStdString().c_str());
+        // qDebug("ImageOverlay::getTopics() raw topic '%s'", topic.toStdString().c_str());
 
         // add transport specific sub-topics
         for (QList<QString>::const_iterator jt = transports.begin(); jt != transports.end(); jt++) {
           if (all_topics.contains(topic + "/" + *jt)) {
             QString sub = topic + " " + *jt;
             topics.insert(sub);
-            //qDebug("ImageOverlay::getTopics() transport specific sub-topic '%s'", sub.toStdString().c_str());
+            // qDebug(
+            //   "ImageOverlay::getTopics() transport specific sub-topic '%s'",
+            //   sub.toStdString().c_str());
           }
         }
       }
@@ -126,7 +132,9 @@ QSet<QString> ImageOverlay::getTopics(
         if (index != -1) {
           topic.replace(index, 1, " ");
           topics.insert(topic);
-          //qDebug("ImageOverlay::getTopics() transport specific sub-topic '%s'", topic.toStdString().c_str());
+          // qDebug(
+          //   "ImageOverlay::getTopics() transport specific sub-topic '%s'",
+          //   topic.toStdString().c_str());
         }
       }
     }

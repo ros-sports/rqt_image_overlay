@@ -17,7 +17,7 @@
 
 #include <QWidget>
 #include "rqt_gui_cpp/plugin.h"
-#include "ui_image_overlay.h"
+#include "./ui_image_overlay.h"
 #include "image_transport/subscriber.hpp"
 
 class ImageOverlay : public rqt_gui_cpp::Plugin
@@ -34,7 +34,7 @@ protected:
     const QSet<QString> & message_sub_types,
     const QList<QString> & transports);
 
-  virtual void selectTopic(const QString& topic);
+  virtual void selectTopic(const QString & topic);
   image_transport::Subscriber subscriber_;
 
 protected slots:
