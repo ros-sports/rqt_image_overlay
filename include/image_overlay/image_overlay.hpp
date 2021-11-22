@@ -15,7 +15,10 @@
 #ifndef IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
 #define IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
 
+#include <QWidget>
 #include "rqt_gui_cpp/plugin.h"
+#include "ui_image_overlay.h"
+#include "image_transport/subscriber.hpp"
 
 class ImageOverlay : public rqt_gui_cpp::Plugin
 {
@@ -23,6 +26,24 @@ class ImageOverlay : public rqt_gui_cpp::Plugin
 
 public:
   ImageOverlay();
+  virtual void initPlugin(qt_gui_cpp::PluginContext & context);
+
+protected:
+  virtual QSet<QString> getTopics(
+    const QSet<QString> & message_types,
+    const QSet<QString> & message_sub_types,
+    const QList<QString> & transports);
+
+  virtual void selectTopic(const QString& topic);
+  image_transport::Subscriber subscriber_;
+
+protected slots:
+  virtual void updateTopicList();
+  virtual void onTopicChanged(int index);
+
+private:
+  QWidget * widget_;
+  Ui::ImageOverlay ui_;
 };
 
 #endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_

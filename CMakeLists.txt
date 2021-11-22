@@ -5,23 +5,30 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
+find_package(image_transport REQUIRED)
 
 # Build image_overlay
 set(SOURCES src/image_overlay.cpp)
 qt5_wrap_cpp(SOURCES include/image_overlay/image_overlay.hpp)  # Must do this for qt's Meta-Object Compiler.
+qt5_wrap_ui(UIS src/image_overlay.ui)
 add_library(image_overlay SHARED
-  ${SOURCES})
+  ${SOURCES}
+  ${UIS})
 target_include_directories(image_overlay PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(image_overlay
   rclcpp
-  rqt_gui_cpp)
+  rqt_gui_cpp
+  image_transport)
 
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 
