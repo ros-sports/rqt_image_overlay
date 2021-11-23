@@ -14,6 +14,7 @@ find_package(rclcpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
 find_package(image_transport REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 
 # Build image_overlay
 set(SOURCES src/image_overlay.cpp)
@@ -28,7 +29,8 @@ target_include_directories(image_overlay PUBLIC
 ament_target_dependencies(image_overlay
   rclcpp
   rqt_gui_cpp
-  image_transport)
+  image_transport
+  Qt5Widgets)
 
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 
