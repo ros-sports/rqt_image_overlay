@@ -30,7 +30,7 @@
        </property>
        <property name="icon">
         <iconset theme="view-refresh">
-         <normaloff>.</normaloff>.</iconset>
+          <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
@@ -50,15 +50,18 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="image_label">
+    <widget class="RatioLayoutedFrame" name="image_label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
-       <width>400</width>
-       <height>400</height>
+       <width>80</width>
+       <height>60</height>
       </size>
-     </property>
-     <property name="text">
-      <string/>
      </property>
     </widget>
    </item>
@@ -94,6 +97,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RatioLayoutedFrame</class>
+   <extends>QLabel</extends>
+   <header>image_overlay/ratio_layouted_frame.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

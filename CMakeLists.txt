@@ -17,8 +17,10 @@ find_package(image_transport REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
 # Build image_overlay
-set(SOURCES src/image_overlay.cpp)
-qt5_wrap_cpp(SOURCES include/image_overlay/image_overlay.hpp)  # Must do this for qt's Meta-Object Compiler.
+set(SOURCES src/image_overlay.cpp src/ratio_layouted_frame.cpp)
+qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
+  include/image_overlay/image_overlay.hpp
+  include/image_overlay/ratio_layouted_frame.hpp)
 qt5_wrap_ui(UIS src/image_overlay.ui)
 add_library(image_overlay SHARED
   ${SOURCES}
