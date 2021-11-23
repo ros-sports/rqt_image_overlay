@@ -15,6 +15,7 @@ find_package(pluginlib REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(Qt5Widgets REQUIRED)
+find_package(cv_bridge REQUIRED)
 
 # Build image_overlay
 set(SOURCES src/image_overlay.cpp src/ratio_layouted_frame.cpp)
@@ -32,7 +33,8 @@ ament_target_dependencies(image_overlay
   rclcpp
   rqt_gui_cpp
   image_transport
-  Qt5Widgets)
+  Qt5Widgets
+  cv_bridge)
 
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 

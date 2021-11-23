@@ -15,18 +15,26 @@
 #ifndef IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
 #define IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
 
-#include <QLabel>
+#include <QFrame>
+#include <QImage>
 
 class RatioLayoutedFrame
-  : public QLabel
+  : public QFrame
 {
   Q_OBJECT
 
 public:
   explicit RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags = 0);
+  void setImage(const QImage & image);
+
+signals:
+  void delayed_update();
 
 protected:
-  void resizeEvent(QResizeEvent *);
+  void paintEvent(QPaintEvent * event);
+
+private:
+  QImage qimage_;
 };
 
 #endif  // IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_

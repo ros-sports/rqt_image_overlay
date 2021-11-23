@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <QMessageBox>
 #include <map>
 #include <algorithm>
 #include <vector>
@@ -19,6 +20,7 @@
 #include "image_overlay/image_overlay.hpp"
 #include "pluginlib/class_list_macros.hpp"
 #include "image_transport/image_transport.hpp"
+#include "cv_bridge/cv_bridge.h"
 
 ImageOverlay::ImageOverlay()
 : rqt_gui_cpp::Plugin()
@@ -84,7 +86,28 @@ void ImageOverlay::updateTopicList()
 
 void ImageOverlay::onTopicChanged(int index)
 {
-  (void) index;
+  subscriber_.shutdown();
+
+  // reset image on topic change
+  ui_.image_frame->setImage(QImage());
+
+  QStringList parts = ui_.image_topics_combo_box->itemData(index).toString().split(" ");
+  QString topic = parts.first();
+  QString transport = parts.length() == 2 ? parts.last() : "raw";
+
+  if (!topic.isEmpty()) {
+    image_transport::ImageTransport it(node_);
+    const image_transport::TransportHints hints(node_.get(), transport.toStdString());
+    try {
+      subscriber_ =
+        it.subscribe(topic.toStdString(), 1, &ImageOverlay::callbackImage, this, &hints);
+      qDebug(
+        "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
+        topic.toStdString().c_str(), subscriber_.getTransport().c_str());
+    } catch (image_transport::TransportLoadException & e) {
+      QMessageBox::warning(widget_, tr("Loading image transport plugin failed"), e.what());
+    }
+  }
 }
 
 QSet<QString> ImageOverlay::getTopics(
@@ -153,6 +176,29 @@ void ImageOverlay::selectTopic(const QString & topic)
     index = ui_.image_topics_combo_box->findText(topic);
   }
   ui_.image_topics_combo_box->setCurrentIndex(index);
+}
+
+void ImageOverlay::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
+{
+  try {
+    // Convert image from ros to cv type
+    cv_bridge::CvImageConstPtr cv_ptr =
+      cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::RGB8);
+    conversion_mat_ = cv_ptr->image;
+  } catch (cv_bridge::Exception & e) {
+    qWarning(
+      "ImageView.callback_image() while trying to convert image from '%s' to 'rgb8' an "
+      "exception was thrown (%s)",
+      msg->encoding.c_str(), e.what());
+    ui_.image_frame->setImage(QImage());
+    return;
+  }
+
+  // image must be copied since it uses the conversion_mat_ for storage which is asynchronously
+  // overwritten in the next callback invocation
+  QImage image(conversion_mat_.data, conversion_mat_.cols, conversion_mat_.rows,
+    conversion_mat_.step[0], QImage::Format_RGB888);
+  ui_.image_frame->setImage(image);
 }
 
 

@@ -19,6 +19,7 @@
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
 #include "image_transport/subscriber.hpp"
+#include "opencv2/core/core.hpp"
 
 class ImageOverlay : public rqt_gui_cpp::Plugin
 {
@@ -35,7 +36,10 @@ protected:
     const QList<QString> & transports);
 
   virtual void selectTopic(const QString & topic);
+  virtual void callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
+
   image_transport::Subscriber subscriber_;
+  cv::Mat conversion_mat_;
 
 protected slots:
   virtual void updateTopicList();

@@ -13,19 +13,37 @@
 // limitations under the License.
 
 #include <QImage>
+#include <QPainter>
 #include "image_overlay/ratio_layouted_frame.hpp"
 
 RatioLayoutedFrame::RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags)
-: QLabel(parent, flags)
+: QFrame(parent, flags)
 {
+  connect(this, SIGNAL(delayed_update()), this, SLOT(update()), Qt::QueuedConnection);
 }
 
-void RatioLayoutedFrame::resizeEvent(QResizeEvent * event)
+void RatioLayoutedFrame::setImage(const QImage & image)
 {
-  (void) event;
+  qimage_ = image.copy();
+  emit delayed_update();
+}
 
-  // Test, display image (https://stackoverflow.com/questions/8211982/qt-resizing-a-qlabel-containing-a-qpixmap-while-keeping-its-aspect-ratio)
-  QImage myImage;
-  myImage.load("/home/ijnek/Pictures/test-face.jpg");
-  setPixmap(QPixmap::fromImage(myImage).scaled(width(), height(), Qt::KeepAspectRatio));
+void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
+{
+  (void)event;
+  QPainter painter(this);
+  if (!qimage_.isNull()) {
+    QImage scaledImage = qimage_.scaled(width(), height(), Qt::KeepAspectRatio);
+    QPoint leftTop = QPoint(
+      (width() - scaledImage.width()) / 2,
+      (height() - scaledImage.height()) / 2);
+    painter.drawImage(leftTop, scaledImage);
+  } else {
+    // default image with gradient
+    QLinearGradient gradient(0, 0, frameRect().width(), frameRect().height());
+    gradient.setColorAt(0, Qt::white);
+    gradient.setColorAt(1, Qt::black);
+    painter.setBrush(gradient);
+    painter.drawRect(0, 0, frameRect().width() + 1, frameRect().height() + 1);
+  }
 }
