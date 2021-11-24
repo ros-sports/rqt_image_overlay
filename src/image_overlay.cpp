@@ -23,7 +23,8 @@
 #include "cv_bridge/cv_bridge.h"
 
 ImageOverlay::ImageOverlay()
-: rqt_gui_cpp::Plugin()
+: rqt_gui_cpp::Plugin(), image_overlay_plugin_loader("image_overlay", "ImageOverlayPlugin"),
+  image_overlay_plugin_classes(image_overlay_plugin_loader.getDeclaredClasses())
 {
 }
 

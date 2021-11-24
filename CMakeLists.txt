@@ -70,5 +70,6 @@ ament_export_libraries(
 ament_export_targets(
   export_${PROJECT_NAME}
 )
+ament_export_dependencies(Qt5Widgets)
 
 ament_package()

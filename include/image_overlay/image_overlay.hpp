@@ -16,10 +16,15 @@
 #define IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
 
 #include <QWidget>
+#include <string>
+#include <vector>
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
 #include "image_transport/subscriber.hpp"
 #include "opencv2/core/core.hpp"
+#include "image_overlay/image_overlay_plugin.hpp"
+#include "pluginlib/class_loader.hpp"
+
 
 class ImageOverlay : public rqt_gui_cpp::Plugin
 {
@@ -48,6 +53,9 @@ protected slots:
 private:
   QWidget * widget_;
   Ui::ImageOverlay ui_;
+
+  pluginlib::ClassLoader<ImageOverlayPlugin> image_overlay_plugin_loader;
+  std::vector<std::string> image_overlay_plugin_classes;
 };
 
 #endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
