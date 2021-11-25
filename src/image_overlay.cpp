@@ -24,6 +24,10 @@
 #include "image_transport/image_transport.hpp"
 #include "cv_bridge/cv_bridge.h"
 
+#define COLUMN_TOPIC 0
+#define COLUMN_PLUGIN 1
+#define COLUMN_RATE 2
+
 ImageOverlay::ImageOverlay()
 : rqt_gui_cpp::Plugin(), image_overlay_plugin_loader("image_overlay", "ImageOverlayPlugin"),
   image_overlay_plugin_classes(image_overlay_plugin_loader.getDeclaredClasses())
@@ -94,6 +98,10 @@ void ImageOverlay::addOverlay(QString plugin_class)
   // std::map<std::string, std::vector<std::string>> topic_info =
   //   node_->get_topic_names_and_types();
   std::cout << "addOverlay called with plugin_class: " << plugin_class.toStdString() << std::endl;
+
+  int row = ui_.plugin_topic_table->rowCount();
+  ui_.plugin_topic_table->insertRow(row);
+  ui_.plugin_topic_table->setItem(row, COLUMN_PLUGIN, new QTableWidgetItem(plugin_class));
 }
 
 void ImageOverlay::onTopicChanged(int index)
