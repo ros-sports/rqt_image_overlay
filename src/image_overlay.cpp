@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <QMessageBox>
+#include <QMenu>
+#include <QSignalMapper>
 #include <map>
 #include <algorithm>
 #include <vector>
@@ -34,16 +36,18 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   ui_.setupUi(widget_);
   context.addWidget(widget_);
 
-  updateTopicList();
+  updateImageTopicList();
   ui_.image_topics_combo_box->setCurrentIndex(ui_.image_topics_combo_box->findText(""));
   connect(
     ui_.image_topics_combo_box, SIGNAL(currentIndexChanged(int)), this,
     SLOT(onTopicChanged(int)));
 
-  connect(ui_.refresh_image_topics_push_button, SIGNAL(pressed()), this, SLOT(updateTopicList()));
+  connect(ui_.refresh_image_topics_button, SIGNAL(pressed()), this, SLOT(updateImageTopicList()));
+
+  fillOverlayMenu();
 }
 
-void ImageOverlay::updateTopicList()
+void ImageOverlay::updateImageTopicList()
 {
   QSet<QString> message_types;
   message_types.insert("sensor_msgs/Image");
@@ -57,7 +61,7 @@ void ImageOverlay::updateTopicList()
   image_transport::ImageTransport it(node_);
   std::vector<std::string> declared = it.getDeclaredTransports();
   for (std::vector<std::string>::const_iterator it = declared.begin(); it != declared.end(); it++) {
-    // qDebug("ImageView::updateTopicList() declared transport '%s'", it->c_str());
+    // qDebug("ImageView::updateImageTopicList() declared transport '%s'", it->c_str());
     QString transport = it->c_str();
 
     // strip prefix from transport name
@@ -83,6 +87,13 @@ void ImageOverlay::updateTopicList()
 
   // restore previous selection
   selectTopic(selected);
+}
+
+void ImageOverlay::addOverlay(QString plugin_class)
+{
+  // std::map<std::string, std::vector<std::string>> topic_info =
+  //   node_->get_topic_names_and_types();
+  std::cout << "addOverlay called with plugin_class: " << plugin_class.toStdString() << std::endl;
 }
 
 void ImageOverlay::onTopicChanged(int index)
@@ -200,6 +211,24 @@ void ImageOverlay::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
   QImage image(conversion_mat_.data, conversion_mat_.cols, conversion_mat_.rows,
     conversion_mat_.step[0], QImage::Format_RGB888);
   ui_.image_frame->setImage(image);
+}
+
+void ImageOverlay::fillOverlayMenu()
+{
+  QMenu * menu = new QMenu();
+  QSignalMapper * signalMapper = new QSignalMapper(this);
+
+  for (std::string str_plugin_class : image_overlay_plugin_classes) {
+    QString qstr_plugin_class = QString::fromStdString(str_plugin_class);
+    QAction * action = new QAction(qstr_plugin_class, this);
+    menu->addAction(action);
+    connect(action, SIGNAL(triggered()), signalMapper, SLOT(map()));
+    signalMapper->setMapping(action, qstr_plugin_class);
+  }
+
+  connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
+
+  ui_.add_overlay_button->setMenu(menu);
 }
 
 

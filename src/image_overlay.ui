@@ -24,7 +24,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="refresh_image_topics_push_button">
+      <widget class="QPushButton" name="refresh_image_topics_button">
        <property name="text">
         <string/>
        </property>
@@ -47,51 +47,38 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QToolButton" name="add_overlay_button">
+       <property name="icon">
+        <iconset theme="add">
+         <normaloff>.</normaloff>.</iconset>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::InstantPopup</enum>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
-    <widget class="RatioLayoutedFrame" name="image_frame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>80</width>
-       <height>60</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tab">
-      <attribute name="title">
-       <string>By plugin type</string>
-      </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QListWidget" name="listWidget"/>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>By topic</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QListWidget" name="listWidget_2"/>
-       </item>
-      </layout>
+     <widget class="QListWidget" name="plugin_topic_list"/>
+     <widget class="RatioLayoutedFrame" name="image_frame">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>100</height>
+       </size>
+      </property>
      </widget>
     </widget>
    </item>

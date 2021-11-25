@@ -47,10 +47,14 @@ protected:
   cv::Mat conversion_mat_;
 
 protected slots:
-  virtual void updateTopicList();
+  virtual void updateImageTopicList();
+  virtual void addOverlay(QString plugin_class);
   virtual void onTopicChanged(int index);
 
 private:
+  void fillOverlayMenu();
+
+
   QWidget * widget_;
   Ui::ImageOverlay ui_;
 
