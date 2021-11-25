@@ -15,11 +15,14 @@
 #ifndef IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
 #define IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
 
+#include <string>
+
 class ImageOverlayPlugin
 {
 public:
   virtual void initialize(double side_length) = 0;
   virtual double area() = 0;
+  virtual std::string getTopicType() = 0;
   virtual ~ImageOverlayPlugin() {}
 
 protected:

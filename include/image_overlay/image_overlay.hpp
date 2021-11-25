@@ -18,6 +18,7 @@
 #include <QWidget>
 #include <string>
 #include <vector>
+#include <memory>
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
 #include "image_transport/subscriber.hpp"
@@ -60,6 +61,8 @@ private:
 
   pluginlib::ClassLoader<ImageOverlayPlugin> image_overlay_plugin_loader;
   std::vector<std::string> image_overlay_plugin_classes;
+
+  std::vector<std::shared_ptr<ImageOverlayPlugin>> plugin_instances;
 };
 
 #endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_

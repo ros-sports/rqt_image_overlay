@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <memory>
 #include "image_overlay/image_overlay.hpp"
 #include "pluginlib/class_list_macros.hpp"
 #include "image_transport/image_transport.hpp"
@@ -95,13 +96,29 @@ void ImageOverlay::updateImageTopicList()
 
 void ImageOverlay::addOverlay(QString plugin_class)
 {
-  // std::map<std::string, std::vector<std::string>> topic_info =
-  //   node_->get_topic_names_and_types();
   std::cout << "addOverlay called with plugin_class: " << plugin_class.toStdString() << std::endl;
 
   int row = ui_.plugin_topic_table->rowCount();
   ui_.plugin_topic_table->insertRow(row);
   ui_.plugin_topic_table->setItem(row, COLUMN_PLUGIN, new QTableWidgetItem(plugin_class));
+
+  // Sample code for adding a plugin
+  std::shared_ptr<ImageOverlayPlugin> plugin_instance =
+    image_overlay_plugin_loader.createSharedInstance(
+    plugin_class.toStdString());
+  plugin_instance->initialize(10.0);
+  plugin_instances.push_back(plugin_instance);
+
+  // Sample code to automatically detect topic name, from plugin type
+  std::map<std::string, std::vector<std::string>> topic_info =
+    node_->get_topic_names_and_types();
+  for (auto const & [topic_name, topic_types] : topic_info) {
+    if (topic_types.at(0) == plugin_instance->getTopicType()) {
+      ui_.plugin_topic_table->setItem(
+        row, COLUMN_TOPIC,
+        new QTableWidgetItem(QString::fromStdString(topic_name)));
+    }
+  }
 }
 
 void ImageOverlay::onTopicChanged(int index)
