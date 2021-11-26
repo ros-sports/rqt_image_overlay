@@ -25,6 +25,7 @@
 #include "opencv2/core/core.hpp"
 #include "image_overlay/image_overlay_plugin.hpp"
 #include "pluginlib/class_loader.hpp"
+#include "rclcpp/create_generic_subscription.hpp"
 
 
 class ImageOverlay : public rqt_gui_cpp::Plugin
@@ -51,10 +52,10 @@ protected slots:
   virtual void updateImageTopicList();
   virtual void addOverlay(QString plugin_class);
   virtual void onTopicChanged(int index);
+  virtual void updatePluginInstances(QTableWidgetItem * table_widget_item);
 
 private:
   void fillOverlayMenu();
-
 
   QWidget * widget_;
   Ui::ImageOverlay ui_;
@@ -63,6 +64,8 @@ private:
   std::vector<std::string> image_overlay_plugin_classes;
 
   std::vector<std::shared_ptr<ImageOverlayPlugin>> plugin_instances;
+
+  std::vector<rclcpp::GenericSubscription::SharedPtr> subscriptions;
 };
 
 #endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_

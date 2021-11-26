@@ -71,5 +71,6 @@ ament_export_targets(
   export_${PROJECT_NAME}
 )
 ament_export_dependencies(Qt5Widgets)
+ament_export_dependencies(rclcpp)
 
 ament_package()

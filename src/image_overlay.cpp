@@ -20,14 +20,18 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <iostream>
 #include "image_overlay/image_overlay.hpp"
 #include "pluginlib/class_list_macros.hpp"
 #include "image_transport/image_transport.hpp"
 #include "cv_bridge/cv_bridge.h"
 
 #define COLUMN_TOPIC 0
-#define COLUMN_PLUGIN 1
-#define COLUMN_RATE 2
+#define COLUMN_TYPE 1
+#define COLUMN_PLUGIN 2
+#define COLUMN_RATE 3
+
+using std::placeholders::_1;
 
 ImageOverlay::ImageOverlay()
 : rqt_gui_cpp::Plugin(), image_overlay_plugin_loader("image_overlay", "ImageOverlayPlugin"),
@@ -48,6 +52,9 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
     SLOT(onTopicChanged(int)));
 
   connect(ui_.refresh_image_topics_button, SIGNAL(pressed()), this, SLOT(updateImageTopicList()));
+  connect(
+    ui_.plugin_topic_table, SIGNAL(itemChanged(QTableWidgetItem*)), this,
+    SLOT(updatePluginInstances(QTableWidgetItem*)));
 
   fillOverlayMenu();
 }
@@ -100,23 +107,31 @@ void ImageOverlay::addOverlay(QString plugin_class)
 
   int row = ui_.plugin_topic_table->rowCount();
   ui_.plugin_topic_table->insertRow(row);
-  ui_.plugin_topic_table->setItem(row, COLUMN_PLUGIN, new QTableWidgetItem(plugin_class));
+  QTableWidgetItem * plugin_class_name_item = new QTableWidgetItem(plugin_class);
+  plugin_class_name_item->setFlags(plugin_class_name_item->flags() ^ Qt::ItemIsEditable);
+  ui_.plugin_topic_table->setItem(row, COLUMN_PLUGIN, plugin_class_name_item);
 
-  // Sample code for adding a plugin
+  // Sample code for instantiating the plugin
   std::shared_ptr<ImageOverlayPlugin> plugin_instance =
     image_overlay_plugin_loader.createSharedInstance(
     plugin_class.toStdString());
   plugin_instance->initialize(10.0);
   plugin_instances.push_back(plugin_instance);
 
+  // Code for filling in type column
+  QTableWidgetItem * type_widget =
+    new QTableWidgetItem(QString::fromStdString(plugin_instance->getTopicType()));
+  type_widget->setFlags(type_widget->flags() ^ Qt::ItemIsEditable);
+  ui_.plugin_topic_table->setItem(row, COLUMN_TYPE, type_widget);
+
   // Sample code to automatically detect topic name, from plugin type
   std::map<std::string, std::vector<std::string>> topic_info =
     node_->get_topic_names_and_types();
   for (auto const & [topic_name, topic_types] : topic_info) {
     if (topic_types.at(0) == plugin_instance->getTopicType()) {
-      ui_.plugin_topic_table->setItem(
-        row, COLUMN_TOPIC,
-        new QTableWidgetItem(QString::fromStdString(topic_name)));
+      QTableWidgetItem * topic_name_item = new QTableWidgetItem(QString::fromStdString(topic_name));
+      ui_.plugin_topic_table->setItem(row, COLUMN_TOPIC, topic_name_item);
+      break;
     }
   }
 }
@@ -254,6 +269,28 @@ void ImageOverlay::fillOverlayMenu()
   connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
 
   ui_.add_overlay_button->setMenu(menu);
+}
+
+void ImageOverlay::updatePluginInstances(QTableWidgetItem * table_widget_item)
+{
+  int row = table_widget_item->row();
+
+  std::string topic_name;
+  std::string topic_type;
+
+  // QTableWidgetItem *topicItem = ui_.plugin_topic_table->item(row, COLUMN_TOPIC);
+  if (auto topicItem = ui_.plugin_topic_table->item(row, COLUMN_TOPIC)) {
+    topic_name = topicItem->text().toStdString();
+  } else {
+    return;
+  }
+
+  topic_type = ui_.plugin_topic_table->item(row, COLUMN_TYPE)->text().toStdString();
+
+  subscriptions.push_back(
+    node_->create_generic_subscription(
+      topic_name, topic_type,
+      rclcpp::QoS(10), std::bind(&ImageOverlayPlugin::overlay, plugin_instances.front(), _1)));
 }
 
 

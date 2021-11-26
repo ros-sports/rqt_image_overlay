@@ -88,6 +88,11 @@
       </column>
       <column>
        <property name="text">
+        <string>Type</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string>Plugin</string>
        </property>
       </column>

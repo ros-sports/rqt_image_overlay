@@ -16,6 +16,8 @@
 #define IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
 
 #include <string>
+#include <memory>
+#include "rclcpp/serialized_message.hpp"
 
 class ImageOverlayPlugin
 {
@@ -23,6 +25,7 @@ public:
   virtual void initialize(double side_length) = 0;
   virtual double area() = 0;
   virtual std::string getTopicType() = 0;
+  virtual void overlay(std::shared_ptr<rclcpp::SerializedMessage> msg) = 0;
   virtual ~ImageOverlayPlugin() {}
 
 protected:
