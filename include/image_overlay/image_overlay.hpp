@@ -60,6 +60,9 @@ private:
   QWidget * widget_;
   Ui::ImageOverlay ui_;
 
+  // Empty layer blueprint that gets initialized upon a new image topic selection
+  std::shared_ptr<QImage> layer_blueprint_;
+
   pluginlib::ClassLoader<ImageOverlayPlugin> image_overlay_plugin_loader;
   std::vector<std::string> image_overlay_plugin_classes;
 

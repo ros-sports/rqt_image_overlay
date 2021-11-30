@@ -21,6 +21,7 @@
 #include <string>
 #include <memory>
 #include <iostream>
+#include <utility>
 #include "image_overlay/image_overlay.hpp"
 #include "pluginlib/class_list_macros.hpp"
 #include "image_transport/image_transport.hpp"
@@ -30,8 +31,6 @@
 #define COLUMN_TYPE 1
 #define COLUMN_PLUGIN 2
 #define COLUMN_RATE 3
-
-using std::placeholders::_1;
 
 ImageOverlay::ImageOverlay()
 : rqt_gui_cpp::Plugin(), image_overlay_plugin_loader("image_overlay", "ImageOverlayPlugin"),
@@ -115,7 +114,6 @@ void ImageOverlay::addOverlay(QString plugin_class)
   std::shared_ptr<ImageOverlayPlugin> plugin_instance =
     image_overlay_plugin_loader.createSharedInstance(
     plugin_class.toStdString());
-  plugin_instance->initialize(10.0);
   plugin_instances.push_back(plugin_instance);
 
   // Code for filling in type column
@@ -142,6 +140,9 @@ void ImageOverlay::onTopicChanged(int index)
 
   // reset image on topic change
   ui_.image_frame->setImage(QImage());
+
+  // Reset blueprint layer since image size may have changed
+  layer_blueprint_ = nullptr;
 
   QStringList parts = ui_.image_topics_combo_box->itemData(index).toString().split(" ");
   QString topic = parts.first();
@@ -251,6 +252,12 @@ void ImageOverlay::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
   QImage image(conversion_mat_.data, conversion_mat_.cols, conversion_mat_.rows,
     conversion_mat_.step[0], QImage::Format_RGB888);
   ui_.image_frame->setImage(image);
+
+  if (!layer_blueprint_) {
+    layer_blueprint_ = std::make_shared<QImage>(
+      image.width(), image.height(), QImage::Format_ARGB32_Premultiplied);
+    layer_blueprint_->fill(qRgba(0, 0, 0, 0));
+  }
 }
 
 void ImageOverlay::fillOverlayMenu()
@@ -278,7 +285,6 @@ void ImageOverlay::updatePluginInstances(QTableWidgetItem * table_widget_item)
   std::string topic_name;
   std::string topic_type;
 
-  // QTableWidgetItem *topicItem = ui_.plugin_topic_table->item(row, COLUMN_TOPIC);
   if (auto topicItem = ui_.plugin_topic_table->item(row, COLUMN_TOPIC)) {
     topic_name = topicItem->text().toStdString();
   } else {
@@ -287,10 +293,22 @@ void ImageOverlay::updatePluginInstances(QTableWidgetItem * table_widget_item)
 
   topic_type = ui_.plugin_topic_table->item(row, COLUMN_TYPE)->text().toStdString();
 
+  // TODO(ijnek): Fix hack below, since only first plugin works.
+  std::shared_ptr<ImageOverlayPlugin> plugin_instance = plugin_instances.front();
   subscriptions.push_back(
     node_->create_generic_subscription(
       topic_name, topic_type,
-      rclcpp::QoS(10), std::bind(&ImageOverlayPlugin::overlay, plugin_instances.front(), _1)));
+      rclcpp::QoS(10),
+      [this, plugin_instance, topic_name]
+        (const std::shared_ptr<rclcpp::SerializedMessage> msg) -> void {
+        if (layer_blueprint_) {
+          std::shared_ptr<QImage> layer = std::make_shared<QImage>(*layer_blueprint_);
+          plugin_instance->overlay(layer, msg);
+          ui_.image_frame->setLayer(topic_name, std::move(layer));
+        }
+      }
+    )
+  );
 }
 
 

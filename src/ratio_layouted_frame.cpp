@@ -14,6 +14,9 @@
 
 #include <QImage>
 #include <QPainter>
+#include <string>
+#include <memory>
+#include <utility>
 #include "image_overlay/ratio_layouted_frame.hpp"
 
 RatioLayoutedFrame::RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags)
@@ -28,10 +31,18 @@ void RatioLayoutedFrame::setImage(const QImage & image)
   emit delayed_update();
 }
 
+void RatioLayoutedFrame::setLayer(std::string name, std::shared_ptr<QImage> image)
+{
+  layers_[name] = std::move(image);
+  emit delayed_update();
+}
+
 void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
 {
   (void)event;
   QPainter painter(this);
+
+  // Draw camera image
   if (!qimage_.isNull()) {
     QImage scaledImage = qimage_.scaled(width(), height(), Qt::KeepAspectRatio);
     QPoint leftTop = QPoint(
@@ -45,5 +56,14 @@ void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
     gradient.setColorAt(1, Qt::black);
     painter.setBrush(gradient);
     painter.drawRect(0, 0, frameRect().width() + 1, frameRect().height() + 1);
+  }
+
+  // Draw layers
+  for (auto const & [name, image] : layers_) {
+    QImage scaledImage = image->scaled(width(), height(), Qt::KeepAspectRatio);
+    QPoint leftTop = QPoint(
+      (width() - scaledImage.width()) / 2,
+      (height() - scaledImage.height()) / 2);
+    painter.drawImage(leftTop, scaledImage);
   }
 }
