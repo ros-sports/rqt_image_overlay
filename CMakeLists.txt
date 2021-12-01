@@ -55,6 +55,11 @@ install(
   RUNTIME DESTINATION bin
 )
 
+# Install - scripts
+install(PROGRAMS scripts/image_overlay
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 # Test
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
