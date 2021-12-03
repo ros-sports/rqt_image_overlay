@@ -40,9 +40,8 @@ ImageOverlay::ImageOverlay()
 
 void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 {
-  widget_ = new QWidget();
-  ui_.setupUi(widget_);
-  context.addWidget(widget_);
+  ui_.setupUi(&widget_);
+  context.addWidget(&widget_);
 
   updateImageTopicList();
   ui_.image_topics_combo_box->setCurrentIndex(ui_.image_topics_combo_box->findText(""));
@@ -102,13 +101,12 @@ void ImageOverlay::updateImageTopicList()
 
 void ImageOverlay::addOverlay(QString plugin_class)
 {
-  std::cout << "addOverlay called with plugin_class: " << plugin_class.toStdString() << std::endl;
-
   int row = ui_.plugin_topic_table->rowCount();
   ui_.plugin_topic_table->insertRow(row);
   QTableWidgetItem * plugin_class_name_item = new QTableWidgetItem(plugin_class);
   plugin_class_name_item->setFlags(plugin_class_name_item->flags() ^ Qt::ItemIsEditable);
-  ui_.plugin_topic_table->setItem(row, COLUMN_PLUGIN, plugin_class_name_item);
+  ui_.plugin_topic_table->setItem(
+    row, COLUMN_PLUGIN, plugin_class_name_item);  // ownership transferred
 
   // Sample code for instantiating the plugin
   std::shared_ptr<ImageOverlayPlugin> plugin_instance =
@@ -120,7 +118,7 @@ void ImageOverlay::addOverlay(QString plugin_class)
   QTableWidgetItem * type_widget =
     new QTableWidgetItem(QString::fromStdString(plugin_instance->getTopicType()));
   type_widget->setFlags(type_widget->flags() ^ Qt::ItemIsEditable);
-  ui_.plugin_topic_table->setItem(row, COLUMN_TYPE, type_widget);
+  ui_.plugin_topic_table->setItem(row, COLUMN_TYPE, type_widget);  // ownership transferred
 
   // Sample code to automatically detect topic name, from plugin type
   std::map<std::string, std::vector<std::string>> topic_info =
@@ -128,7 +126,7 @@ void ImageOverlay::addOverlay(QString plugin_class)
   for (auto const & [topic_name, topic_types] : topic_info) {
     if (topic_types.at(0) == plugin_instance->getTopicType()) {
       QTableWidgetItem * topic_name_item = new QTableWidgetItem(QString::fromStdString(topic_name));
-      ui_.plugin_topic_table->setItem(row, COLUMN_TOPIC, topic_name_item);
+      ui_.plugin_topic_table->setItem(row, COLUMN_TOPIC, topic_name_item);  // ownership transferred
       break;
     }
   }
@@ -142,7 +140,7 @@ void ImageOverlay::onTopicChanged(int index)
   ui_.image_frame->setImage(QImage());
 
   // Reset blueprint layer since image size may have changed
-  layer_blueprint_ = nullptr;
+  layer_blueprint_ = QImage{};
 
   QStringList parts = ui_.image_topics_combo_box->itemData(index).toString().split(" ");
   QString topic = parts.first();
@@ -158,7 +156,7 @@ void ImageOverlay::onTopicChanged(int index)
         "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
         topic.toStdString().c_str(), subscriber_.getTransport().c_str());
     } catch (image_transport::TransportLoadException & e) {
-      QMessageBox::warning(widget_, tr("Loading image transport plugin failed"), e.what());
+      QMessageBox::warning(&widget_, tr("Loading image transport plugin failed"), e.what());
     }
   }
 }
@@ -253,22 +251,23 @@ void ImageOverlay::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
     conversion_mat_.step[0], QImage::Format_RGB888);
   ui_.image_frame->setImage(image);
 
-  if (!layer_blueprint_) {
-    layer_blueprint_ = std::make_shared<QImage>(
-      image.width(), image.height(), QImage::Format_ARGB32_Premultiplied);
-    layer_blueprint_->fill(qRgba(0, 0, 0, 0));
+  if (layer_blueprint_.isNull()) {
+    layer_blueprint_ = QImage{
+      image.width(), image.height(), QImage::Format_ARGB32_Premultiplied};
+    layer_blueprint_.fill(qRgba(0, 0, 0, 0));
   }
 }
 
 void ImageOverlay::fillOverlayMenu()
 {
-  QMenu * menu = new QMenu();
+  menu = new QMenu();
   QSignalMapper * signalMapper = new QSignalMapper(this);
+  signalMappers.push_back(signalMapper);
 
   for (std::string str_plugin_class : image_overlay_plugin_classes) {
     QString qstr_plugin_class = QString::fromStdString(str_plugin_class);
     QAction * action = new QAction(qstr_plugin_class, this);
-    menu->addAction(action);
+    menu->addAction(action);  // ownership transferred
     connect(action, SIGNAL(triggered()), signalMapper, SLOT(map()));
     signalMapper->setMapping(action, qstr_plugin_class);
   }
@@ -301,14 +300,23 @@ void ImageOverlay::updatePluginInstances(QTableWidgetItem * table_widget_item)
       rclcpp::QoS(10),
       [this, plugin_instance, topic_name]
         (const std::shared_ptr<rclcpp::SerializedMessage> msg) -> void {
-        if (layer_blueprint_) {
-          std::shared_ptr<QImage> layer = std::make_shared<QImage>(*layer_blueprint_);
+        if (!layer_blueprint_.isNull()) {
+          QImage layer = layer_blueprint_.copy();
           plugin_instance->overlay(layer, msg);
-          ui_.image_frame->setLayer(topic_name, std::move(layer));
+          ui_.image_frame->setLayer(topic_name, layer);
         }
       }
     )
   );
+}
+
+ImageOverlay::~ImageOverlay()
+{
+  delete menu;
+
+  for (auto mapper : signalMappers) {
+    delete mapper;
+  }
 }
 
 

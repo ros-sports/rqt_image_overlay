@@ -31,9 +31,9 @@ void RatioLayoutedFrame::setImage(const QImage & image)
   emit delayed_update();
 }
 
-void RatioLayoutedFrame::setLayer(std::string name, std::shared_ptr<QImage> image)
+void RatioLayoutedFrame::setLayer(std::string name, const QImage & layer)
 {
-  layers_[name] = std::move(image);
+  layers_[name] = layer.copy();
   emit delayed_update();
 }
 
@@ -60,7 +60,7 @@ void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
 
   // Draw layers
   for (auto const & [name, image] : layers_) {
-    QImage scaledImage = image->scaled(width(), height(), Qt::KeepAspectRatio);
+    QImage scaledImage = image.scaled(width(), height(), Qt::KeepAspectRatio);
     QPoint leftTop = QPoint(
       (width() - scaledImage.width()) / 2,
       (height() - scaledImage.height()) / 2);

@@ -17,7 +17,6 @@
 
 #include <QFrame>
 #include <QImage>
-#include <memory>
 #include <string>
 #include <map>
 
@@ -29,7 +28,7 @@ class RatioLayoutedFrame
 public:
   explicit RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags = 0);
   void setImage(const QImage & image);
-  void setLayer(std::string name, std::shared_ptr<QImage> image);
+  void setLayer(std::string name, const QImage & layer);
 
 signals:
   void delayed_update();
@@ -39,7 +38,7 @@ protected:
 
 private:
   QImage qimage_;
-  std::map<std::string, std::shared_ptr<QImage>> layers_;
+  std::map<std::string, QImage> layers_;
 };
 
 #endif  // IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_

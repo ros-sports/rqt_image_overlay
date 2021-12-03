@@ -33,7 +33,7 @@ public:
   }
 
   void overlay(
-    std::shared_ptr<QImage> layer,
+    QImage & layer,
     const std::shared_ptr<rclcpp::SerializedMessage> msg) override
   {
     overlay(layer, deserialize(msg));
@@ -42,25 +42,30 @@ public:
   virtual ~ImageOverlayPluginT() {}
 
 protected:
-  ImageOverlayPluginT() {}
+  ImageOverlayPluginT()
+  : library(rclcpp::get_typesupport_library(rosidl_generator_traits::name<T>(),
+      "rosidl_typesupport_cpp")),
+    string_typesupport(rclcpp::get_typesupport_handle(rosidl_generator_traits::name<T>(),
+      "rosidl_typesupport_cpp", *library)),
+    base(string_typesupport)
+  {
+  }
 
   virtual void overlay(
-    std::shared_ptr<QImage> layer,
+    QImage & layer,
     const T msg) = 0;
 
 private:
   T deserialize(std::shared_ptr<rclcpp::SerializedMessage> msg)
   {
-    auto library = rclcpp::get_typesupport_library(
-      rosidl_generator_traits::name<T>(), "rosidl_typesupport_cpp");
-    auto string_typesupport = rclcpp::get_typesupport_handle(
-      rosidl_generator_traits::name<T>(), "rosidl_typesupport_cpp", *library);
-    rclcpp::SerializationBase base(string_typesupport);
-
     T des;
     base.deserialize_message(msg.get(), &des);
     return des;
   }
+
+  const std::shared_ptr<rcpputils::SharedLibrary> library;
+  const rosidl_message_type_support_t * string_typesupport;
+  const rclcpp::SerializationBase base;
 };
 
 #endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_T_HPP_

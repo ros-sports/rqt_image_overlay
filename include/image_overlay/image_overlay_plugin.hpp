@@ -25,7 +25,7 @@ class ImageOverlayPlugin
 public:
   virtual std::string getTopicType() = 0;
   virtual void overlay(
-    std::shared_ptr<QImage> layer,
+    QImage & layer,
     const std::shared_ptr<rclcpp::SerializedMessage> msg) = 0;
   virtual ~ImageOverlayPlugin() {}
 

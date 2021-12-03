@@ -27,6 +27,8 @@
 #include "pluginlib/class_loader.hpp"
 #include "rclcpp/create_generic_subscription.hpp"
 
+class QSignalMapper;
+
 
 class ImageOverlay : public rqt_gui_cpp::Plugin
 {
@@ -34,6 +36,7 @@ class ImageOverlay : public rqt_gui_cpp::Plugin
 
 public:
   ImageOverlay();
+  ~ImageOverlay();
   virtual void initPlugin(qt_gui_cpp::PluginContext & context);
 
 protected:
@@ -57,11 +60,11 @@ protected slots:
 private:
   void fillOverlayMenu();
 
-  QWidget * widget_;
+  QWidget widget_;
   Ui::ImageOverlay ui_;
 
   // Empty layer blueprint that gets initialized upon a new image topic selection
-  std::shared_ptr<QImage> layer_blueprint_;
+  QImage layer_blueprint_;
 
   pluginlib::ClassLoader<ImageOverlayPlugin> image_overlay_plugin_loader;
   std::vector<std::string> image_overlay_plugin_classes;
@@ -69,6 +72,9 @@ private:
   std::vector<std::shared_ptr<ImageOverlayPlugin>> plugin_instances;
 
   std::vector<rclcpp::GenericSubscription::SharedPtr> subscriptions;
+
+  QMenu * menu;
+  std::vector<QSignalMapper *> signalMappers;
 };
 
 #endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
