@@ -21,6 +21,7 @@
 #include "rclcpp/typesupport_helpers.hpp"
 #include "rclcpp/serialization.hpp"
 #include "rosidl_runtime_cpp/traits.hpp"
+#include "rcpputils/asserts.hpp"
 
 
 template<typename T>
@@ -36,7 +37,11 @@ public:
     QImage & layer,
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) override
   {
-    overlay(layer, deserialize(msg));
+    try {
+      overlay(layer, deserialize(msg));
+    } catch (const rcpputils::IllegalStateException & ex) {
+      // ignore exception
+    }
   }
 
   virtual ~ImageOverlayPluginT() {}

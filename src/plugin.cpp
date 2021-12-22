@@ -39,8 +39,11 @@ void Plugin::setTopic(std::string topic)
 
 void Plugin::overlay(QImage & image)
 {
-  if (lastMsg) {
-    instance->overlay(image, lastMsg);
+  // Create a new shared_ptr, since lastMsg may change if a new message arrives.
+  const std::shared_ptr<rclcpp::SerializedMessage> lastMsgCopy(std::atomic_load(&lastMsg));
+
+  if (lastMsgCopy) {
+    instance->overlay(image, lastMsgCopy);
   }
 }
 
@@ -71,7 +74,7 @@ bool Plugin::getEnabled() const
 
 void Plugin::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
-  lastMsg = msg;
+  std::atomic_store(&lastMsg, msg);
 }
 
 std::string Plugin::guessTopic()

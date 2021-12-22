@@ -26,7 +26,7 @@ ImageManager::ImageManager(const rclcpp::Node::SharedPtr & node, QObject * paren
 
 void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
-  lastImageMsg = msg;
+  std::atomic_store(&lastMsg, msg);
 }
 
 
@@ -35,7 +35,7 @@ void ImageManager::onTopicChanged(const QString & text)
   subscriber_.shutdown();
 
   // reset image on topic change
-  lastImageMsg = nullptr;
+  std::atomic_store(&lastMsg, sensor_msgs::msg::Image::ConstSharedPtr{});
 
   QStringList parts = text.split(" ");
   QString topic = parts.first();
@@ -94,10 +94,13 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
 std::unique_ptr<QImage> ImageManager::getImage() const
 {
   std::unique_ptr<QImage> image;
-  if (lastImageMsg) {
+
+  // Create a new shared_ptr, since lastMsg may change if a new message arrives.
+  const sensor_msgs::msg::Image::ConstSharedPtr lastMsgCopy(std::atomic_load(&lastMsg));
+  if (lastMsgCopy) {
     image = std::make_unique<QImage>(
       ros_image_to_qimage::Convert(
-        lastImageMsg));
+        lastMsgCopy));
   }
   return image;
 }

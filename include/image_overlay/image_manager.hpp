@@ -44,7 +44,7 @@ private:
 
   image_transport::Subscriber subscriber_;
   const rclcpp::Node::SharedPtr & node_;
-  sensor_msgs::msg::Image::ConstSharedPtr lastImageMsg;
+  sensor_msgs::msg::Image::ConstSharedPtr lastMsg;
 
   std::vector<std::string> topics;
 };
