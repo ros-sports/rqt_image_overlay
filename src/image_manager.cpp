@@ -1,0 +1,103 @@
+// Copyright 2021 Kenji Brameld
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <string>
+#include <memory>
+#include "image_overlay/image_manager.hpp"
+#include "image_transport/image_transport.hpp"
+#include "image_transport_helpers/list_image_topics.hpp"
+#include "ros_image_to_qimage/ros_image_to_qimage.hpp"
+
+ImageManager::ImageManager(const rclcpp::Node::SharedPtr & node, QObject * parent)
+: QAbstractListModel(parent), node_(node)
+{
+}
+
+void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
+{
+  lastImageMsg = msg;
+}
+
+
+void ImageManager::onTopicChanged(const QString & text)
+{
+  subscriber_.shutdown();
+
+  // reset image on topic change
+  lastImageMsg = nullptr;
+
+  QStringList parts = text.split(" ");
+  QString topic = parts.first();
+  QString transport = parts.length() == 2 ? parts.last() : "raw";
+
+  if (!topic.isEmpty()) {
+    image_transport::ImageTransport it(node_);
+    const image_transport::TransportHints hints(node_.get(), transport.toStdString());
+    try {
+      subscriber_ =
+        it.subscribe(topic.toStdString(), 1, &ImageManager::callbackImage, this, &hints);
+      qDebug(
+        "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
+        topic.toStdString().c_str(), subscriber_.getTransport().c_str());
+    } catch (image_transport::TransportLoadException & e) {
+      std::cerr << "Loading image transport plugin failed" << std::endl;
+    }
+  }
+}
+
+void ImageManager::updateImageTopicList()
+{
+  beginResetModel();
+  topics.clear();
+
+  // fill combo box
+  topics = image_transport_helpers::ListImageTopics(node_);
+
+  for (unsigned i = 0; i < topics.size(); ++i) {
+    std::string & topic = topics.at(i);
+    std::replace(topic.begin(), topic.end(), ' ', '/');
+  }
+  endResetModel();
+}
+
+
+int ImageManager::rowCount(const QModelIndex &) const
+{
+  return topics.size() + 1;
+}
+
+QVariant ImageManager::data(const QModelIndex & index, int role) const
+{
+  if (role == Qt::DisplayRole) {
+    if (index.row() == 0) {
+      return QVariant();
+    } else {
+      std::string topic = topics.at(index.row() - 1);
+      return QString::fromStdString(topic);
+    }
+  }
+
+  return QVariant();
+}
+
+std::unique_ptr<QImage> ImageManager::getImage() const
+{
+  std::unique_ptr<QImage> image;
+  if (lastImageMsg) {
+    image = std::make_unique<QImage>(
+      ros_image_to_qimage::Convert(
+        lastImageMsg));
+  }
+  return image;
+}

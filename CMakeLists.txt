@@ -15,13 +15,22 @@ find_package(pluginlib REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(Qt5Widgets REQUIRED)
-find_package(cv_bridge REQUIRED)
+find_package(image_transport_helpers REQUIRED)
+find_package(ros_image_to_qimage REQUIRED)
 
 # Build image_overlay
-set(SOURCES src/image_overlay.cpp src/ratio_layouted_frame.cpp)
+set(SOURCES
+  src/image_overlay.cpp
+  src/ratio_layouted_frame.cpp
+  src/compositor.cpp
+  src/plugin_manager.cpp
+  src/plugin.cpp
+  src/image_manager.cpp)
 qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
   include/image_overlay/image_overlay.hpp
-  include/image_overlay/ratio_layouted_frame.hpp)
+  include/image_overlay/ratio_layouted_frame.hpp
+  include/image_overlay/compositor.hpp
+  include/image_overlay/image_manager.hpp)
 qt5_wrap_ui(UIS src/image_overlay.ui)
 add_library(image_overlay SHARED
   ${SOURCES}
@@ -34,7 +43,8 @@ ament_target_dependencies(image_overlay
   rqt_gui_cpp
   image_transport
   Qt5Widgets
-  cv_bridge)
+  image_transport_helpers
+  ros_image_to_qimage)
 
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 

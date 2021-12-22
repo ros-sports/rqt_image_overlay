@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <QImage>
 #include <QPainter>
-#include <string>
 #include <memory>
 #include <utility>
+#include <algorithm>
 #include "image_overlay/ratio_layouted_frame.hpp"
 
 RatioLayoutedFrame::RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags)
@@ -25,15 +24,9 @@ RatioLayoutedFrame::RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags)
   connect(this, SIGNAL(delayed_update()), this, SLOT(update()), Qt::QueuedConnection);
 }
 
-void RatioLayoutedFrame::setImage(const QImage & image)
+void RatioLayoutedFrame::setImage(std::unique_ptr<QImage> image)
 {
-  qimage_ = image.copy();
-  emit delayed_update();
-}
-
-void RatioLayoutedFrame::setLayer(std::string name, const QImage & layer)
-{
-  layers_[name] = layer.copy();
+  qimage_ = std::move(image);
   emit delayed_update();
 }
 
@@ -41,14 +34,18 @@ void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
 {
   (void)event;
   QPainter painter(this);
-
   // Draw camera image
-  if (!qimage_.isNull()) {
-    QImage scaledImage = qimage_.scaled(width(), height(), Qt::KeepAspectRatio);
+  if (qimage_ && !qimage_->isNull()) {
+    float widthRatio = static_cast<float>(width()) / qimage_->width();
+    float heightRatio = static_cast<float>(height()) / qimage_->height();
+
+    float scale = std::min(widthRatio, heightRatio);
+    painter.scale(scale, scale);
+
     QPoint leftTop = QPoint(
-      (width() - scaledImage.width()) / 2,
-      (height() - scaledImage.height()) / 2);
-    painter.drawImage(leftTop, scaledImage);
+      (width() / scale - qimage_->width()) / 2,
+      (height() / scale - qimage_->height()) / 2);
+    painter.drawImage(leftTop, *qimage_);
   } else {
     // default image with gradient
     QLinearGradient gradient(0, 0, frameRect().width(), frameRect().height());
@@ -56,14 +53,5 @@ void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
     gradient.setColorAt(1, Qt::black);
     painter.setBrush(gradient);
     painter.drawRect(0, 0, frameRect().width() + 1, frameRect().height() + 1);
-  }
-
-  // Draw layers
-  for (auto const & [name, image] : layers_) {
-    QImage scaledImage = image.scaled(width(), height(), Qt::KeepAspectRatio);
-    QPoint leftTop = QPoint(
-      (width() - scaledImage.width()) / 2,
-      (height() - scaledImage.height()) / 2);
-    painter.drawImage(leftTop, scaledImage);
   }
 }

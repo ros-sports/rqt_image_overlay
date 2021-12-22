@@ -65,42 +65,22 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <widget class="QTableWidget" name="plugin_topic_table">
+     <widget class="QTableView" name="plugin_topic_table">
       <property name="dragEnabled">
        <bool>false</bool>
       </property>
       <property name="dragDropMode">
        <enum>QAbstractItemView::NoDragDrop</enum>
       </property>
-      <attribute name="horizontalHeaderStretchLastSection">
+      <attribute name="verticalHeaderCascadingSectionResizes">
        <bool>true</bool>
       </attribute>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="verticalHeaderDefaultSectionSize">
+      <attribute name="verticalHeaderMinimumSectionSize">
        <number>24</number>
       </attribute>
-      <column>
-       <property name="text">
-        <string>Topic</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Type</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Plugin</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Rate</string>
-       </property>
-      </column>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>21</number>
+      </attribute>
      </widget>
      <widget class="RatioLayoutedFrame" name="image_frame">
       <property name="sizePolicy">

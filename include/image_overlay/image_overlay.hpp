@@ -16,16 +16,14 @@
 #define IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
 
 #include <QWidget>
-#include <string>
+#include <QThread>
 #include <vector>
-#include <memory>
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
-#include "image_transport/subscriber.hpp"
-#include "opencv2/core/core.hpp"
 #include "image_overlay/image_overlay_plugin.hpp"
-#include "pluginlib/class_loader.hpp"
-#include "rclcpp/create_generic_subscription.hpp"
+#include "image_overlay/compositor.hpp"
+#include "image_overlay/plugin_manager.hpp"
+#include "image_overlay/image_manager.hpp"
 
 class QSignalMapper;
 
@@ -40,22 +38,10 @@ public:
   virtual void initPlugin(qt_gui_cpp::PluginContext & context);
 
 protected:
-  virtual QSet<QString> getTopics(
-    const QSet<QString> & message_types,
-    const QSet<QString> & message_sub_types,
-    const QList<QString> & transports);
-
   virtual void selectTopic(const QString & topic);
-  virtual void callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
-
-  image_transport::Subscriber subscriber_;
-  cv::Mat conversion_mat_;
 
 protected slots:
-  virtual void updateImageTopicList();
-  virtual void addOverlay(QString plugin_class);
-  virtual void onTopicChanged(int index);
-  virtual void updatePluginInstances(QTableWidgetItem * table_widget_item);
+  virtual void addPlugin(QString plugin_class);
 
 private:
   void fillOverlayMenu();
@@ -63,18 +49,15 @@ private:
   QWidget widget_;
   Ui::ImageOverlay ui_;
 
-  // Empty layer blueprint that gets initialized upon a new image topic selection
-  QImage layer_blueprint_;
-
-  pluginlib::ClassLoader<ImageOverlayPlugin> image_overlay_plugin_loader;
-  std::vector<std::string> image_overlay_plugin_classes;
-
-  std::vector<std::shared_ptr<ImageOverlayPlugin>> plugin_instances;
-
-  std::vector<rclcpp::GenericSubscription::SharedPtr> subscriptions;
-
   QMenu * menu;
   std::vector<QSignalMapper *> signalMappers;
+
+  QThread thread;
+
+  ImageManager imageManager;
+  PluginManager pluginManager;
+
+  Compositor compositor;
 };
 
 #endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_

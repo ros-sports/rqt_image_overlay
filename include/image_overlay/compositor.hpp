@@ -12,32 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
-#define IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
+#ifndef IMAGE_OVERLAY__COMPOSITOR_HPP_
+#define IMAGE_OVERLAY__COMPOSITOR_HPP_
 
-#include <QFrame>
 #include <QImage>
+#include <QObject>
 #include <memory>
-#include <string>
 
-class RatioLayoutedFrame
-  : public QFrame
+class ImageManager;
+class PluginManager;
+
+class Compositor : public QObject
 {
   Q_OBJECT
 
 public:
-  explicit RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags = 0);
-  void setImage(std::unique_ptr<QImage> image);
+  Compositor(
+    const ImageManager & imageManager, const PluginManager & pluginManager,
+    float frequency, QObject * parent = 0);
 
-signals:
-  void delayed_update();
-
-protected:
-  void paintEvent(QPaintEvent * event);
+  void setCallableSetImage(std::function<void(std::unique_ptr<QImage>)> setImage);
 
 private:
-  std::unique_ptr<std::string> strPtr_;
-  std::unique_ptr<QImage> qimage_;
+  std::unique_ptr<QImage> compose();
+  void timerEvent(QTimerEvent *) override;
+
+  const ImageManager & imageManager;
+  const PluginManager & pluginManager;
+
+  std::function<void(std::unique_ptr<QImage>)> setImage;
 };
 
-#endif  // IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
+#endif  // IMAGE_OVERLAY__COMPOSITOR_HPP_

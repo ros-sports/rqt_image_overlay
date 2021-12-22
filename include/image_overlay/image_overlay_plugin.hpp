@@ -15,10 +15,12 @@
 #ifndef IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
 #define IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
 
-#include <QImage>
 #include <string>
 #include <memory>
-#include "rclcpp/serialized_message.hpp"
+
+// forward declaration
+class QImage;
+namespace rclcpp {class SerializedMessage;}
 
 class ImageOverlayPlugin
 {
@@ -26,7 +28,7 @@ public:
   virtual std::string getTopicType() = 0;
   virtual void overlay(
     QImage & layer,
-    const std::shared_ptr<rclcpp::SerializedMessage> msg) = 0;
+    const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;
   virtual ~ImageOverlayPlugin() {}
 
 protected:

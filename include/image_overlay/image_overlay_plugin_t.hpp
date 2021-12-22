@@ -34,7 +34,7 @@ public:
 
   void overlay(
     QImage & layer,
-    const std::shared_ptr<rclcpp::SerializedMessage> msg) override
+    const std::shared_ptr<rclcpp::SerializedMessage> & msg) override
   {
     overlay(layer, deserialize(msg));
   }
@@ -53,10 +53,10 @@ protected:
 
   virtual void overlay(
     QImage & layer,
-    const T msg) = 0;
+    const T & msg) = 0;
 
 private:
-  T deserialize(std::shared_ptr<rclcpp::SerializedMessage> msg)
+  T deserialize(const std::shared_ptr<rclcpp::SerializedMessage> & msg)
   {
     T des;
     base.deserialize_message(msg.get(), &des);
