@@ -15,5 +15,5 @@ From the menubar, add the plugin by navigating through Plugins>Debugging>Image O
 Alternatively, run rqt with the following argument:
 
 ```
-rqt --force-discover -s ImageOverlay
+rqt --force-discover -s rqt_image_overlay/ImageOverlay
 ```
