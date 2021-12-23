@@ -27,8 +27,9 @@ ImageOverlay::ImageOverlay()
 
 void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 {
-  ui_.setupUi(&widget_);
-  context.addWidget(&widget_);
+  QWidget * widget = new QWidget();
+  ui_.setupUi(widget);
+  context.addWidget(widget);
 
   ui_.plugin_topic_table->setModel(&pluginManager);
   ui_.image_topics_combo_box->setModel(&imageManager);

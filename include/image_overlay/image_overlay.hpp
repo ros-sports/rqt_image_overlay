@@ -49,7 +49,6 @@ public slots:
 private:
   void fillOverlayMenu();
 
-  QWidget widget_;
   Ui::ImageOverlay ui_;
 
   QMenu * menu;
