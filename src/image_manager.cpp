@@ -104,3 +104,11 @@ std::unique_ptr<QImage> ImageManager::getImage() const
   }
   return image;
 }
+
+void ImageManager::setTopicExplicitly(QString topic)
+{
+  beginResetModel();
+  topics.clear();
+  topics.push_back(topic.toStdString());
+  endResetModel();
+}

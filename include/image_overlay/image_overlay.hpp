@@ -35,13 +35,16 @@ class ImageOverlay : public rqt_gui_cpp::Plugin
 public:
   ImageOverlay();
   ~ImageOverlay();
-  virtual void initPlugin(qt_gui_cpp::PluginContext & context);
+  void initPlugin(qt_gui_cpp::PluginContext & context) override;
+  void saveSettings(
+    qt_gui_cpp::Settings &,
+    qt_gui_cpp::Settings & instance_settings) const override;
+  void restoreSettings(
+    const qt_gui_cpp::Settings &,
+    const qt_gui_cpp::Settings & instance_settings) override;
 
-protected:
-  virtual void selectTopic(const QString & topic);
-
-protected slots:
-  virtual void addPlugin(QString plugin_class);
+public slots:
+  void addPlugin(QString plugin_class);
 
 private:
   void fillOverlayMenu();

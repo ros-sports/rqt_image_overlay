@@ -58,17 +58,28 @@ void ImageOverlay::addPlugin(QString plugin_class)
   pluginManager.addPlugin(plugin_class.toStdString());
 }
 
-void ImageOverlay::selectTopic(const QString & topic)
+
+void ImageOverlay::saveSettings(
+  qt_gui_cpp::Settings &,
+  qt_gui_cpp::Settings & instance_settings) const
 {
-  int index = ui_.image_topics_combo_box->findText(topic);
-  if (index == -1) {
-    // add topic name to list if not yet in
-    QString label(topic);
-    label.replace(" ", "/");
-    ui_.image_topics_combo_box->addItem(label, QVariant(topic));
-    index = ui_.image_topics_combo_box->findText(topic);
+  instance_settings.setValue("image_topic", ui_.image_topics_combo_box->currentText());
+  pluginManager.saveSettings(instance_settings);
+}
+
+void ImageOverlay::restoreSettings(
+  const qt_gui_cpp::Settings &,
+  const qt_gui_cpp::Settings & instance_settings)
+{
+  if (instance_settings.contains("image_topic")) {
+    QString topic = instance_settings.value("image_topic").toString();
+    if (topic != "") {
+      imageManager.setTopicExplicitly(topic);
+      ui_.image_topics_combo_box->setCurrentIndex(1);
+    }
   }
-  ui_.image_topics_combo_box->setCurrentIndex(index);
+
+  pluginManager.restoreSettings(instance_settings);
 }
 
 void ImageOverlay::fillOverlayMenu()
@@ -93,10 +104,14 @@ void ImageOverlay::fillOverlayMenu()
 
 ImageOverlay::~ImageOverlay()
 {
-  delete menu;
+  if (menu) {
+    delete menu;
+  }
 
   for (auto mapper : signalMappers) {
-    delete mapper;
+    if (mapper) {
+      delete mapper;
+    }
   }
 }
 

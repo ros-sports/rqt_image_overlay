@@ -30,6 +30,7 @@ class ImageManager : public QAbstractListModel
 public:
   explicit ImageManager(const rclcpp::Node::SharedPtr & node, QObject * parent = nullptr);
   std::unique_ptr<QImage> getImage() const;
+  void setTopicExplicitly(QString topic);
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;

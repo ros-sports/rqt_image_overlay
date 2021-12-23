@@ -22,6 +22,9 @@
 #include "image_overlay/plugin.hpp"
 #include "pluginlib/class_loader.hpp"
 
+// forward declaration
+namespace qt_gui_cpp {class Settings;}
+
 
 // Refer to https://doc.qt.io/archives/4.6/model-view-model-subclassing.html
 // for implementing methods of QAbstractTableModel
@@ -31,8 +34,10 @@ class PluginManager : public QAbstractTableModel
 public:
   explicit PluginManager(const rclcpp::Node::SharedPtr & node, QObject * parent = nullptr);
   const std::vector<std::string> & getDeclaredClasses();
-  void addPlugin(std::string plugin_class);
+  bool addPlugin(std::string plugin_class);
   void overlay(QImage & image) const;
+  void saveSettings(qt_gui_cpp::Settings & instance_settings) const;
+  void restoreSettings(const qt_gui_cpp::Settings & settings);
 
 protected:
   // Overriding QAbstractTableModel methods

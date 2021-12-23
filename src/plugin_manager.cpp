@@ -17,6 +17,7 @@
 #include <vector>
 #include "image_overlay/plugin_manager.hpp"
 #include "image_overlay/plugin.hpp"
+#include "qt_gui_cpp/settings.h"
 
 PluginManager::PluginManager(const rclcpp::Node::SharedPtr & node, QObject * parent)
 : QAbstractTableModel(parent),
@@ -27,14 +28,19 @@ PluginManager::PluginManager(const rclcpp::Node::SharedPtr & node, QObject * par
 {
 }
 
-void PluginManager::addPlugin(std::string plugin_class)
+bool PluginManager::addPlugin(std::string plugin_class)
 {
-  insertRows(plugins.size(), 1);
+  std::shared_ptr<ImageOverlayPlugin> instance;
+  try {
+    instance = plugin_loader.createSharedInstance(plugin_class);
+  } catch (const std::exception & e) {
+    std::cerr << e.what() << '\n';
+    return false;
+  }
 
-  plugins.push_back(
-    std::make_unique<Plugin>(
-      plugin_class,
-      plugin_loader.createSharedInstance(plugin_class), node_));
+  insertRows(plugins.size(), 1);
+  plugins.push_back(std::make_unique<Plugin>(plugin_class, instance, node_));
+  return true;
 }
 
 const std::vector<std::string> & PluginManager::getDeclaredClasses()
@@ -140,5 +146,46 @@ void PluginManager::overlay(QImage & image) const
 {
   for (auto & plugin : plugins) {
     plugin->overlay(image);
+  }
+}
+
+void PluginManager::saveSettings(qt_gui_cpp::Settings & settings) const
+{
+  QList<QVariant> list;
+
+  for (auto & plugin : plugins) {
+    QMap<QString, QVariant> map;
+    map.insert("Topic", QString::fromStdString(plugin->getTopic()));
+    map.insert("Plugin", QString::fromStdString(plugin->getPluginClass()));
+    map.insert("Show", plugin->getEnabled());
+    list.append(QVariant(map));
+  }
+
+  settings.setValue("plugin table", QVariant(list));
+}
+
+void PluginManager::restoreSettings(const qt_gui_cpp::Settings & settings)
+{
+  if (settings.contains("plugin table")) {
+    QList<QVariant> list = settings.value("plugin table").toList();
+    for (QList<QVariant>::iterator i = list.begin(); i != list.end(); ++i) {
+      QMap<QString, QVariant> map = i->toMap();
+      if (map.contains("Plugin")) {
+        std::string plugin = map.value("Plugin").toString().toStdString();
+        if (!addPlugin(plugin)) {
+          continue;  // Couldn't add plugin of the type successfully, skip this one
+        }
+      }
+
+      if (map.contains("Topic")) {
+        std::string topic = map.value("Topic").toString().toStdString();
+        plugins.back()->setTopic(topic);
+      }
+
+      if (map.contains("Show")) {
+        bool enabled = map.value("Show").toBool();
+        plugins.back()->setEnabled(enabled);
+      }
+    }
   }
 }
