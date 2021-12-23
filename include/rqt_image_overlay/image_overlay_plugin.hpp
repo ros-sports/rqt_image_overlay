@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
-#define IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
+#ifndef RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
+#define RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
 
 #include <string>
 #include <memory>
@@ -21,6 +21,9 @@
 // forward declaration
 class QImage;
 namespace rclcpp {class SerializedMessage;}
+
+namespace rqt_image_overlay
+{
 
 class ImageOverlayPlugin
 {
@@ -35,4 +38,6 @@ protected:
   ImageOverlayPlugin() {}
 };
 
-#endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
+}  // namespace rqt_image_overlay
+
+#endif  // RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_

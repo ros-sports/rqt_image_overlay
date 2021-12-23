@@ -1,5 +1,5 @@
-<library path="image_overlay">
-  <class type="ImageOverlay" base_class_type="rqt_gui_cpp::Plugin">
+<library path="rqt_image_overlay">
+  <class type="rqt_image_overlay::ImageOverlay" base_class_type="rqt_gui_cpp::Plugin">
     <description>A GUI plugin to overlay images with information.</description>
     <qtgui>
       <group>

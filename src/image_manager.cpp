@@ -14,10 +14,13 @@
 
 #include <string>
 #include <memory>
-#include "image_overlay/image_manager.hpp"
+#include "rqt_image_overlay/image_manager.hpp"
 #include "image_transport/image_transport.hpp"
 #include "image_transport_helpers/list_image_topics.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
+
+namespace rqt_image_overlay
+{
 
 ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent)
 : QAbstractListModel(parent), node_(node)
@@ -112,3 +115,5 @@ void ImageManager::setTopicExplicitly(QString topic)
   topics.push_back(topic.toStdString());
   endResetModel();
 }
+
+}  // namespace rqt_image_overlay

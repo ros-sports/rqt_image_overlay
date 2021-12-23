@@ -16,10 +16,13 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include "image_overlay/overlay.hpp"
+#include "rqt_image_overlay/overlay.hpp"
 #include "rclcpp/create_generic_subscription.hpp"
 #include "rclcpp/node.hpp"
-#include "image_overlay/image_overlay_plugin.hpp"
+#include "rqt_image_overlay/image_overlay_plugin.hpp"
+
+namespace rqt_image_overlay
+{
 
 Overlay::Overlay(
   std::string pluginClass, pluginlib::ClassLoader<ImageOverlayPlugin> & pluginLoader,
@@ -82,3 +85,5 @@ void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
   std::atomic_store(&lastMsg, msg);
 }
+
+}  // namespace rqt_image_overlay

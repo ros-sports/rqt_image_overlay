@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_T_HPP_
-#define IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_T_HPP_
+#ifndef RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_T_HPP_
+#define RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_T_HPP_
 
 #include <string>
 #include <memory>
-#include "image_overlay/image_overlay_plugin.hpp"
+#include "rqt_image_overlay/image_overlay_plugin.hpp"
 #include "rclcpp/typesupport_helpers.hpp"
 #include "rclcpp/serialization.hpp"
 #include "rosidl_runtime_cpp/traits.hpp"
 #include "rcpputils/asserts.hpp"
 
+namespace rqt_image_overlay
+{
 
 template<typename T>
 class ImageOverlayPluginT : public ImageOverlayPlugin
@@ -73,4 +75,6 @@ private:
   const rclcpp::SerializationBase base;
 };
 
-#endif  // IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_T_HPP_
+}  // namespace rqt_image_overlay
+
+#endif  // RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_T_HPP_

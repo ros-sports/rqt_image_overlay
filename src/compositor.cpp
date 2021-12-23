@@ -14,9 +14,12 @@
 
 #include <memory>
 #include <utility>
-#include "image_overlay/compositor.hpp"
-#include "image_overlay/image_manager.hpp"
-#include "image_overlay/overlay_manager.hpp"
+#include "rqt_image_overlay/compositor.hpp"
+#include "rqt_image_overlay/image_manager.hpp"
+#include "rqt_image_overlay/overlay_manager.hpp"
+
+namespace rqt_image_overlay
+{
 
 Compositor::Compositor(
   const ImageManager & imageManager, const OverlayManager & overlayManager,
@@ -59,3 +62,5 @@ void Compositor::timerEvent(QTimerEvent * event)
 
   setImage(std::move(image));
 }
+
+}  // namespace rqt_image_overlay

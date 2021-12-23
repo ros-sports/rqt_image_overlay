@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(image_overlay)
+project(rqt_image_overlay)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -18,7 +18,7 @@ find_package(Qt5Widgets REQUIRED)
 find_package(image_transport_helpers REQUIRED)
 find_package(ros_image_to_qimage REQUIRED)
 
-# Build image_overlay
+# Build rqt_image_overlay
 set(SOURCES
   src/image_overlay.cpp
   src/ratio_layouted_frame.cpp
@@ -27,18 +27,18 @@ set(SOURCES
   src/overlay.cpp
   src/image_manager.cpp)
 qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
-  include/image_overlay/image_overlay.hpp
-  include/image_overlay/ratio_layouted_frame.hpp
-  include/image_overlay/compositor.hpp
-  include/image_overlay/image_manager.hpp)
+  include/rqt_image_overlay/image_overlay.hpp
+  include/rqt_image_overlay/ratio_layouted_frame.hpp
+  include/rqt_image_overlay/compositor.hpp
+  include/rqt_image_overlay/image_manager.hpp)
 qt5_wrap_ui(UIS src/image_overlay.ui)
-add_library(image_overlay SHARED
+add_library(rqt_image_overlay SHARED
   ${SOURCES}
   ${UIS})
-target_include_directories(image_overlay PUBLIC
+target_include_directories(rqt_image_overlay PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(image_overlay
+ament_target_dependencies(rqt_image_overlay
   rclcpp
   rqt_gui_cpp
   image_transport
@@ -49,7 +49,7 @@ ament_target_dependencies(image_overlay
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 
 # This flag must be set for the foxy branch to compile
-target_compile_definitions(image_overlay PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+target_compile_definitions(rqt_image_overlay PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 # Install - headers
 install(
@@ -58,7 +58,7 @@ install(
 
 # Install - libraries
 install(
-  TARGETS image_overlay
+  TARGETS rqt_image_overlay
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -66,7 +66,7 @@ install(
 )
 
 # Install - scripts
-install(PROGRAMS scripts/image_overlay
+install(PROGRAMS scripts/rqt_image_overlay
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -80,7 +80,7 @@ endif()
 ament_export_include_directories(include)
 
 ament_export_libraries(
-  image_overlay
+  rqt_image_overlay
 )
 ament_export_targets(
   export_${PROJECT_NAME}

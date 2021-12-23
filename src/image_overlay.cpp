@@ -16,8 +16,11 @@
 #include <QSignalMapper>
 #include <functional>
 #include <string>
-#include "image_overlay/image_overlay.hpp"
+#include "rqt_image_overlay/image_overlay.hpp"
 #include "pluginlib/class_list_macros.hpp"
+
+namespace rqt_image_overlay
+{
 
 ImageOverlay::ImageOverlay()
 : rqt_gui_cpp::Plugin(), thread(this), imageManager(node_), overlayManager(node_),
@@ -128,5 +131,7 @@ ImageOverlay::~ImageOverlay()
   }
 }
 
+}  // namespace rqt_image_overlay
 
-PLUGINLIB_EXPORT_CLASS(ImageOverlay, rqt_gui_cpp::Plugin)
+
+PLUGINLIB_EXPORT_CLASS(rqt_image_overlay::ImageOverlay, rqt_gui_cpp::Plugin)

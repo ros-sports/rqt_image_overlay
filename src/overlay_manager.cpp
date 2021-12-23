@@ -16,13 +16,16 @@
 #include <memory>
 #include <vector>
 #include <iostream>
-#include "image_overlay/overlay_manager.hpp"
-#include "image_overlay/overlay.hpp"
+#include "rqt_image_overlay/overlay_manager.hpp"
+#include "rqt_image_overlay/overlay.hpp"
 #include "qt_gui_cpp/settings.h"
+
+namespace rqt_image_overlay
+{
 
 OverlayManager::OverlayManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent)
 : QAbstractTableModel(parent),
-  plugin_loader("image_overlay", "ImageOverlayPlugin"),
+  plugin_loader("rqt_image_overlay", "rqt_image_overlay::ImageOverlayPlugin"),
   declared_plugin_classes(plugin_loader.getDeclaredClasses()),
   node_(node),
   columns{"Topic", "Type", "Plugin"}
@@ -202,3 +205,5 @@ void OverlayManager::restoreSettings(const qt_gui_cpp::Settings & settings)
     }
   }
 }
+
+}  // namespace rqt_image_overlay

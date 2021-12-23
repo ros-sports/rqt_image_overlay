@@ -16,7 +16,10 @@
 #include <memory>
 #include <utility>
 #include <algorithm>
-#include "image_overlay/ratio_layouted_frame.hpp"
+#include "rqt_image_overlay/ratio_layouted_frame.hpp"
+
+namespace rqt_image_overlay
+{
 
 RatioLayoutedFrame::RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags)
 : QFrame(parent, flags)
@@ -55,3 +58,5 @@ void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
     painter.drawRect(0, 0, frameRect().width() + 1, frameRect().height() + 1);
   }
 }
+
+}  // namespace rqt_image_overlay

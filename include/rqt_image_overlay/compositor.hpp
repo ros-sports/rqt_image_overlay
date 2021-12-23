@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__COMPOSITOR_HPP_
-#define IMAGE_OVERLAY__COMPOSITOR_HPP_
+#ifndef RQT_IMAGE_OVERLAY__COMPOSITOR_HPP_
+#define RQT_IMAGE_OVERLAY__COMPOSITOR_HPP_
 
 #include <QImage>
 #include <QObject>
 #include <memory>
 
+namespace rqt_image_overlay
+{
 class ImageManager;
 class OverlayManager;
 
@@ -43,4 +45,6 @@ private:
   std::function<void(std::unique_ptr<QImage>)> setImage;
 };
 
-#endif  // IMAGE_OVERLAY__COMPOSITOR_HPP_
+}  // namespace rqt_image_overlay
+
+#endif  // RQT_IMAGE_OVERLAY__COMPOSITOR_HPP_

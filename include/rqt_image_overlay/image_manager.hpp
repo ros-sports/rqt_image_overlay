@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__IMAGE_MANAGER_HPP_
-#define IMAGE_OVERLAY__IMAGE_MANAGER_HPP_
+#ifndef RQT_IMAGE_OVERLAY__IMAGE_MANAGER_HPP_
+#define RQT_IMAGE_OVERLAY__IMAGE_MANAGER_HPP_
 
 #include <QAbstractListModel>
 #include <QImage>
@@ -23,6 +23,9 @@
 #include "image_transport/subscriber.hpp"
 
 namespace rclcpp {class Node;}
+
+namespace rqt_image_overlay
+{
 
 class ImageManager : public QAbstractListModel
 {
@@ -51,4 +54,6 @@ private:
   std::vector<std::string> topics;
 };
 
-#endif  // IMAGE_OVERLAY__IMAGE_MANAGER_HPP_
+}  // namespace rqt_image_overlay
+
+#endif  // RQT_IMAGE_OVERLAY__IMAGE_MANAGER_HPP_

@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
-#define IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
+#ifndef RQT_IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
+#define RQT_IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
 
 #include <QFrame>
 #include <QImage>
 #include <memory>
 #include <string>
+
+namespace rqt_image_overlay
+{
 
 class RatioLayoutedFrame
   : public QFrame
@@ -40,4 +43,6 @@ private:
   std::unique_ptr<QImage> qimage_;
 };
 
-#endif  // IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
+}  // namespace rqt_image_overlay
+
+#endif  // RQT_IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_

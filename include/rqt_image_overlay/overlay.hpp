@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__OVERLAY_HPP_
-#define IMAGE_OVERLAY__OVERLAY_HPP_
+#ifndef RQT_IMAGE_OVERLAY__OVERLAY_HPP_
+#define RQT_IMAGE_OVERLAY__OVERLAY_HPP_
 
 #include <memory>
 #include <string>
@@ -26,8 +26,11 @@ class Node;
 class GenericSubscription;
 class SerializedMessage;
 }
-class ImageOverlayPlugin;
 class QImage;
+
+namespace rqt_image_overlay
+{
+class ImageOverlayPlugin;
 
 class Overlay
 {
@@ -57,4 +60,6 @@ private:
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
 };
 
-#endif  // IMAGE_OVERLAY__OVERLAY_HPP_
+}  // namespace rqt_image_overlay
+
+#endif  // RQT_IMAGE_OVERLAY__OVERLAY_HPP_

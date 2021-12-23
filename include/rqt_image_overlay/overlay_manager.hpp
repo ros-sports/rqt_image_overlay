@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
-#define IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
+#ifndef RQT_IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
+#define RQT_IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
 
 #include <QAbstractTableModel>
 #include <vector>
 #include <string>
 #include <memory>
-#include "image_overlay/overlay.hpp"
+#include "rqt_image_overlay/overlay.hpp"
 #include "pluginlib/class_loader.hpp"
-#include "image_overlay/image_overlay_plugin.hpp"
+#include "rqt_image_overlay/image_overlay_plugin.hpp"
 
 // forward declaration
 namespace qt_gui_cpp {class Settings;}
 namespace rclcpp {class Node;}
 class Overlay;
+
+namespace rqt_image_overlay
+{
 
 // Refer to https://doc.qt.io/archives/4.6/model-view-model-subclassing.html
 // for implementing methods of QAbstractTableModel
@@ -64,4 +67,6 @@ private:
   const std::vector<std::string> columns;
 };
 
-#endif  // IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
+}  // namespace rqt_image_overlay
+
+#endif  // RQT_IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
