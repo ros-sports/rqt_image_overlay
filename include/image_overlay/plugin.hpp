@@ -47,7 +47,6 @@ private:
   std::shared_ptr<rclcpp::SerializedMessage> lastMsg;
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
-  std::string guessTopic();
 };
 
 #endif  // IMAGE_OVERLAY__PLUGIN_HPP_

@@ -58,6 +58,19 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="remove_overlay_button">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="icon">
+        <iconset theme="remove"/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -72,6 +85,12 @@
       <property name="dragDropMode">
        <enum>QAbstractItemView::NoDragDrop</enum>
       </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
       <attribute name="verticalHeaderCascadingSectionResizes">
        <bool>true</bool>
       </attribute>
@@ -79,7 +98,7 @@
        <number>24</number>
       </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
-       <number>21</number>
+       <number>24</number>
       </attribute>
      </widget>
      <widget class="RatioLayoutedFrame" name="image_frame">

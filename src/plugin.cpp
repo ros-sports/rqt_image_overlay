@@ -23,17 +23,19 @@ Plugin::Plugin(
   const rclcpp::Node::SharedPtr & node)
 : pluginClass(pluginClass), instance(instance), msgType(instance->getTopicType()), node_(node)
 {
-  setTopic(guessTopic());
 }
 
 void Plugin::setTopic(std::string topic)
 {
-  this->topic = topic;
-
   if (topic != "") {
-    subscription = node_->create_generic_subscription(
-      topic, msgType, rclcpp::QoS(10),
-      std::bind(&Plugin::msgCallback, this, std::placeholders::_1));
+    try {
+      subscription = node_->create_generic_subscription(
+        topic, msgType, rclcpp::QoS(10),
+        std::bind(&Plugin::msgCallback, this, std::placeholders::_1));
+      this->topic = topic;
+    } catch (const std::exception & e) {
+      std::cerr << "Failed to create subscription: " << e.what() << '\n';
+    }
   }
 }
 
@@ -75,18 +77,4 @@ bool Plugin::getEnabled() const
 void Plugin::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
   std::atomic_store(&lastMsg, msg);
-}
-
-std::string Plugin::guessTopic()
-{
-  // try and automatically detect topic name from plugin type
-  std::map<std::string, std::vector<std::string>> topic_info =
-    node_->get_topic_names_and_types();
-  for (auto const & [topic_name, topic_types] : topic_info) {
-    if (topic_types.at(0) == instance->getTopicType()) {
-      return topic_name;
-    }
-  }
-
-  return "";
 }

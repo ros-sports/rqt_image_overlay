@@ -34,6 +34,8 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   ui_.plugin_topic_table->setModel(&pluginManager);
   ui_.image_topics_combo_box->setModel(&imageManager);
 
+  ui_.plugin_topic_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
   fillOverlayMenu();
 
   ui_.image_topics_combo_box->setCurrentIndex(ui_.image_topics_combo_box->findText(""));
@@ -44,6 +46,8 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   connect(
     ui_.refresh_image_topics_button, SIGNAL(pressed()), &imageManager,
     SLOT(updateImageTopicList()));
+
+  connect(ui_.remove_overlay_button, SIGNAL(pressed()), this, SLOT(removeOverlay()));
 
   compositor.moveToThread(&thread);
   thread.start();
@@ -57,6 +61,14 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 void ImageOverlay::addPlugin(QString plugin_class)
 {
   pluginManager.addPlugin(plugin_class.toStdString());
+}
+
+void ImageOverlay::removeOverlay()
+{
+  QItemSelectionModel * select = ui_.plugin_topic_table->selectionModel();
+  for (auto & index : select->selectedRows()) {
+    pluginManager.removePlugin(index.row());
+  }
 }
 
 

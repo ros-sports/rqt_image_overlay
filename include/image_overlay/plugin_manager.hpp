@@ -35,6 +35,7 @@ public:
   explicit PluginManager(const rclcpp::Node::SharedPtr & node, QObject * parent = nullptr);
   const std::vector<std::string> & getDeclaredClasses();
   bool addPlugin(std::string plugin_class);
+  void removePlugin(unsigned index);
   void overlay(QImage & image) const;
   void saveSettings(qt_gui_cpp::Settings & instance_settings) const;
   void restoreSettings(const qt_gui_cpp::Settings & settings);
@@ -50,6 +51,7 @@ protected:
     int section, Qt::Orientation orientation,
     int role = Qt::DisplayRole) const override;
   bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
+  bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
 
 private:
   pluginlib::ClassLoader<ImageOverlayPlugin> plugin_loader;

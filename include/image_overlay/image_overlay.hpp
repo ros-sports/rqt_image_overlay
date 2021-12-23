@@ -45,6 +45,7 @@ public:
 
 public slots:
   void addPlugin(QString plugin_class);
+  void removeOverlay();
 
 private:
   void fillOverlayMenu();

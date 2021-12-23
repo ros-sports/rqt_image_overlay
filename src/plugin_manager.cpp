@@ -24,7 +24,7 @@ PluginManager::PluginManager(const rclcpp::Node::SharedPtr & node, QObject * par
   plugin_loader("image_overlay", "ImageOverlayPlugin"),
   declared_classes(plugin_loader.getDeclaredClasses()),
   node_(node),
-  columns{"Show", "Topic", "Type", "Plugin"}
+  columns{"Topic", "Type", "Plugin"}
 {
 }
 
@@ -41,6 +41,16 @@ bool PluginManager::addPlugin(std::string plugin_class)
   insertRows(plugins.size(), 1);
   plugins.push_back(std::make_unique<Plugin>(plugin_class, instance, node_));
   return true;
+}
+
+void PluginManager::removePlugin(unsigned index)
+{
+  if (index < plugins.size()) {
+    plugins.erase(plugins.begin() + index);
+    removeRows(index, 1);
+  } else {
+    std::cerr << "Failed to remove plugin on row " << index << ", which doesn't exist" << std::endl;
+  }
 }
 
 const std::vector<std::string> & PluginManager::getDeclaredClasses()
@@ -73,7 +83,7 @@ QVariant PluginManager::data(const QModelIndex & index, int role) const
   }
 
   if (role == Qt::CheckStateRole) {
-    if (column == "Show") {
+    if (column == "Topic") {
       if (plugins.at(index.row())->getEnabled()) {
         return Qt::Checked;
       } else {
@@ -98,7 +108,7 @@ bool PluginManager::setData(
   }
 
   if (role == Qt::CheckStateRole) {
-    if (columns.at(index.column()) == "Show") {
+    if (columns.at(index.column()) == "Topic") {
       plugins.at(index.row())->setEnabled(value.toBool());
     }
     emit dataChanged(index, index);
@@ -111,9 +121,7 @@ Qt::ItemFlags PluginManager::flags(const QModelIndex & index) const
 {
   std::string column = columns.at(index.column());
   if (column == "Topic") {
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
-  } else if (column == "Show") {
-    return QAbstractItemModel::flags(index) | Qt::ItemIsUserCheckable;
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
   }
   return QAbstractItemModel::flags(index) | Qt::ItemIsEnabled;
 }
@@ -140,6 +148,13 @@ bool PluginManager::insertRows(int row, int, const QModelIndex & parent)
   return true;
 }
 
+bool PluginManager::removeRows(int row, int, const QModelIndex & parent)
+{
+  beginRemoveRows(parent, row, row);
+  endRemoveRows();
+  return true;
+}
+
 void PluginManager::overlay(QImage & image) const
 {
   for (auto & plugin : plugins) {
@@ -155,7 +170,7 @@ void PluginManager::saveSettings(qt_gui_cpp::Settings & settings) const
     QMap<QString, QVariant> map;
     map.insert("Topic", QString::fromStdString(plugin->getTopic()));
     map.insert("Plugin", QString::fromStdString(plugin->getPluginClass()));
-    map.insert("Show", plugin->getEnabled());
+    map.insert("Enabled", plugin->getEnabled());
     list.append(QVariant(map));
   }
 
@@ -180,8 +195,8 @@ void PluginManager::restoreSettings(const qt_gui_cpp::Settings & settings)
         plugins.back()->setTopic(topic);
       }
 
-      if (map.contains("Show")) {
-        bool enabled = map.value("Show").toBool();
+      if (map.contains("Enabled")) {
+        bool enabled = map.value("Enabled").toBool();
         plugins.back()->setEnabled(enabled);
       }
     }
