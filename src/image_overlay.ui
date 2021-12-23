@@ -67,7 +67,8 @@
         </sizepolicy>
        </property>
        <property name="icon">
-        <iconset theme="remove"/>
+        <iconset theme="remove">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
@@ -78,7 +79,7 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <widget class="QTableView" name="plugin_topic_table">
+     <widget class="QTableView" name="overlay_table">
       <property name="dragEnabled">
        <bool>false</bool>
       </property>

@@ -15,14 +15,12 @@
 #ifndef IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
 #define IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
 
-#include <QWidget>
 #include <QThread>
 #include <vector>
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
-#include "image_overlay/image_overlay_plugin.hpp"
 #include "image_overlay/compositor.hpp"
-#include "image_overlay/plugin_manager.hpp"
+#include "image_overlay/overlay_manager.hpp"
 #include "image_overlay/image_manager.hpp"
 
 class QSignalMapper;
@@ -44,7 +42,7 @@ public:
     const qt_gui_cpp::Settings & instance_settings) override;
 
 public slots:
-  void addPlugin(QString plugin_class);
+  void addOverlay(QString plugin_class);
   void removeOverlay();
 
 private:
@@ -58,7 +56,7 @@ private:
   QThread thread;
 
   ImageManager imageManager;
-  PluginManager pluginManager;
+  OverlayManager overlayManager;
 
   Compositor compositor;
 };

@@ -23,8 +23,8 @@ set(SOURCES
   src/image_overlay.cpp
   src/ratio_layouted_frame.cpp
   src/compositor.cpp
-  src/plugin_manager.cpp
-  src/plugin.cpp
+  src/overlay_manager.cpp
+  src/overlay.cpp
   src/image_manager.cpp)
 qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
   include/image_overlay/image_overlay.hpp

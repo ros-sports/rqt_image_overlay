@@ -20,7 +20,7 @@
 #include <memory>
 
 class ImageManager;
-class PluginManager;
+class OverlayManager;
 
 class Compositor : public QObject
 {
@@ -28,7 +28,7 @@ class Compositor : public QObject
 
 public:
   Compositor(
-    const ImageManager & imageManager, const PluginManager & pluginManager,
+    const ImageManager & imageManager, const OverlayManager & overlayManager,
     float frequency, QObject * parent = 0);
 
   void setCallableSetImage(std::function<void(std::unique_ptr<QImage>)> setImage);
@@ -38,7 +38,7 @@ private:
   void timerEvent(QTimerEvent *) override;
 
   const ImageManager & imageManager;
-  const PluginManager & pluginManager;
+  const OverlayManager & overlayManager;
 
   std::function<void(std::unique_ptr<QImage>)> setImage;
 };

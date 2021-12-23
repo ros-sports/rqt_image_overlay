@@ -12,21 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__PLUGIN_HPP_
-#define IMAGE_OVERLAY__PLUGIN_HPP_
+#ifndef IMAGE_OVERLAY__OVERLAY_HPP_
+#define IMAGE_OVERLAY__OVERLAY_HPP_
 
 #include <memory>
 #include <string>
-#include "image_overlay/image_overlay_plugin.hpp"
-#include "rclcpp/create_generic_subscription.hpp"
-#include "rclcpp/node.hpp"
 
-class Plugin
+// Forward Declaration
+namespace rclcpp
+{
+class Node;
+class GenericSubscription;
+class SerializedMessage;
+}
+class ImageOverlayPlugin;
+class QImage;
+
+class Overlay
 {
 public:
-  Plugin(
+  Overlay(
     std::string pluginClass, std::shared_ptr<ImageOverlayPlugin>,
-    const rclcpp::Node::SharedPtr & node);
+    const std::shared_ptr<rclcpp::Node> & node);
   void setTopic(std::string topic);
   void overlay(QImage & image);
   void setEnabled(bool enabled);
@@ -42,11 +49,11 @@ private:
   const std::string msgType;
   std::string topic;
   bool enabled = true;
-  rclcpp::GenericSubscription::SharedPtr subscription;
-  const rclcpp::Node::SharedPtr & node_;
+  std::shared_ptr<rclcpp::GenericSubscription> subscription;
+  const std::shared_ptr<rclcpp::Node> & node_;
   std::shared_ptr<rclcpp::SerializedMessage> lastMsg;
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
 };
 
-#endif  // IMAGE_OVERLAY__PLUGIN_HPP_
+#endif  // IMAGE_OVERLAY__OVERLAY_HPP_

@@ -12,30 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef IMAGE_OVERLAY__PLUGIN_MANAGER_HPP_
-#define IMAGE_OVERLAY__PLUGIN_MANAGER_HPP_
+#ifndef IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
+#define IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
 
 #include <QAbstractTableModel>
 #include <vector>
 #include <string>
 #include <memory>
-#include "image_overlay/plugin.hpp"
+#include "image_overlay/overlay.hpp"
 #include "pluginlib/class_loader.hpp"
+#include "image_overlay/image_overlay_plugin.hpp"
 
 // forward declaration
 namespace qt_gui_cpp {class Settings;}
-
+namespace rclcpp{class Node;}
+class Overlay;
 
 // Refer to https://doc.qt.io/archives/4.6/model-view-model-subclassing.html
 // for implementing methods of QAbstractTableModel
 
-class PluginManager : public QAbstractTableModel
+class OverlayManager : public QAbstractTableModel
 {
 public:
-  explicit PluginManager(const rclcpp::Node::SharedPtr & node, QObject * parent = nullptr);
-  const std::vector<std::string> & getDeclaredClasses();
-  bool addPlugin(std::string plugin_class);
-  void removePlugin(unsigned index);
+  explicit OverlayManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent = nullptr);
+  const std::vector<std::string> & getDeclaredPluginClasses();
+  bool addOverlay(std::string plugin_class);
+  void removeOverlay(unsigned index);
   void overlay(QImage & image) const;
   void saveSettings(qt_gui_cpp::Settings & instance_settings) const;
   void restoreSettings(const qt_gui_cpp::Settings & settings);
@@ -55,11 +57,11 @@ protected:
 
 private:
   pluginlib::ClassLoader<ImageOverlayPlugin> plugin_loader;
-  const std::vector<std::string> declared_classes;
-  const rclcpp::Node::SharedPtr & node_;
+  const std::vector<std::string> declared_plugin_classes;
+  const std::shared_ptr<rclcpp::Node> & node_;
 
-  std::vector<std::unique_ptr<Plugin>> plugins;
+  std::vector<std::unique_ptr<Overlay>> overlays;
   const std::vector<std::string> columns;
 };
 
-#endif  // IMAGE_OVERLAY__PLUGIN_MANAGER_HPP_
+#endif  // IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_

@@ -19,7 +19,7 @@
 #include "image_transport_helpers/list_image_topics.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
 
-ImageManager::ImageManager(const rclcpp::Node::SharedPtr & node, QObject * parent)
+ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent)
 : QAbstractListModel(parent), node_(node)
 {
 }

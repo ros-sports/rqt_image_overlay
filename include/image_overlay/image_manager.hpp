@@ -20,15 +20,16 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "rclcpp/node.hpp"
 #include "image_transport/subscriber.hpp"
+
+namespace rclcpp {class Node;}
 
 class ImageManager : public QAbstractListModel
 {
   Q_OBJECT
 
 public:
-  explicit ImageManager(const rclcpp::Node::SharedPtr & node, QObject * parent = nullptr);
+  explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent = nullptr);
   std::unique_ptr<QImage> getImage() const;
   void setTopicExplicitly(QString topic);
 
@@ -44,7 +45,7 @@ private:
   void callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
 
   image_transport::Subscriber subscriber_;
-  const rclcpp::Node::SharedPtr & node_;
+  const std::shared_ptr<rclcpp::Node> & node_;
   sensor_msgs::msg::Image::ConstSharedPtr lastMsg;
 
   std::vector<std::string> topics;

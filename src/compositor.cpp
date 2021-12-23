@@ -16,12 +16,12 @@
 #include <utility>
 #include "image_overlay/compositor.hpp"
 #include "image_overlay/image_manager.hpp"
-#include "image_overlay/plugin_manager.hpp"
+#include "image_overlay/overlay_manager.hpp"
 
 Compositor::Compositor(
-  const ImageManager & imageManager, const PluginManager & pluginManager,
+  const ImageManager & imageManager, const OverlayManager & overlayManager,
   float frequency, QObject * parent)
-: QObject(parent), imageManager(imageManager), pluginManager(pluginManager)
+: QObject(parent), imageManager(imageManager), overlayManager(overlayManager)
 {
   startTimer(1000.0 / frequency);
 }
@@ -35,7 +35,7 @@ std::unique_ptr<QImage> Compositor::compose()
 {
   std::unique_ptr<QImage> composition = imageManager.getImage();
   if (composition != nullptr) {
-    pluginManager.overlay(*composition);
+    overlayManager.overlay(*composition);
   }
 
   return composition;

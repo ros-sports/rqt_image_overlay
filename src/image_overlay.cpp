@@ -20,8 +20,8 @@
 #include "pluginlib/class_list_macros.hpp"
 
 ImageOverlay::ImageOverlay()
-: rqt_gui_cpp::Plugin(), thread(this), imageManager(node_), pluginManager(node_),
-  compositor(imageManager, pluginManager, 30.0)
+: rqt_gui_cpp::Plugin(), thread(this), imageManager(node_), overlayManager(node_),
+  compositor(imageManager, overlayManager, 30.0)
 {
 }
 
@@ -31,10 +31,10 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   ui_.setupUi(widget);
   context.addWidget(widget);
 
-  ui_.plugin_topic_table->setModel(&pluginManager);
+  ui_.overlay_table->setModel(&overlayManager);
   ui_.image_topics_combo_box->setModel(&imageManager);
 
-  ui_.plugin_topic_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui_.overlay_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
   fillOverlayMenu();
 
@@ -58,16 +58,16 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
       std::placeholders::_1));
 }
 
-void ImageOverlay::addPlugin(QString plugin_class)
+void ImageOverlay::addOverlay(QString plugin_class)
 {
-  pluginManager.addPlugin(plugin_class.toStdString());
+  overlayManager.addOverlay(plugin_class.toStdString());
 }
 
 void ImageOverlay::removeOverlay()
 {
-  QItemSelectionModel * select = ui_.plugin_topic_table->selectionModel();
+  QItemSelectionModel * select = ui_.overlay_table->selectionModel();
   for (auto & index : select->selectedRows()) {
-    pluginManager.removePlugin(index.row());
+    overlayManager.removeOverlay(index.row());
   }
 }
 
@@ -77,7 +77,7 @@ void ImageOverlay::saveSettings(
   qt_gui_cpp::Settings & instance_settings) const
 {
   instance_settings.setValue("image_topic", ui_.image_topics_combo_box->currentText());
-  pluginManager.saveSettings(instance_settings);
+  overlayManager.saveSettings(instance_settings);
 }
 
 void ImageOverlay::restoreSettings(
@@ -92,7 +92,7 @@ void ImageOverlay::restoreSettings(
     }
   }
 
-  pluginManager.restoreSettings(instance_settings);
+  overlayManager.restoreSettings(instance_settings);
 }
 
 void ImageOverlay::fillOverlayMenu()
@@ -101,7 +101,7 @@ void ImageOverlay::fillOverlayMenu()
   QSignalMapper * signalMapper = new QSignalMapper(this);
   signalMappers.push_back(signalMapper);
 
-  for (std::string str_plugin_class : pluginManager.getDeclaredClasses()) {
+  for (std::string str_plugin_class : overlayManager.getDeclaredPluginClasses()) {
     QString qstr_plugin_class = QString::fromStdString(str_plugin_class);
     QAction * action = new QAction(qstr_plugin_class, this);
     menu->addAction(action);  // ownership transferred
@@ -109,7 +109,7 @@ void ImageOverlay::fillOverlayMenu()
     signalMapper->setMapping(action, qstr_plugin_class);
   }
 
-  connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(addPlugin(QString)));
+  connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
 
   ui_.add_overlay_button->setMenu(menu);
 }

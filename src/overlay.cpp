@@ -16,22 +16,25 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include "image_overlay/plugin.hpp"
+#include "image_overlay/overlay.hpp"
+#include "rclcpp/create_generic_subscription.hpp"
+#include "rclcpp/node.hpp"
+#include "image_overlay/image_overlay_plugin.hpp"
 
-Plugin::Plugin(
+Overlay::Overlay(
   std::string pluginClass, std::shared_ptr<ImageOverlayPlugin> instance,
-  const rclcpp::Node::SharedPtr & node)
+  const std::shared_ptr<rclcpp::Node> & node)
 : pluginClass(pluginClass), instance(instance), msgType(instance->getTopicType()), node_(node)
 {
 }
 
-void Plugin::setTopic(std::string topic)
+void Overlay::setTopic(std::string topic)
 {
   if (topic != "") {
     try {
       subscription = node_->create_generic_subscription(
         topic, msgType, rclcpp::QoS(10),
-        std::bind(&Plugin::msgCallback, this, std::placeholders::_1));
+        std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;
     } catch (const std::exception & e) {
       std::cerr << "Failed to create subscription: " << e.what() << '\n';
@@ -39,7 +42,7 @@ void Plugin::setTopic(std::string topic)
   }
 }
 
-void Plugin::overlay(QImage & image)
+void Overlay::overlay(QImage & image)
 {
   // Create a new shared_ptr, since lastMsg may change if a new message arrives.
   const std::shared_ptr<rclcpp::SerializedMessage> lastMsgCopy(std::atomic_load(&lastMsg));
@@ -49,32 +52,32 @@ void Plugin::overlay(QImage & image)
   }
 }
 
-std::string Plugin::getTopic() const
+std::string Overlay::getTopic() const
 {
   return topic;
 }
 
-std::string Plugin::getPluginClass() const
+std::string Overlay::getPluginClass() const
 {
   return pluginClass;
 }
 
-std::string Plugin::getMsgType() const
+std::string Overlay::getMsgType() const
 {
   return msgType;
 }
 
-void Plugin::setEnabled(bool enabled)
+void Overlay::setEnabled(bool enabled)
 {
   this->enabled = enabled;
 }
 
-bool Plugin::getEnabled() const
+bool Overlay::getEnabled() const
 {
   return enabled;
 }
 
-void Plugin::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
+void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
   std::atomic_store(&lastMsg, msg);
 }
