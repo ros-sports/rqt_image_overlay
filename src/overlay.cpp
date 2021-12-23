@@ -22,9 +22,10 @@
 #include "image_overlay/image_overlay_plugin.hpp"
 
 Overlay::Overlay(
-  std::string pluginClass, std::shared_ptr<ImageOverlayPlugin> instance,
+  std::string pluginClass, pluginlib::ClassLoader<ImageOverlayPlugin> & pluginLoader,
   const std::shared_ptr<rclcpp::Node> & node)
-: pluginClass(pluginClass), instance(instance), msgType(instance->getTopicType()), node_(node)
+: pluginClass(pluginClass), instance(pluginLoader.createSharedInstance(pluginClass)),
+  msgType(instance->getTopicType()), node_(node)
 {
 }
 

@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <string>
+#include "pluginlib/class_loader.hpp"
 
 // Forward Declaration
 namespace rclcpp
@@ -32,7 +33,7 @@ class Overlay
 {
 public:
   Overlay(
-    std::string pluginClass, std::shared_ptr<ImageOverlayPlugin>,
+    std::string pluginClass, pluginlib::ClassLoader<ImageOverlayPlugin> & pluginLoader,
     const std::shared_ptr<rclcpp::Node> & node);
   void setTopic(std::string topic);
   void overlay(QImage & image);

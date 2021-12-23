@@ -25,7 +25,7 @@
 
 // forward declaration
 namespace qt_gui_cpp {class Settings;}
-namespace rclcpp{class Node;}
+namespace rclcpp {class Node;}
 class Overlay;
 
 // Refer to https://doc.qt.io/archives/4.6/model-view-model-subclassing.html

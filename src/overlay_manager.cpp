@@ -31,16 +31,14 @@ OverlayManager::OverlayManager(const std::shared_ptr<rclcpp::Node> & node, QObje
 
 bool OverlayManager::addOverlay(std::string plugin_class)
 {
-  std::shared_ptr<ImageOverlayPlugin> instance;
   try {
-    instance = plugin_loader.createSharedInstance(plugin_class);
+    overlays.push_back(std::make_unique<Overlay>(plugin_class, plugin_loader, node_));
   } catch (const std::exception & e) {
     std::cerr << e.what() << '\n';
     return false;
   }
 
   insertRows(overlays.size(), 1);
-  overlays.push_back(std::make_unique<Overlay>(plugin_class, instance, node_));
   return true;
 }
 
@@ -50,7 +48,8 @@ void OverlayManager::removeOverlay(unsigned index)
     overlays.erase(overlays.begin() + index);
     removeRows(index, 1);
   } else {
-    std::cerr << "Failed to remove overlay on row " << index << ", which doesn't exist" << std::endl;
+    std::cerr << "Failed to remove overlay on row " << index << ", which doesn't exist" <<
+      std::endl;
   }
 }
 
