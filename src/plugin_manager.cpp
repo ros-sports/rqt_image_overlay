@@ -24,7 +24,7 @@ PluginManager::PluginManager(const rclcpp::Node::SharedPtr & node, QObject * par
   plugin_loader("image_overlay", "ImageOverlayPlugin"),
   declared_classes(plugin_loader.getDeclaredClasses()),
   node_(node),
-  columns{"Show", "Topic", "Type", "Plugin", "Detail"}
+  columns{"Show", "Topic", "Type", "Plugin"}
 {
 }
 
@@ -69,8 +69,6 @@ QVariant PluginManager::data(const QModelIndex & index, int role) const
       return QString::fromStdString(plugins.at(index.row())->getMsgType());
     } else if (column == "Plugin") {
       return QString::fromStdString(plugins.at(index.row())->getPluginClass());
-    } else if (column == "Detail") {
-      return QVariant();
     }
   }
 
