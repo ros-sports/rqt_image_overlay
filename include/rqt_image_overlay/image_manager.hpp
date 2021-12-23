@@ -47,8 +47,8 @@ public slots:
 private:
   void callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
 
-  image_transport::Subscriber subscriber_;
-  const std::shared_ptr<rclcpp::Node> & node_;
+  image_transport::Subscriber subscriber;
+  const std::shared_ptr<rclcpp::Node> & node;
   sensor_msgs::msg::Image::ConstSharedPtr lastMsg;
 
   std::vector<std::string> topics;

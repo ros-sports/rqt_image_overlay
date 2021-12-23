@@ -54,7 +54,7 @@ private:
   std::string topic;
   bool enabled = true;
   std::shared_ptr<rclcpp::GenericSubscription> subscription;
-  const std::shared_ptr<rclcpp::Node> & node_;
+  const std::shared_ptr<rclcpp::Node> & node;
   std::shared_ptr<rclcpp::SerializedMessage> lastMsg;
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);

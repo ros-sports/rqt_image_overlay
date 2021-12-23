@@ -24,13 +24,13 @@ namespace rqt_image_overlay
 RatioLayoutedFrame::RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags)
 : QFrame(parent, flags)
 {
-  connect(this, SIGNAL(delayed_update()), this, SLOT(update()), Qt::QueuedConnection);
+  connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()), Qt::QueuedConnection);
 }
 
 void RatioLayoutedFrame::setImage(std::unique_ptr<QImage> image)
 {
-  qimage_ = std::move(image);
-  emit delayed_update();
+  qimage = std::move(image);
+  emit delayedUpdate();
 }
 
 void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
@@ -38,17 +38,17 @@ void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
   (void)event;
   QPainter painter(this);
   // Draw camera image
-  if (qimage_ && !qimage_->isNull()) {
-    float widthRatio = static_cast<float>(width()) / qimage_->width();
-    float heightRatio = static_cast<float>(height()) / qimage_->height();
+  if (qimage && !qimage->isNull()) {
+    float widthRatio = static_cast<float>(width()) / qimage->width();
+    float heightRatio = static_cast<float>(height()) / qimage->height();
 
     float scale = std::min(widthRatio, heightRatio);
     painter.scale(scale, scale);
 
     QPoint leftTop = QPoint(
-      (width() / scale - qimage_->width()) / 2,
-      (height() / scale - qimage_->height()) / 2);
-    painter.drawImage(leftTop, *qimage_);
+      (width() / scale - qimage->width()) / 2,
+      (height() / scale - qimage->height()) / 2);
+    painter.drawImage(leftTop, *qimage);
   } else {
     // default image with gradient
     QLinearGradient gradient(0, 0, frameRect().width(), frameRect().height());

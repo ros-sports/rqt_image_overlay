@@ -31,33 +31,33 @@ ImageOverlay::ImageOverlay()
 void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 {
   QWidget * widget = new QWidget();
-  ui_.setupUi(widget);
+  ui.setupUi(widget);
   context.addWidget(widget);
 
-  ui_.overlay_table->setModel(&overlayManager);
-  ui_.image_topics_combo_box->setModel(&imageManager);
+  ui.overlay_table->setModel(&overlayManager);
+  ui.image_topics_combo_box->setModel(&imageManager);
 
-  ui_.overlay_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui.overlay_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
   fillOverlayMenu();
 
-  ui_.image_topics_combo_box->setCurrentIndex(ui_.image_topics_combo_box->findText(""));
+  ui.image_topics_combo_box->setCurrentIndex(ui.image_topics_combo_box->findText(""));
   connect(
-    ui_.image_topics_combo_box, SIGNAL(currentTextChanged(QString)), &imageManager,
+    ui.image_topics_combo_box, SIGNAL(currentTextChanged(QString)), &imageManager,
     SLOT(onTopicChanged(QString)));
 
   connect(
-    ui_.refresh_image_topics_button, SIGNAL(pressed()), &imageManager,
+    ui.refresh_image_topics_button, SIGNAL(pressed()), &imageManager,
     SLOT(updateImageTopicList()));
 
-  connect(ui_.remove_overlay_button, SIGNAL(pressed()), this, SLOT(removeOverlay()));
+  connect(ui.remove_overlay_button, SIGNAL(pressed()), this, SLOT(removeOverlay()));
 
   compositor.moveToThread(&thread);
   thread.start();
 
   compositor.setCallableSetImage(
     std::bind(
-      &RatioLayoutedFrame::setImage, ui_.image_frame,
+      &RatioLayoutedFrame::setImage, ui.image_frame,
       std::placeholders::_1));
 }
 
@@ -68,7 +68,7 @@ void ImageOverlay::addOverlay(QString plugin_class)
 
 void ImageOverlay::removeOverlay()
 {
-  QItemSelectionModel * select = ui_.overlay_table->selectionModel();
+  QItemSelectionModel * select = ui.overlay_table->selectionModel();
   for (auto & index : select->selectedRows()) {
     overlayManager.removeOverlay(index.row());
   }
@@ -79,7 +79,7 @@ void ImageOverlay::saveSettings(
   qt_gui_cpp::Settings &,
   qt_gui_cpp::Settings & instance_settings) const
 {
-  instance_settings.setValue("image_topic", ui_.image_topics_combo_box->currentText());
+  instance_settings.setValue("image_topic", ui.image_topics_combo_box->currentText());
   overlayManager.saveSettings(instance_settings);
 }
 
@@ -91,7 +91,7 @@ void ImageOverlay::restoreSettings(
     QString topic = instance_settings.value("image_topic").toString();
     if (topic != "") {
       imageManager.setTopicExplicitly(topic);
-      ui_.image_topics_combo_box->setCurrentIndex(1);
+      ui.image_topics_combo_box->setCurrentIndex(1);
     }
   }
 
@@ -114,7 +114,7 @@ void ImageOverlay::fillOverlayMenu()
 
   connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
 
-  ui_.add_overlay_button->setMenu(menu);
+  ui.add_overlay_button->setMenu(menu);
 }
 
 

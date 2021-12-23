@@ -23,7 +23,7 @@ namespace rqt_image_overlay
 {
 
 ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent)
-: QAbstractListModel(parent), node_(node)
+: QAbstractListModel(parent), node(node)
 {
 }
 
@@ -35,7 +35,7 @@ void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
 
 void ImageManager::onTopicChanged(const QString & text)
 {
-  subscriber_.shutdown();
+  subscriber.shutdown();
 
   // reset image on topic change
   std::atomic_store(&lastMsg, sensor_msgs::msg::Image::ConstSharedPtr{});
@@ -45,14 +45,14 @@ void ImageManager::onTopicChanged(const QString & text)
   QString transport = parts.length() == 2 ? parts.last() : "raw";
 
   if (!topic.isEmpty()) {
-    image_transport::ImageTransport it(node_);
-    const image_transport::TransportHints hints(node_.get(), transport.toStdString());
+    image_transport::ImageTransport it(node);
+    const image_transport::TransportHints hints(node.get(), transport.toStdString());
     try {
-      subscriber_ =
+      subscriber =
         it.subscribe(topic.toStdString(), 1, &ImageManager::callbackImage, this, &hints);
       qDebug(
         "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
-        topic.toStdString().c_str(), subscriber_.getTransport().c_str());
+        topic.toStdString().c_str(), subscriber.getTransport().c_str());
     } catch (image_transport::TransportLoadException & e) {
       std::cerr << "Loading image transport plugin failed" << std::endl;
     }
@@ -65,7 +65,7 @@ void ImageManager::updateImageTopicList()
   topics.clear();
 
   // fill combo box
-  topics = image_transport_helpers::ListImageTopics(node_);
+  topics = image_transport_helpers::ListImageTopics(node);
 
   for (unsigned i = 0; i < topics.size(); ++i) {
     std::string & topic = topics.at(i);

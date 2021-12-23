@@ -33,14 +33,13 @@ public:
   void setImage(std::unique_ptr<QImage> image);
 
 signals:
-  void delayed_update();
+  void delayedUpdate();
 
 protected:
   void paintEvent(QPaintEvent * event);
 
 private:
-  std::unique_ptr<std::string> strPtr_;
-  std::unique_ptr<QImage> qimage_;
+  std::unique_ptr<QImage> qimage;
 };
 
 }  // namespace rqt_image_overlay

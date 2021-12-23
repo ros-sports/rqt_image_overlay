@@ -39,10 +39,10 @@ class OverlayManager : public QAbstractTableModel
 public:
   explicit OverlayManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent = nullptr);
   const std::vector<std::string> & getDeclaredPluginClasses();
-  bool addOverlay(std::string plugin_class);
+  bool addOverlay(std::string pluginClass);
   void removeOverlay(unsigned index);
   void overlay(QImage & image) const;
-  void saveSettings(qt_gui_cpp::Settings & instance_settings) const;
+  void saveSettings(qt_gui_cpp::Settings & settings) const;
   void restoreSettings(const qt_gui_cpp::Settings & settings);
 
 protected:
@@ -59,9 +59,9 @@ protected:
   bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
 
 private:
-  pluginlib::ClassLoader<ImageOverlayPlugin> plugin_loader;
-  const std::vector<std::string> declared_plugin_classes;
-  const std::shared_ptr<rclcpp::Node> & node_;
+  pluginlib::ClassLoader<ImageOverlayPlugin> pluginLoader;
+  const std::vector<std::string> declaredPluginClasses;
+  const std::shared_ptr<rclcpp::Node> & node;
 
   std::vector<std::unique_ptr<Overlay>> overlays;
   const std::vector<std::string> columns;

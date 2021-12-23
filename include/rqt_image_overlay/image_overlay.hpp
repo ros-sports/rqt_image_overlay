@@ -38,10 +38,10 @@ public:
   void initPlugin(qt_gui_cpp::PluginContext & context) override;
   void saveSettings(
     qt_gui_cpp::Settings &,
-    qt_gui_cpp::Settings & instance_settings) const override;
+    qt_gui_cpp::Settings & instanceSettings) const override;
   void restoreSettings(
     const qt_gui_cpp::Settings &,
-    const qt_gui_cpp::Settings & instance_settings) override;
+    const qt_gui_cpp::Settings & instanceSettings) override;
 
 public slots:
   void addOverlay(QString plugin_class);
@@ -50,7 +50,7 @@ public slots:
 private:
   void fillOverlayMenu();
 
-  Ui::ImageOverlay ui_;
+  Ui::ImageOverlay ui;
 
   QMenu * menu;
   std::vector<QSignalMapper *> signalMappers;

@@ -28,7 +28,7 @@ Overlay::Overlay(
   std::string pluginClass, pluginlib::ClassLoader<ImageOverlayPlugin> & pluginLoader,
   const std::shared_ptr<rclcpp::Node> & node)
 : pluginClass(pluginClass), instance(pluginLoader.createSharedInstance(pluginClass)),
-  msgType(instance->getTopicType()), node_(node)
+  msgType(instance->getTopicType()), node(node)
 {
 }
 
@@ -36,7 +36,7 @@ void Overlay::setTopic(std::string topic)
 {
   if (topic != "") {
     try {
-      subscription = node_->create_generic_subscription(
+      subscription = node->create_generic_subscription(
         topic, msgType, rclcpp::QoS(10),
         std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;

@@ -25,17 +25,17 @@ namespace rqt_image_overlay
 
 OverlayManager::OverlayManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent)
 : QAbstractTableModel(parent),
-  plugin_loader("rqt_image_overlay", "rqt_image_overlay::ImageOverlayPlugin"),
-  declared_plugin_classes(plugin_loader.getDeclaredClasses()),
-  node_(node),
+  pluginLoader("rqt_image_overlay", "rqt_image_overlay::ImageOverlayPlugin"),
+  declaredPluginClasses(pluginLoader.getDeclaredClasses()),
+  node(node),
   columns{"Topic", "Type", "Plugin"}
 {
 }
 
-bool OverlayManager::addOverlay(std::string plugin_class)
+bool OverlayManager::addOverlay(std::string pluginClass)
 {
   try {
-    overlays.push_back(std::make_unique<Overlay>(plugin_class, plugin_loader, node_));
+    overlays.push_back(std::make_unique<Overlay>(pluginClass, pluginLoader, node));
   } catch (const std::exception & e) {
     std::cerr << e.what() << '\n';
     return false;
@@ -58,7 +58,7 @@ void OverlayManager::removeOverlay(unsigned index)
 
 const std::vector<std::string> & OverlayManager::getDeclaredPluginClasses()
 {
-  return declared_plugin_classes;
+  return declaredPluginClasses;
 }
 
 int OverlayManager::rowCount(const QModelIndex &) const

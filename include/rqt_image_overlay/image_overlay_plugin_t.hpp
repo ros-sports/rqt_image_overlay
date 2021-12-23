@@ -52,9 +52,9 @@ protected:
   ImageOverlayPluginT()
   : library(rclcpp::get_typesupport_library(rosidl_generator_traits::name<T>(),
       "rosidl_typesupport_cpp")),
-    string_typesupport(rclcpp::get_typesupport_handle(rosidl_generator_traits::name<T>(),
+    stringTypesupport(rclcpp::get_typesupport_handle(rosidl_generator_traits::name<T>(),
       "rosidl_typesupport_cpp", *library)),
-    base(string_typesupport)
+    base(stringTypesupport)
   {
   }
 
@@ -71,7 +71,7 @@ private:
   }
 
   const std::shared_ptr<rcpputils::SharedLibrary> library;
-  const rosidl_message_type_support_t * string_typesupport;
+  const rosidl_message_type_support_t * stringTypesupport;
   const rclcpp::SerializationBase base;
 };
 
