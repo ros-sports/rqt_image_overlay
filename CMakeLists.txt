@@ -85,7 +85,13 @@ ament_export_libraries(
 ament_export_targets(
   export_${PROJECT_NAME}
 )
-ament_export_dependencies(Qt5Widgets)
+
 ament_export_dependencies(rclcpp)
+ament_export_dependencies(pluginlib)
+ament_export_dependencies(rqt_gui_cpp)
+ament_export_dependencies(image_transport)
+ament_export_dependencies(Qt5Widgets)
+ament_export_dependencies(image_transport_helpers)
+ament_export_dependencies(ros_image_to_qimage)
 
 ament_package()
