@@ -14,7 +14,7 @@
 
 #include <string>
 #include <memory>
-#include "rqt_image_overlay/image_manager.hpp"
+#include "./image_manager.hpp"
 #include "image_transport/image_transport.hpp"
 #include "image_transport_helpers/list_image_topics.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"

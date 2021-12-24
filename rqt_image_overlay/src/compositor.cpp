@@ -14,9 +14,9 @@
 
 #include <memory>
 #include <utility>
-#include "rqt_image_overlay/compositor.hpp"
-#include "rqt_image_overlay/image_manager.hpp"
-#include "rqt_image_overlay/overlay_manager.hpp"
+#include "./compositor.hpp"
+#include "./image_manager.hpp"
+#include "./overlay_manager.hpp"
 
 namespace rqt_image_overlay
 {

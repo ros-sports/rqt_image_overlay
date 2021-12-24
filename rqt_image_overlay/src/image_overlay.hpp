@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
-#define RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
+#ifndef IMAGE_OVERLAY_HPP_
+#define IMAGE_OVERLAY_HPP_
 
 #include <QThread>
 #include <vector>
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
-#include "rqt_image_overlay/compositor.hpp"
-#include "rqt_image_overlay/overlay_manager.hpp"
-#include "rqt_image_overlay/image_manager.hpp"
+#include "./compositor.hpp"
+#include "./overlay_manager.hpp"
+#include "./image_manager.hpp"
 
 class QSignalMapper;
 
@@ -65,4 +65,4 @@ private:
 
 }  // namespace rqt_image_overlay
 
-#endif  // RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_HPP_
+#endif  // IMAGE_OVERLAY_HPP_

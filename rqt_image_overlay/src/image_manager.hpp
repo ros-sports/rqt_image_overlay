@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RQT_IMAGE_OVERLAY__IMAGE_MANAGER_HPP_
-#define RQT_IMAGE_OVERLAY__IMAGE_MANAGER_HPP_
+#ifndef IMAGE_MANAGER_HPP_
+#define IMAGE_MANAGER_HPP_
 
 #include <QAbstractListModel>
 #include <QImage>
@@ -56,4 +56,4 @@ private:
 
 }  // namespace rqt_image_overlay
 
-#endif  // RQT_IMAGE_OVERLAY__IMAGE_MANAGER_HPP_
+#endif  // IMAGE_MANAGER_HPP_

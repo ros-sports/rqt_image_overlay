@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RQT_IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
-#define RQT_IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
+#ifndef RATIO_LAYOUTED_FRAME_HPP_
+#define RATIO_LAYOUTED_FRAME_HPP_
 
 #include <QFrame>
 #include <QImage>
@@ -44,4 +44,4 @@ private:
 
 }  // namespace rqt_image_overlay
 
-#endif  // RQT_IMAGE_OVERLAY__RATIO_LAYOUTED_FRAME_HPP_
+#endif  // RATIO_LAYOUTED_FRAME_HPP_

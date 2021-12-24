@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RQT_IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
-#define RQT_IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
+#ifndef OVERLAY_MANAGER_HPP_
+#define OVERLAY_MANAGER_HPP_
 
 #include <QAbstractTableModel>
 #include <vector>
 #include <string>
 #include <memory>
-#include "rqt_image_overlay/overlay.hpp"
+#include "./overlay.hpp"
 #include "pluginlib/class_loader.hpp"
 #include "rqt_image_overlay_layer/plugin_interface.hpp"
 
@@ -69,4 +69,4 @@ private:
 
 }  // namespace rqt_image_overlay
 
-#endif  // RQT_IMAGE_OVERLAY__OVERLAY_MANAGER_HPP_
+#endif  // OVERLAY_MANAGER_HPP_

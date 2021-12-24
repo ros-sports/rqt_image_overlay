@@ -16,8 +16,8 @@
 #include <memory>
 #include <vector>
 #include <iostream>
-#include "rqt_image_overlay/overlay_manager.hpp"
-#include "rqt_image_overlay/overlay.hpp"
+#include "./overlay_manager.hpp"
+#include "./overlay.hpp"
 #include "qt_gui_cpp/settings.h"
 
 namespace rqt_image_overlay

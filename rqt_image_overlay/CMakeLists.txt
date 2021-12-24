@@ -28,10 +28,10 @@ set(SOURCES
   src/overlay.cpp
   src/image_manager.cpp)
 qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
-  include/rqt_image_overlay/image_overlay.hpp
-  include/rqt_image_overlay/ratio_layouted_frame.hpp
-  include/rqt_image_overlay/compositor.hpp
-  include/rqt_image_overlay/image_manager.hpp)
+  src/image_overlay.hpp
+  src/ratio_layouted_frame.hpp
+  src/compositor.hpp
+  src/image_manager.hpp)
 qt5_wrap_ui(UIS src/image_overlay.ui)
 add_library(rqt_image_overlay SHARED
   ${SOURCES}
@@ -50,14 +50,6 @@ ament_target_dependencies(rqt_image_overlay
 
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 
-# This flag must be set for the foxy branch to compile
-target_compile_definitions(rqt_image_overlay PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-
-# Install - headers
-install(
-  DIRECTORY include/
-  DESTINATION include)
-
 # Install - libraries
 install(
   TARGETS rqt_image_overlay
@@ -67,7 +59,7 @@ install(
   RUNTIME DESTINATION bin
 )
 
-# Install - scripts
+# Install - script for running rqt_image_overlay standalone
 install(PROGRAMS scripts/rqt_image_overlay
   DESTINATION lib/${PROJECT_NAME}
 )
@@ -84,14 +76,5 @@ ament_export_libraries(
 ament_export_targets(
   export_${PROJECT_NAME}
 )
-
-ament_export_dependencies(rclcpp)
-ament_export_dependencies(pluginlib)
-ament_export_dependencies(rqt_gui_cpp)
-ament_export_dependencies(image_transport)
-ament_export_dependencies(Qt5Widgets)
-ament_export_dependencies(image_transport_helpers)
-ament_export_dependencies(ros_image_to_qimage)
-ament_export_dependencies(rqt_image_overlay_layer)
 
 ament_package()

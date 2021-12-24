@@ -16,7 +16,7 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include "rqt_image_overlay/overlay.hpp"
+#include "./overlay.hpp"
 #include "rclcpp/create_generic_subscription.hpp"
 #include "rclcpp/node.hpp"
 #include "rqt_image_overlay_layer/plugin_interface.hpp"

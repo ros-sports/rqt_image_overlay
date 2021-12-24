@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RQT_IMAGE_OVERLAY__COMPOSITOR_HPP_
-#define RQT_IMAGE_OVERLAY__COMPOSITOR_HPP_
+#ifndef COMPOSITOR_HPP_
+#define COMPOSITOR_HPP_
 
 #include <QImage>
 #include <QObject>
@@ -47,4 +47,4 @@ private:
 
 }  // namespace rqt_image_overlay
 
-#endif  // RQT_IMAGE_OVERLAY__COMPOSITOR_HPP_
+#endif  // COMPOSITOR_HPP_

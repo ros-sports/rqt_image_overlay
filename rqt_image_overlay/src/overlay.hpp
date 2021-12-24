@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RQT_IMAGE_OVERLAY__OVERLAY_HPP_
-#define RQT_IMAGE_OVERLAY__OVERLAY_HPP_
+#ifndef OVERLAY_HPP_
+#define OVERLAY_HPP_
 
 #include <memory>
 #include <string>
@@ -63,4 +63,4 @@ private:
 
 }  // namespace rqt_image_overlay
 
-#endif  // RQT_IMAGE_OVERLAY__OVERLAY_HPP_
+#endif  // OVERLAY_HPP_

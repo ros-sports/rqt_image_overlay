@@ -16,7 +16,7 @@
 #include <memory>
 #include <utility>
 #include <algorithm>
-#include "rqt_image_overlay/ratio_layouted_frame.hpp"
+#include "./ratio_layouted_frame.hpp"
 
 namespace rqt_image_overlay
 {

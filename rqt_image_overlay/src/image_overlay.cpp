@@ -16,7 +16,7 @@
 #include <QSignalMapper>
 #include <functional>
 #include <string>
-#include "rqt_image_overlay/image_overlay.hpp"
+#include "./image_overlay.hpp"
 #include "pluginlib/class_list_macros.hpp"
 
 namespace rqt_image_overlay
