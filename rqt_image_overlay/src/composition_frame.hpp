@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RATIO_LAYOUTED_FRAME_HPP_
-#define RATIO_LAYOUTED_FRAME_HPP_
+#ifndef COMPOSITION_FRAME_HPP_
+#define COMPOSITION_FRAME_HPP_
 
 #include <QFrame>
 #include <QImage>
@@ -23,13 +23,13 @@
 namespace rqt_image_overlay
 {
 
-class RatioLayoutedFrame
+class CompositionFrame
   : public QFrame
 {
   Q_OBJECT
 
 public:
-  explicit RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags = 0);
+  explicit CompositionFrame(QWidget * parent, Qt::WindowFlags flags = 0);
   void setImage(std::unique_ptr<QImage> image);
 
 signals:
@@ -44,4 +44,4 @@ private:
 
 }  // namespace rqt_image_overlay
 
-#endif  // RATIO_LAYOUTED_FRAME_HPP_
+#endif  // COMPOSITION_FRAME_HPP_

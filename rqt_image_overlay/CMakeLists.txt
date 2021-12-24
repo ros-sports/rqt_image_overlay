@@ -22,14 +22,14 @@ find_package(rqt_image_overlay_layer REQUIRED)
 # Build rqt_image_overlay
 set(SOURCES
   src/image_overlay.cpp
-  src/ratio_layouted_frame.cpp
+  src/composition_frame.cpp
   src/compositor.cpp
   src/overlay_manager.cpp
   src/overlay.cpp
   src/image_manager.cpp)
 qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
   src/image_overlay.hpp
-  src/ratio_layouted_frame.hpp
+  src/composition_frame.hpp
   src/compositor.hpp
   src/image_manager.hpp)
 qt5_wrap_ui(UIS src/image_overlay.ui)

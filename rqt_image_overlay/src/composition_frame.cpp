@@ -16,24 +16,24 @@
 #include <memory>
 #include <utility>
 #include <algorithm>
-#include "./ratio_layouted_frame.hpp"
+#include "./composition_frame.hpp"
 
 namespace rqt_image_overlay
 {
 
-RatioLayoutedFrame::RatioLayoutedFrame(QWidget * parent, Qt::WindowFlags flags)
+CompositionFrame::CompositionFrame(QWidget * parent, Qt::WindowFlags flags)
 : QFrame(parent, flags)
 {
   connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()), Qt::QueuedConnection);
 }
 
-void RatioLayoutedFrame::setImage(std::unique_ptr<QImage> image)
+void CompositionFrame::setImage(std::unique_ptr<QImage> image)
 {
   qimage = std::move(image);
   emit delayedUpdate();
 }
 
-void RatioLayoutedFrame::paintEvent(QPaintEvent * event)
+void CompositionFrame::paintEvent(QPaintEvent * event)
 {
   (void)event;
   QPainter painter(this);

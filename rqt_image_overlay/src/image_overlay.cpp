@@ -57,7 +57,7 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 
   compositor.setCallableSetImage(
     std::bind(
-      &RatioLayoutedFrame::setImage, ui.image_frame,
+      &CompositionFrame::setImage, ui.image_frame,
       std::placeholders::_1));
 }
 

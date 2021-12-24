@@ -102,7 +102,7 @@
        <number>24</number>
       </attribute>
      </widget>
-     <widget class="rqt_image_overlay::RatioLayoutedFrame" name="image_frame">
+     <widget class="rqt_image_overlay::CompositionFrame" name="image_frame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -122,9 +122,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>rqt_image_overlay::RatioLayoutedFrame</class>
+   <class>rqt_image_overlay::CompositionFrame</class>
    <extends>QFrame</extends>
-   <header>src/ratio_layouted_frame.hpp</header>
+   <header>src/composition_frame.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
