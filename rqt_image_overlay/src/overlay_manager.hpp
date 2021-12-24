@@ -38,7 +38,7 @@ class OverlayManager : public QAbstractTableModel
 {
 public:
   explicit OverlayManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent = nullptr);
-  const std::vector<std::string> & getDeclaredPluginClasses();
+  const std::vector<std::string> & getDeclaredPluginClasses() const;
   bool addOverlay(std::string pluginClass);
   void removeOverlay(unsigned index);
   void overlay(QImage & image) const;

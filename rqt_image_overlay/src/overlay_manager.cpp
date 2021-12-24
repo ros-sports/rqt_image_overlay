@@ -56,7 +56,7 @@ void OverlayManager::removeOverlay(unsigned index)
   }
 }
 
-const std::vector<std::string> & OverlayManager::getDeclaredPluginClasses()
+const std::vector<std::string> & OverlayManager::getDeclaredPluginClasses() const
 {
   return declaredPluginClasses;
 }

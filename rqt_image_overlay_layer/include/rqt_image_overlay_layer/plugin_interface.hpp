@@ -28,7 +28,7 @@ namespace rqt_image_overlay_layer
 class PluginInterface
 {
 public:
-  virtual std::string getTopicType() = 0;
+  virtual std::string getTopicType() const = 0;
   virtual void overlay(
     QImage & layer,
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;

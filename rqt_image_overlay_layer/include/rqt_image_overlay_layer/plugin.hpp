@@ -30,7 +30,7 @@ template<typename T>
 class Plugin : public PluginInterface
 {
 public:
-  std::string getTopicType() override
+  std::string getTopicType() const override
   {
     return rosidl_generator_traits::name<T>();
   }
