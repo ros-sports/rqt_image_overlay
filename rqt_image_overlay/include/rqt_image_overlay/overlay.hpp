@@ -27,16 +27,17 @@ class GenericSubscription;
 class SerializedMessage;
 }
 class QImage;
+namespace rqt_image_overlay_layer {class PluginInterface;}
 
 namespace rqt_image_overlay
 {
-class ImageOverlayPlugin;
 
 class Overlay
 {
 public:
   Overlay(
-    std::string pluginClass, pluginlib::ClassLoader<ImageOverlayPlugin> & pluginLoader,
+    std::string pluginClass,
+    pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
     const std::shared_ptr<rclcpp::Node> & node);
   void setTopic(std::string topic);
   void overlay(QImage & image);
@@ -49,7 +50,7 @@ public:
 
 private:
   const std::string pluginClass;
-  const std::shared_ptr<ImageOverlayPlugin> instance;
+  const std::shared_ptr<rqt_image_overlay_layer::PluginInterface> instance;
   const std::string msgType;
   std::string topic;
   bool enabled = true;

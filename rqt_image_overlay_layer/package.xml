@@ -1,28 +1,22 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>rqt_image_overlay</name>
+  <name>rqt_image_overlay_layer</name>
   <version>0.0.0</version>
-  <description>An rqt plugin to display custom messages overlayed on an image with a plugin system.</description>
+  <description>TODO: Package description</description>
   <maintainer email="kenjibrameld@gmail.com">ijnek</maintainer>
-  <license>Apache License 2.0</license>
+  <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>pluginlib</depend>
-  <depend>rqt_gui_cpp</depend>
-  <depend>image_transport</depend>
-  <depend>qtbase5-dev</depend>
-  <depend>image_transport_helpers</depend>
-  <depend>ros_image_to_qimage</depend>
-  <depend>rqt_image_overlay_layer</depend>
+  <depend>rosidl_runtime_cpp</depend>
+  <depend>rcpputils</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
-    <rqt_gui plugin="${prefix}/plugin.xml"/>
   </export>
 </package>

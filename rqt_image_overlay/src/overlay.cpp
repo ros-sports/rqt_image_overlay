@@ -19,13 +19,14 @@
 #include "rqt_image_overlay/overlay.hpp"
 #include "rclcpp/create_generic_subscription.hpp"
 #include "rclcpp/node.hpp"
-#include "rqt_image_overlay/image_overlay_plugin.hpp"
+#include "rqt_image_overlay_layer/plugin_interface.hpp"
 
 namespace rqt_image_overlay
 {
 
 Overlay::Overlay(
-  std::string pluginClass, pluginlib::ClassLoader<ImageOverlayPlugin> & pluginLoader,
+  std::string pluginClass,
+  pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
   const std::shared_ptr<rclcpp::Node> & node)
 : pluginClass(pluginClass), instance(pluginLoader.createSharedInstance(pluginClass)),
   msgType(instance->getTopicType()), node(node)

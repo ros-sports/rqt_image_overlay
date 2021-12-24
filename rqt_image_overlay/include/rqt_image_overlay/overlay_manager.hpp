@@ -21,7 +21,7 @@
 #include <memory>
 #include "rqt_image_overlay/overlay.hpp"
 #include "pluginlib/class_loader.hpp"
-#include "rqt_image_overlay/image_overlay_plugin.hpp"
+#include "rqt_image_overlay_layer/plugin_interface.hpp"
 
 // forward declaration
 namespace qt_gui_cpp {class Settings;}
@@ -59,7 +59,7 @@ protected:
   bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
 
 private:
-  pluginlib::ClassLoader<ImageOverlayPlugin> pluginLoader;
+  pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> pluginLoader;
   const std::vector<std::string> declaredPluginClasses;
   const std::shared_ptr<rclcpp::Node> & node;
 

@@ -17,6 +17,7 @@ find_package(image_transport REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(image_transport_helpers REQUIRED)
 find_package(ros_image_to_qimage REQUIRED)
+find_package(rqt_image_overlay_layer REQUIRED)
 
 # Build rqt_image_overlay
 set(SOURCES
@@ -44,7 +45,8 @@ ament_target_dependencies(rqt_image_overlay
   image_transport
   Qt5Widgets
   image_transport_helpers
-  ros_image_to_qimage)
+  ros_image_to_qimage
+  rqt_image_overlay_layer)
 
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 
@@ -76,9 +78,6 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-# Export includes
-ament_export_include_directories(include)
-
 ament_export_libraries(
   rqt_image_overlay
 )
@@ -93,5 +92,6 @@ ament_export_dependencies(image_transport)
 ament_export_dependencies(Qt5Widgets)
 ament_export_dependencies(image_transport_helpers)
 ament_export_dependencies(ros_image_to_qimage)
+ament_export_dependencies(rqt_image_overlay_layer)
 
 ament_package()

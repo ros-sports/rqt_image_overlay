@@ -25,7 +25,7 @@ namespace rqt_image_overlay
 
 OverlayManager::OverlayManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent)
 : QAbstractTableModel(parent),
-  pluginLoader("rqt_image_overlay", "rqt_image_overlay::ImageOverlayPlugin"),
+  pluginLoader("rqt_image_overlay_layer", "rqt_image_overlay_layer::PluginInterface"),
   declaredPluginClasses(pluginLoader.getDeclaredClasses()),
   node(node),
   columns{"Topic", "Type", "Plugin"}

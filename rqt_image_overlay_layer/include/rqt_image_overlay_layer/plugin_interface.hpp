@@ -12,32 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
-#define RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
+#ifndef RQT_IMAGE_OVERLAY_LAYER__PLUGIN_INTERFACE_HPP_
+#define RQT_IMAGE_OVERLAY_LAYER__PLUGIN_INTERFACE_HPP_
 
+#include <QImage>
 #include <string>
 #include <memory>
 
 // forward declaration
-class QImage;
 namespace rclcpp {class SerializedMessage;}
 
-namespace rqt_image_overlay
+namespace rqt_image_overlay_layer
 {
 
-class ImageOverlayPlugin
+class PluginInterface
 {
 public:
   virtual std::string getTopicType() = 0;
   virtual void overlay(
     QImage & layer,
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;
-  virtual ~ImageOverlayPlugin() {}
+  virtual ~PluginInterface() {}
 
 protected:
-  ImageOverlayPlugin() {}
+  PluginInterface() {}
 };
 
-}  // namespace rqt_image_overlay
+}  // namespace rqt_image_overlay_layer
 
-#endif  // RQT_IMAGE_OVERLAY__IMAGE_OVERLAY_PLUGIN_HPP_
+#endif  // RQT_IMAGE_OVERLAY_LAYER__PLUGIN_INTERFACE_HPP_
