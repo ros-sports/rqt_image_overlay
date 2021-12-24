@@ -67,8 +67,7 @@ void ImageManager::updateImageTopicList()
   // fill combo box
   topics = image_transport_helpers::ListImageTopics(node);
 
-  for (unsigned i = 0; i < topics.size(); ++i) {
-    std::string & topic = topics.at(i);
+  for (std::string & topic : topics) {
     std::replace(topic.begin(), topic.end(), ' ', '/');
   }
   endResetModel();

@@ -169,7 +169,7 @@ void OverlayManager::saveSettings(qt_gui_cpp::Settings & settings) const
 {
   QList<QVariant> list;
 
-  for (auto & overlay : overlays) {
+  for (auto const & overlay : overlays) {
     QMap<QString, QVariant> map;
     map.insert("Topic", QString::fromStdString(overlay->getTopic()));
     map.insert("Plugin", QString::fromStdString(overlay->getPluginClass()));

@@ -69,7 +69,7 @@ void ImageOverlay::addOverlay(QString plugin_class)
 void ImageOverlay::removeOverlay()
 {
   QItemSelectionModel * select = ui.overlay_table->selectionModel();
-  for (auto & index : select->selectedRows()) {
+  for (auto const & index : select->selectedRows()) {
     overlayManager.removeOverlay(index.row());
   }
 }
@@ -104,7 +104,7 @@ void ImageOverlay::fillOverlayMenu()
   QSignalMapper * signalMapper = new QSignalMapper(this);
   signalMappers.push_back(signalMapper);
 
-  for (std::string str_plugin_class : overlayManager.getDeclaredPluginClasses()) {
+  for (const std::string & str_plugin_class : overlayManager.getDeclaredPluginClasses()) {
     QString qstr_plugin_class = QString::fromStdString(str_plugin_class);
     QAction * action = new QAction(qstr_plugin_class, this);
     menu->addAction(action);  // ownership transferred
