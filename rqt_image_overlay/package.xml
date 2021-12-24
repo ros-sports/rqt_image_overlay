@@ -3,7 +3,7 @@
 <package format="3">
   <name>rqt_image_overlay</name>
   <version>0.0.0</version>
-  <description>An rqt plugin to display custom messages overlayed on an image with a plugin system.</description>
+  <description>An rqt plugin to display overlays for custom msgs on an image using plugins.</description>
   <maintainer email="kenjibrameld@gmail.com">ijnek</maintainer>
   <license>Apache License 2.0</license>
 

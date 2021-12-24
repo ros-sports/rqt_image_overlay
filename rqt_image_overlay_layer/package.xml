@@ -3,9 +3,9 @@
 <package format="3">
   <name>rqt_image_overlay_layer</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Provides an rqt_image_overlay_layer plugin interface, and a template impelementation class</description>
   <maintainer email="kenjibrameld@gmail.com">ijnek</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
