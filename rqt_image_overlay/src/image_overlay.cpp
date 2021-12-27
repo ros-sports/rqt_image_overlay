@@ -63,8 +63,11 @@ void ImageOverlay::addOverlay(QString plugin_class)
 
 void ImageOverlay::removeOverlay()
 {
-  for (auto const & index : ui.overlay_table->selectionModel()->selectedRows()) {
-    overlayManager.removeOverlay(index.row());
+  QItemSelectionModel * select = ui.overlay_table->selectionModel();
+  if (select) {
+    for (auto const & index : select->selectedRows()) {
+      overlayManager.removeOverlay(index.row());
+    }
   }
 }
 
