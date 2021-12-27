@@ -81,7 +81,7 @@ std::string Overlay::getReceivedStatus() const
   if (timeLastMsgReceivedCopy) {
     rclcpp::Duration diff = node->now() - *timeLastMsgReceivedCopy;
     char msg[50];
-    snprintf(msg, 50, "%.4fs ago", diff.nanoseconds() / 1000000000.0);
+    snprintf(msg, sizeof(msg), "%.4fs ago", diff.nanoseconds() / 1000000000.0);
     return msg;
   } else {
     return "Not received yet";
