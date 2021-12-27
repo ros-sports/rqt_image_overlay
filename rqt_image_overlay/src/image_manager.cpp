@@ -54,7 +54,7 @@ void ImageManager::onTopicChanged(const QString & text)
         "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
         topic.toStdString().c_str(), subscriber.getTransport().c_str());
     } catch (image_transport::TransportLoadException & e) {
-      std::cerr << "Loading image transport plugin failed" << std::endl;
+      qWarning("(ImageManager) Loading image transport plugin failed");
     }
   }
 }

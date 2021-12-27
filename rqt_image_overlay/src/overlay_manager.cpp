@@ -42,7 +42,7 @@ bool OverlayManager::addOverlay(std::string pluginClass)
   try {
     overlays.push_back(std::make_unique<Overlay>(pluginClass, pluginLoader, node));
   } catch (const std::exception & e) {
-    std::cerr << e.what() << '\n';
+    qWarning("(OverlayManager) Failed to add overlay: %s", e.what());
     return false;
   }
 
@@ -56,8 +56,7 @@ void OverlayManager::removeOverlay(unsigned index)
     overlays.erase(overlays.begin() + index);
     removeRows(index, 1);
   } else {
-    std::cerr << "Failed to remove overlay on row " << index << ", which doesn't exist" <<
-      std::endl;
+    qWarning("(OverlayManager) Failed to remove overlay on row %d, which doesn't exist", index);
   }
 }
 
@@ -232,7 +231,7 @@ int OverlayManager::findStatusIndex() const
   if (it != columns.end()) {
     return it - columns.begin();
   } else {
-    std::cerr << "Couldn't find index of 'Status' column, can't display status" << std::endl;
+    qWarning("(OverlayManager) Couldn't find index of 'Status' column, can't display status");
     return STATUS_INDEX_UNFOUND;
   }
 }

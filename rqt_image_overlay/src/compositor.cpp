@@ -50,7 +50,7 @@ void Compositor::timerEvent(QTimerEvent * event)
   (void) event;
 
   if (!setImage) {
-    std::cerr << "(Compositor) setCallableSetImage method not called" << std::endl;
+    qWarning("(Compositor) setCallableSetImage method not called");
     return;
   }
 

@@ -44,7 +44,7 @@ void Overlay::setTopic(std::string topic)
       this->topic = topic;
       std::atomic_store(&lastMsg, std::make_shared<rclcpp::SerializedMessage>());
     } catch (const std::exception & e) {
-      std::cerr << "Failed to change subscription topic: " << e.what() << '\n';
+      qWarning("(Overlay) Failed to change subscription topic: %s", e.what());
       rcutils_reset_error();
     }
   }
