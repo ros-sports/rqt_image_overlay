@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <QMenu>
-#include <QSignalMapper>
 #include <functional>
 #include <string>
 #include "./image_overlay.hpp"
@@ -97,36 +95,21 @@ void ImageOverlay::restoreSettings(
 
 void ImageOverlay::fillOverlayMenu()
 {
-  menu = new QMenu();
-  QSignalMapper * signalMapper = new QSignalMapper(this);
-  signalMappers.push_back(signalMapper);
+  menu.clear();
 
   for (const std::string & str_plugin_class : overlayManager.getDeclaredPluginClasses()) {
     QString qstr_plugin_class = QString::fromStdString(str_plugin_class);
     QAction * action = new QAction(qstr_plugin_class, this);
-    menu->addAction(action);  // ownership transferred
-    connect(action, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    signalMapper->setMapping(action, qstr_plugin_class);
+    menu.addAction(action);  // ownership transferred
+    connect(action, SIGNAL(triggered()), &signalMapper, SLOT(map()));
+    signalMapper.setMapping(action, qstr_plugin_class);
   }
 
-  connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
+  connect(&signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
 
-  ui.add_overlay_button->setMenu(menu);
+  ui.add_overlay_button->setMenu(&menu);
 }
 
-
-ImageOverlay::~ImageOverlay()
-{
-  if (menu) {
-    delete menu;
-  }
-
-  for (auto mapper : signalMappers) {
-    if (mapper) {
-      delete mapper;
-    }
-  }
-}
 
 }  // namespace rqt_image_overlay
 

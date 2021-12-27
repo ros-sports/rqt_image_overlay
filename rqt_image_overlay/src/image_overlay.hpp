@@ -15,14 +15,14 @@
 #ifndef IMAGE_OVERLAY_HPP_
 #define IMAGE_OVERLAY_HPP_
 
+#include <QSignalMapper>
+#include <QMenu>
 #include <vector>
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
 #include "./compositor.hpp"
 #include "./overlay_manager.hpp"
 #include "./image_manager.hpp"
-
-class QSignalMapper;
 
 namespace rqt_image_overlay
 {
@@ -33,7 +33,6 @@ class ImageOverlay : public rqt_gui_cpp::Plugin
 
 public:
   ImageOverlay();
-  ~ImageOverlay();
   void initPlugin(qt_gui_cpp::PluginContext & context) override;
   void saveSettings(
     qt_gui_cpp::Settings &,
@@ -51,8 +50,8 @@ private:
 
   Ui::ImageOverlay ui;
 
-  QMenu * menu;
-  std::vector<QSignalMapper *> signalMappers;
+  QMenu menu;
+  QSignalMapper signalMapper;
 
   ImageManager imageManager;
   OverlayManager overlayManager;
