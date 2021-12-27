@@ -15,7 +15,6 @@
 #ifndef IMAGE_OVERLAY_HPP_
 #define IMAGE_OVERLAY_HPP_
 
-#include <QSignalMapper>
 #include <QMenu>
 #include <vector>
 #include "rqt_gui_cpp/plugin.h"
@@ -42,7 +41,6 @@ public:
     const qt_gui_cpp::Settings & instanceSettings) override;
 
 public slots:
-  void addOverlay(QString plugin_class);
   void removeOverlay();
 
 private:
@@ -51,7 +49,6 @@ private:
   Ui::ImageOverlay ui;
 
   QMenu * menu;
-  QSignalMapper * signalMapper;
 
   ImageManager * imageManager;
   OverlayManager * overlayManager;

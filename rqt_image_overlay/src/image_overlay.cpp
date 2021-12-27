@@ -32,7 +32,6 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   context.addWidget(widget);
 
   menu = new QMenu(widget);
-  signalMapper = new QSignalMapper(widget);
   imageManager = new ImageManager(widget, node_);
   overlayManager = new OverlayManager(widget, node_);
   compositor = new Compositor(widget, *imageManager, *overlayManager, 30.0);
@@ -59,11 +58,6 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
     std::bind(
       &CompositionFrame::setImage, ui.image_frame,
       std::placeholders::_1));
-}
-
-void ImageOverlay::addOverlay(QString plugin_class)
-{
-  overlayManager->addOverlay(plugin_class.toStdString());
 }
 
 void ImageOverlay::removeOverlay()
@@ -108,11 +102,11 @@ void ImageOverlay::fillOverlayMenu()
     QString qstr_plugin_class = QString::fromStdString(str_plugin_class);
     QAction * action = new QAction(qstr_plugin_class, this);
     menu->addAction(action);  // ownership transferred
-    connect(action, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    signalMapper->setMapping(action, qstr_plugin_class);
+    connect(
+      action, &QAction::triggered, [this, str_plugin_class] {
+        overlayManager->addOverlay(str_plugin_class);
+      });
   }
-
-  connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
 
   ui.add_overlay_button->setMenu(menu);
 }
