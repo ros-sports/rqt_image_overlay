@@ -46,7 +46,7 @@ public:
   std::string getTopic() const;
   std::string getPluginClass() const;
   std::string getMsgType() const;
-  bool getEnabled() const;
+  bool isEnabled() const;
 
 private:
   const std::string pluginClass;

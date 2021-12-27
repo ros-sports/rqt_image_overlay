@@ -79,7 +79,7 @@ void Overlay::setEnabled(bool enabled)
   this->enabled = enabled;
 }
 
-bool Overlay::getEnabled() const
+bool Overlay::isEnabled() const
 {
   return enabled;
 }

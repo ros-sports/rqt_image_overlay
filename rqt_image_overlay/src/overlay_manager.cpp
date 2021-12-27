@@ -87,7 +87,7 @@ QVariant OverlayManager::data(const QModelIndex & index, int role) const
 
   if (role == Qt::CheckStateRole) {
     if (column == "Topic") {
-      if (overlays.at(index.row())->getEnabled()) {
+      if (overlays.at(index.row())->isEnabled()) {
         return Qt::Checked;
       } else {
         return Qt::Unchecked;
@@ -161,7 +161,9 @@ bool OverlayManager::removeRows(int row, int, const QModelIndex & parent)
 void OverlayManager::overlay(QImage & image) const
 {
   for (auto & overlay : overlays) {
-    overlay->overlay(image);
+    if (overlay->isEnabled()) {
+      overlay->overlay(image);
+    }
   }
 }
 
@@ -173,7 +175,7 @@ void OverlayManager::saveSettings(qt_gui_cpp::Settings & settings) const
     QMap<QString, QVariant> map;
     map.insert("Topic", QString::fromStdString(overlay->getTopic()));
     map.insert("Plugin", QString::fromStdString(overlay->getPluginClass()));
-    map.insert("Enabled", overlay->getEnabled());
+    map.insert("Enabled", overlay->isEnabled());
     list.append(QVariant(map));
   }
 
