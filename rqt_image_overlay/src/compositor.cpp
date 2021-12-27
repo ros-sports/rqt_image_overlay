@@ -22,8 +22,8 @@ namespace rqt_image_overlay
 {
 
 Compositor::Compositor(
-  const ImageManager & imageManager, const OverlayManager & overlayManager,
-  float frequency, QObject * parent)
+  QObject * parent, const ImageManager & imageManager, const OverlayManager & overlayManager,
+  float frequency)
 : QObject(parent), imageManager(imageManager), overlayManager(overlayManager)
 {
   startTimer(1000.0 / frequency);

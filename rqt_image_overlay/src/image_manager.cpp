@@ -22,7 +22,7 @@
 namespace rqt_image_overlay
 {
 
-ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node, QObject * parent)
+ImageManager::ImageManager(QObject * parent, const std::shared_ptr<rclcpp::Node> & node)
 : QAbstractListModel(parent), node(node)
 {
 }

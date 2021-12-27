@@ -50,13 +50,12 @@ private:
 
   Ui::ImageOverlay ui;
 
-  QMenu menu;
-  QSignalMapper signalMapper;
+  QMenu * menu;
+  QSignalMapper * signalMapper;
 
-  ImageManager imageManager;
-  OverlayManager overlayManager;
-
-  Compositor compositor;
+  ImageManager * imageManager;
+  OverlayManager * overlayManager;
+  Compositor * compositor;
 };
 
 }  // namespace rqt_image_overlay

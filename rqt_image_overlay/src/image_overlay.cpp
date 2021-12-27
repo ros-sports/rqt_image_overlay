@@ -21,8 +21,7 @@ namespace rqt_image_overlay
 {
 
 ImageOverlay::ImageOverlay()
-: rqt_gui_cpp::Plugin(), imageManager(node_), overlayManager(node_),
-  compositor(imageManager, overlayManager, 30.0)
+: rqt_gui_cpp::Plugin()
 {
 }
 
@@ -32,8 +31,14 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   ui.setupUi(widget);
   context.addWidget(widget);
 
-  ui.overlay_table->setModel(&overlayManager);
-  ui.image_topics_combo_box->setModel(&imageManager);
+  menu = new QMenu(widget);
+  signalMapper = new QSignalMapper(widget);
+  imageManager = new ImageManager(widget, node_);
+  overlayManager = new OverlayManager(widget, node_);
+  compositor = new Compositor(widget, *imageManager, *overlayManager, 30.0);
+
+  ui.overlay_table->setModel(overlayManager);
+  ui.image_topics_combo_box->setModel(imageManager);
 
   ui.overlay_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
@@ -41,16 +46,16 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 
   ui.image_topics_combo_box->setCurrentIndex(ui.image_topics_combo_box->findText(""));
   connect(
-    ui.image_topics_combo_box, SIGNAL(currentTextChanged(QString)), &imageManager,
+    ui.image_topics_combo_box, SIGNAL(currentTextChanged(QString)), imageManager,
     SLOT(onTopicChanged(QString)));
 
   connect(
-    ui.refresh_image_topics_button, SIGNAL(pressed()), &imageManager,
+    ui.refresh_image_topics_button, SIGNAL(pressed()), imageManager,
     SLOT(updateImageTopicList()));
 
   connect(ui.remove_overlay_button, SIGNAL(pressed()), this, SLOT(removeOverlay()));
 
-  compositor.setCallableSetImage(
+  compositor->setCallableSetImage(
     std::bind(
       &CompositionFrame::setImage, ui.image_frame,
       std::placeholders::_1));
@@ -58,7 +63,7 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 
 void ImageOverlay::addOverlay(QString plugin_class)
 {
-  overlayManager.addOverlay(plugin_class.toStdString());
+  overlayManager->addOverlay(plugin_class.toStdString());
 }
 
 void ImageOverlay::removeOverlay()
@@ -66,7 +71,7 @@ void ImageOverlay::removeOverlay()
   QItemSelectionModel * select = ui.overlay_table->selectionModel();
   if (select) {
     for (auto const & index : select->selectedRows()) {
-      overlayManager.removeOverlay(index.row());
+      overlayManager->removeOverlay(index.row());
     }
   }
 }
@@ -77,7 +82,7 @@ void ImageOverlay::saveSettings(
   qt_gui_cpp::Settings & instance_settings) const
 {
   instance_settings.setValue("image_topic", ui.image_topics_combo_box->currentText());
-  overlayManager.saveSettings(instance_settings);
+  overlayManager->saveSettings(instance_settings);
 }
 
 void ImageOverlay::restoreSettings(
@@ -87,29 +92,29 @@ void ImageOverlay::restoreSettings(
   if (instance_settings.contains("image_topic")) {
     QString topic = instance_settings.value("image_topic").toString();
     if (topic != "") {
-      imageManager.setTopicExplicitly(topic);
+      imageManager->setTopicExplicitly(topic);
       ui.image_topics_combo_box->setCurrentIndex(1);
     }
   }
 
-  overlayManager.restoreSettings(instance_settings);
+  overlayManager->restoreSettings(instance_settings);
 }
 
 void ImageOverlay::fillOverlayMenu()
 {
-  menu.clear();
+  menu->clear();
 
-  for (const std::string & str_plugin_class : overlayManager.getDeclaredPluginClasses()) {
+  for (const std::string & str_plugin_class : overlayManager->getDeclaredPluginClasses()) {
     QString qstr_plugin_class = QString::fromStdString(str_plugin_class);
     QAction * action = new QAction(qstr_plugin_class, this);
-    menu.addAction(action);  // ownership transferred
-    connect(action, SIGNAL(triggered()), &signalMapper, SLOT(map()));
-    signalMapper.setMapping(action, qstr_plugin_class);
+    menu->addAction(action);  // ownership transferred
+    connect(action, SIGNAL(triggered()), signalMapper, SLOT(map()));
+    signalMapper->setMapping(action, qstr_plugin_class);
   }
 
-  connect(&signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
+  connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(addOverlay(QString)));
 
-  ui.add_overlay_button->setMenu(&menu);
+  ui.add_overlay_button->setMenu(menu);
 }
 
 
