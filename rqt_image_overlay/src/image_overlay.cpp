@@ -23,7 +23,7 @@ namespace rqt_image_overlay
 {
 
 ImageOverlay::ImageOverlay()
-: rqt_gui_cpp::Plugin(), thread(this), imageManager(node_), overlayManager(node_),
+: rqt_gui_cpp::Plugin(), imageManager(node_), overlayManager(node_),
   compositor(imageManager, overlayManager, 30.0)
 {
 }
@@ -51,9 +51,6 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
     SLOT(updateImageTopicList()));
 
   connect(ui.remove_overlay_button, SIGNAL(pressed()), this, SLOT(removeOverlay()));
-
-  compositor.moveToThread(&thread);
-  thread.start();
 
   compositor.setCallableSetImage(
     std::bind(

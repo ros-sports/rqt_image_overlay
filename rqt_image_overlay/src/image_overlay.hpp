@@ -15,7 +15,6 @@
 #ifndef IMAGE_OVERLAY_HPP_
 #define IMAGE_OVERLAY_HPP_
 
-#include <QThread>
 #include <vector>
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
@@ -54,8 +53,6 @@ private:
 
   QMenu * menu;
   std::vector<QSignalMapper *> signalMappers;
-
-  QThread thread;
 
   ImageManager imageManager;
   OverlayManager overlayManager;
