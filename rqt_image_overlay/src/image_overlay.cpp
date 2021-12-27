@@ -27,7 +27,7 @@ ImageOverlay::ImageOverlay()
 
 void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 {
-  QWidget * widget = new QWidget();
+  widget = new QWidget();
   ui.setupUi(widget);
   context.addWidget(widget);
 
@@ -38,8 +38,6 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 
   ui.overlay_table->setModel(overlayManager);
   ui.image_topics_combo_box->setModel(imageManager);
-
-  ui.overlay_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
   fillOverlayMenu();
 
@@ -58,6 +56,14 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
     std::bind(
       &CompositionFrame::setImage, ui.image_frame,
       std::placeholders::_1));
+}
+
+void ImageOverlay::shutdownPlugin()
+{
+  if (widget) {
+    delete widget;  // This deletes all the children too
+    widget = nullptr;
+  }
 }
 
 void ImageOverlay::removeOverlay()

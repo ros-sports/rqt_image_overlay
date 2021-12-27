@@ -33,6 +33,7 @@ class ImageOverlay : public rqt_gui_cpp::Plugin
 public:
   ImageOverlay();
   void initPlugin(qt_gui_cpp::PluginContext & context) override;
+  void shutdownPlugin() override;
   void saveSettings(
     qt_gui_cpp::Settings &,
     qt_gui_cpp::Settings & instanceSettings) const override;
@@ -53,6 +54,8 @@ private:
   ImageManager * imageManager;
   OverlayManager * overlayManager;
   Compositor * compositor;
+
+  QWidget * widget;
 };
 
 }  // namespace rqt_image_overlay
