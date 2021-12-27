@@ -19,6 +19,7 @@
 #include "./overlay.hpp"
 #include "rclcpp/create_generic_subscription.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp/time.hpp"
 #include "rqt_image_overlay_layer/plugin_interface.hpp"
 
 namespace rqt_image_overlay
@@ -74,6 +75,20 @@ std::string Overlay::getMsgType() const
   return msgType;
 }
 
+std::string Overlay::getReceivedStatus() const
+{
+  std::shared_ptr<rclcpp::Time> timeLastMsgReceivedCopy(std::atomic_load(&timeLastMsgReceived));
+  if (timeLastMsgReceivedCopy) {
+    rclcpp::Duration diff = node->now() - *timeLastMsgReceivedCopy;
+    char format[] = "%.4fs ago";
+    char msg[50];
+    sprintf(msg, format, diff.nanoseconds() / 1000000000.0);
+    return msg;
+  } else {
+    return "Not received yet";
+  }
+}
+
 void Overlay::setEnabled(bool enabled)
 {
   this->enabled = enabled;
@@ -87,6 +102,7 @@ bool Overlay::isEnabled() const
 void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
   std::atomic_store(&lastMsg, msg);
+  std::atomic_store(&timeLastMsgReceived, std::make_shared<rclcpp::Time>(node->now()));
 }
 
 }  // namespace rqt_image_overlay

@@ -20,6 +20,9 @@
 #include "./overlay.hpp"
 #include "qt_gui_cpp/settings.h"
 
+#define STATUS_UPDATE_MS 200
+#define STATUS_INDEX_UNFOUND -1
+
 namespace rqt_image_overlay
 {
 
@@ -28,8 +31,10 @@ OverlayManager::OverlayManager(QObject * parent, const std::shared_ptr<rclcpp::N
   pluginLoader("rqt_image_overlay_layer", "rqt_image_overlay_layer::PluginInterface"),
   declaredPluginClasses(pluginLoader.getDeclaredClasses()),
   node(node),
-  columns{"Topic", "Type", "Plugin"}
+  columns{"Topic", "Type", "Plugin", "Status"},
+  statusIndex(findStatusIndex())
 {
+  startTimer(STATUS_UPDATE_MS);
 }
 
 bool OverlayManager::addOverlay(std::string pluginClass)
@@ -82,6 +87,8 @@ QVariant OverlayManager::data(const QModelIndex & index, int role) const
       return QString::fromStdString(overlays.at(index.row())->getMsgType());
     } else if (column == "Plugin") {
       return QString::fromStdString(overlays.at(index.row())->getPluginClass());
+    } else if (column == "Status") {
+      return QString::fromStdString(overlays.at(index.row())->getReceivedStatus());
     }
   }
 
@@ -205,6 +212,28 @@ void OverlayManager::restoreSettings(const qt_gui_cpp::Settings & settings)
         overlays.back()->setEnabled(enabled);
       }
     }
+  }
+}
+
+void OverlayManager::timerEvent(QTimerEvent * event)
+{
+  (void) event;
+  if (!overlays.empty() && statusIndex != STATUS_INDEX_UNFOUND) {
+    QModelIndex topLeft = createIndex(0, statusIndex);
+    QModelIndex bottomRight = createIndex(overlays.size() - 1, statusIndex);
+    emit dataChanged(topLeft, bottomRight, {Qt::DisplayRole});
+  }
+}
+
+int OverlayManager::findStatusIndex() const
+{
+  auto it = find(columns.begin(), columns.end(), "Status");
+
+  if (it != columns.end()) {
+    return it - columns.begin();
+  } else {
+    std::cerr << "Couldn't find index of 'Status' column, can't display status" << std::endl;
+    return STATUS_INDEX_UNFOUND;
   }
 }
 

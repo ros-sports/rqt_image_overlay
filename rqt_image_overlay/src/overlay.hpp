@@ -25,6 +25,7 @@ namespace rclcpp
 class Node;
 class GenericSubscription;
 class SerializedMessage;
+class Time;
 }
 class QImage;
 namespace rqt_image_overlay_layer {class PluginInterface;}
@@ -46,6 +47,7 @@ public:
   std::string getTopic() const;
   std::string getPluginClass() const;
   std::string getMsgType() const;
+  std::string getReceivedStatus() const;
   bool isEnabled() const;
 
 private:
@@ -57,6 +59,7 @@ private:
   std::shared_ptr<rclcpp::GenericSubscription> subscription;
   const std::shared_ptr<rclcpp::Node> & node;
   std::shared_ptr<rclcpp::SerializedMessage> lastMsg;
+  std::shared_ptr<rclcpp::Time> timeLastMsgReceived;
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
 };

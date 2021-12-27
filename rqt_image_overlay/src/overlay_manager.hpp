@@ -59,12 +59,17 @@ protected:
   bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
 
 private:
+  void timerEvent(QTimerEvent *) override;
+
   pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> pluginLoader;
   const std::vector<std::string> declaredPluginClasses;
   const std::shared_ptr<rclcpp::Node> & node;
 
   std::vector<std::unique_ptr<Overlay>> overlays;
   const std::vector<std::string> columns;
+
+  const int statusIndex;  // keep track of status index to avoid constant look up
+  int findStatusIndex() const;
 };
 
 }  // namespace rqt_image_overlay
