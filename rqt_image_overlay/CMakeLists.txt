@@ -32,7 +32,7 @@ qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
   src/composition_frame.hpp
   src/compositor.hpp
   src/image_manager.hpp)
-qt5_wrap_ui(UIS src/image_overlay.ui)
+qt5_wrap_ui(UIS resource/image_overlay.ui)
 add_library(rqt_image_overlay SHARED
   ${SOURCES}
   ${UIS})
