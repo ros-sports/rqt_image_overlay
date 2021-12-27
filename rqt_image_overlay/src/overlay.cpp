@@ -41,8 +41,10 @@ void Overlay::setTopic(std::string topic)
         topic, msgType, rclcpp::QoS(10),
         std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;
+      std::atomic_store(&lastMsg, std::make_shared<rclcpp::SerializedMessage>());
     } catch (const std::exception & e) {
-      std::cerr << "Failed to create subscription: " << e.what() << '\n';
+      std::cerr << "Failed to change subscription topic: " << e.what() << '\n';
+      rcutils_reset_error();
     }
   }
 }
