@@ -30,7 +30,7 @@ class Compositor : public QObject
 
 public:
   Compositor(
-    QObject * parent, const ImageManager & imageManager, const OverlayManager & overlayManager,
+    const ImageManager & imageManager, const OverlayManager & overlayManager,
     float frequency);
 
   void setCallableSetImage(std::function<void(std::unique_ptr<QImage>)> setImage);

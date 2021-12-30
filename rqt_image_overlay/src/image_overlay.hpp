@@ -19,13 +19,13 @@
 #include <vector>
 #include <memory>
 #include "rqt_gui_cpp/plugin.h"
-#include "./ui_image_overlay.h"
-#include "./compositor.hpp"
-#include "./overlay_manager.hpp"
-#include "./image_manager.hpp"
 
+namespace Ui {class ImageOverlay;}
 namespace rqt_image_overlay
 {
+class ImageManager;
+class OverlayManager;
+class Compositor;
 
 class ImageOverlay : public rqt_gui_cpp::Plugin
 {
@@ -33,6 +33,7 @@ class ImageOverlay : public rqt_gui_cpp::Plugin
 
 public:
   ImageOverlay();
+  ~ImageOverlay();  // need a destructor (StackOverflow: 13414652)
   void initPlugin(qt_gui_cpp::PluginContext & context) override;
   void shutdownPlugin() override;
   void saveSettings(
@@ -48,15 +49,11 @@ public slots:
 private:
   void fillOverlayMenu();
 
-  Ui::ImageOverlay ui;
-
+  std::unique_ptr<Ui::ImageOverlay> ui;
   std::unique_ptr<QMenu> menu;
-
   std::shared_ptr<ImageManager> imageManager;
   std::shared_ptr<OverlayManager> overlayManager;
   std::unique_ptr<Compositor> compositor;
-
-  QWidget * widget;
 };
 
 }  // namespace rqt_image_overlay

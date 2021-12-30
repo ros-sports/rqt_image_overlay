@@ -32,7 +32,7 @@ class ImageManager : public QAbstractListModel
   Q_OBJECT
 
 public:
-  explicit ImageManager(QObject * parent, const std::shared_ptr<rclcpp::Node> & node);
+  explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node);
   std::unique_ptr<QImage> getImage() const;
   void setTopicExplicitly(QString topic);
 
