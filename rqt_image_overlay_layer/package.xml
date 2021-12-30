@@ -12,6 +12,8 @@
   <depend>rclcpp</depend>
   <depend>rosidl_runtime_cpp</depend>
   <depend>rcpputils</depend>
+  <depend>pluginlib</depend>
+  <depend>qtbase5-dev</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
