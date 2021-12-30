@@ -17,6 +17,7 @@
 
 #include <QMenu>
 #include <vector>
+#include <memory>
 #include "rqt_gui_cpp/plugin.h"
 #include "./ui_image_overlay.h"
 #include "./compositor.hpp"
@@ -49,11 +50,11 @@ private:
 
   Ui::ImageOverlay ui;
 
-  QMenu * menu;
+  std::unique_ptr<QMenu> menu;
 
-  ImageManager * imageManager;
-  OverlayManager * overlayManager;
-  Compositor * compositor;
+  std::shared_ptr<ImageManager> imageManager;
+  std::shared_ptr<OverlayManager> overlayManager;
+  std::unique_ptr<Compositor> compositor;
 
   QWidget * widget;
 };

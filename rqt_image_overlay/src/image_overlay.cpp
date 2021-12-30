@@ -31,23 +31,23 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   ui.setupUi(widget);
   context.addWidget(widget);
 
-  menu = new QMenu(widget);
-  imageManager = new ImageManager(widget, node_);
-  overlayManager = new OverlayManager(widget, node_);
-  compositor = new Compositor(widget, *imageManager, *overlayManager, 30.0);
+  menu = std::make_unique<QMenu>();
+  imageManager = std::make_shared<ImageManager>(widget, node_);
+  overlayManager = std::make_shared<OverlayManager>(widget, node_);
+  compositor = std::make_unique<Compositor>(widget, *imageManager, *overlayManager, 30.0);
 
-  ui.overlay_table->setModel(overlayManager);
-  ui.image_topics_combo_box->setModel(imageManager);
+  ui.overlay_table->setModel(overlayManager.get());
+  ui.image_topics_combo_box->setModel(imageManager.get());
 
   fillOverlayMenu();
 
   ui.image_topics_combo_box->setCurrentIndex(ui.image_topics_combo_box->findText(""));
   connect(
-    ui.image_topics_combo_box, SIGNAL(currentTextChanged(QString)), imageManager,
+    ui.image_topics_combo_box, SIGNAL(currentTextChanged(QString)), imageManager.get(),
     SLOT(onTopicChanged(QString)));
 
   connect(
-    ui.refresh_image_topics_button, SIGNAL(pressed()), imageManager,
+    ui.refresh_image_topics_button, SIGNAL(pressed()), imageManager.get(),
     SLOT(updateImageTopicList()));
 
   connect(ui.remove_overlay_button, SIGNAL(pressed()), this, SLOT(removeOverlay()));
@@ -60,6 +60,10 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 
 void ImageOverlay::shutdownPlugin()
 {
+  menu.reset();
+  imageManager.reset();
+  overlayManager.reset();
+  compositor.reset();
 }
 
 void ImageOverlay::removeOverlay()
@@ -110,7 +114,7 @@ void ImageOverlay::fillOverlayMenu()
       });
   }
 
-  ui.add_overlay_button->setMenu(menu);
+  ui.add_overlay_button->setMenu(menu.get());
 }
 
 
