@@ -14,6 +14,7 @@
 
 #include <functional>
 #include <string>
+#include <memory>
 #include "./image_overlay.hpp"
 #include "./ui_image_overlay.h"
 #include "./compositor.hpp"
