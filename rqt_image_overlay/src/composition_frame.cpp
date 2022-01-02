@@ -27,9 +27,9 @@ CompositionFrame::CompositionFrame(QWidget * parent, Qt::WindowFlags flags)
   connect(this, SIGNAL(delayedUpdate()), this, SLOT(update()), Qt::QueuedConnection);
 }
 
-void CompositionFrame::setImage(std::unique_ptr<QImage> image)
+void CompositionFrame::setImage(std::shared_ptr<QImage> image)
 {
-  qimage = std::move(image);
+  std::atomic_store(&qimage, image);
   emit delayedUpdate();
 }
 
@@ -37,18 +37,20 @@ void CompositionFrame::paintEvent(QPaintEvent * event)
 {
   (void)event;
   QPainter painter(this);
+
+  const std::shared_ptr<QImage> qimageCopy(std::atomic_load(&qimage));
   // Draw camera image
-  if (qimage && !qimage->isNull()) {
-    float widthRatio = static_cast<float>(width()) / qimage->width();
-    float heightRatio = static_cast<float>(height()) / qimage->height();
+  if (qimageCopy && !qimageCopy->isNull()) {
+    float widthRatio = static_cast<float>(width()) / qimageCopy->width();
+    float heightRatio = static_cast<float>(height()) / qimageCopy->height();
 
     float scale = std::min(widthRatio, heightRatio);
     painter.scale(scale, scale);
 
     QPoint leftTop = QPoint(
-      (width() / scale - qimage->width()) / 2,
-      (height() / scale - qimage->height()) / 2);
-    painter.drawImage(leftTop, *qimage);
+      (width() / scale - qimageCopy->width()) / 2,
+      (height() / scale - qimageCopy->height()) / 2);
+    painter.drawImage(leftTop, *qimageCopy);
   } else {
     // default image with gradient
     QLinearGradient gradient(0, 0, frameRect().width(), frameRect().height());

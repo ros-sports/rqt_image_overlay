@@ -29,14 +29,14 @@ Compositor::Compositor(
   startTimer(1000.0 / frequency);
 }
 
-void Compositor::setCallableSetImage(std::function<void(std::unique_ptr<QImage>)> setImage)
+void Compositor::setCallableSetImage(std::function<void(std::shared_ptr<QImage>)> setImage)
 {
   this->setImage = setImage;
 }
 
-std::unique_ptr<QImage> Compositor::compose()
+std::shared_ptr<QImage> Compositor::compose()
 {
-  std::unique_ptr<QImage> composition = imageManager.getImage();
+  std::shared_ptr<QImage> composition = imageManager.getImage();
   if (composition != nullptr) {
     overlayManager.overlay(*composition);
   }
@@ -54,7 +54,7 @@ void Compositor::timerEvent(QTimerEvent * event)
     return;
   }
 
-  std::unique_ptr<QImage> image = compose();
+  std::shared_ptr<QImage> image = compose();
 
   if (!image) {
     return;

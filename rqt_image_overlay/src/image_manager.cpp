@@ -93,14 +93,14 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
   return QVariant();
 }
 
-std::unique_ptr<QImage> ImageManager::getImage() const
+std::shared_ptr<QImage> ImageManager::getImage() const
 {
-  std::unique_ptr<QImage> image;
+  std::shared_ptr<QImage> image;
 
   // Create a new shared_ptr, since lastMsg may change if a new message arrives.
   const sensor_msgs::msg::Image::ConstSharedPtr lastMsgCopy(std::atomic_load(&lastMsg));
   if (lastMsgCopy) {
-    image = std::make_unique<QImage>(
+    image = std::make_shared<QImage>(
       ros_image_to_qimage::Convert(
         lastMsgCopy));
   }

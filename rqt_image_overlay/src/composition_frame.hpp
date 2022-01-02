@@ -30,7 +30,7 @@ class CompositionFrame
 
 public:
   explicit CompositionFrame(QWidget * parent, Qt::WindowFlags flags = 0);
-  void setImage(std::unique_ptr<QImage> image);
+  void setImage(std::shared_ptr<QImage> image);
 
 signals:
   void delayedUpdate();
@@ -39,7 +39,7 @@ protected:
   void paintEvent(QPaintEvent * event);
 
 private:
-  std::unique_ptr<QImage> qimage;
+  std::shared_ptr<QImage> qimage;
 };
 
 }  // namespace rqt_image_overlay

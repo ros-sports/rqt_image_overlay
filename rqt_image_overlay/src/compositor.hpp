@@ -33,16 +33,16 @@ public:
     const ImageManager & imageManager, const OverlayManager & overlayManager,
     float frequency);
 
-  void setCallableSetImage(std::function<void(std::unique_ptr<QImage>)> setImage);
+  void setCallableSetImage(std::function<void(std::shared_ptr<QImage>)> setImage);
 
 private:
-  std::unique_ptr<QImage> compose();
+  std::shared_ptr<QImage> compose();
   void timerEvent(QTimerEvent *) override;
 
   const ImageManager & imageManager;
   const OverlayManager & overlayManager;
 
-  std::function<void(std::unique_ptr<QImage>)> setImage;
+  std::function<void(std::shared_ptr<QImage>)> setImage;
 };
 
 }  // namespace rqt_image_overlay
