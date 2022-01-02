@@ -15,7 +15,6 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <iostream>
 #include "./overlay_manager.hpp"
 #include "./overlay.hpp"
 #include "qt_gui_cpp/settings.h"
