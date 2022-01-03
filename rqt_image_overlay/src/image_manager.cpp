@@ -100,9 +100,7 @@ std::shared_ptr<QImage> ImageManager::getImage() const
   // Create a new shared_ptr, since lastMsg may change if a new message arrives.
   const sensor_msgs::msg::Image::ConstSharedPtr lastMsgCopy(std::atomic_load(&lastMsg));
   if (lastMsgCopy) {
-    image = std::make_shared<QImage>(
-      ros_image_to_qimage::Convert(
-        lastMsgCopy));
+    image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*lastMsgCopy));
   }
   return image;
 }
