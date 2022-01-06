@@ -15,8 +15,8 @@
 #include <string>
 #include <memory>
 #include "./image_manager.hpp"
+#include "./list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
-#include "image_transport_helpers/list_image_topics.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
 
 namespace rqt_image_overlay
@@ -65,7 +65,7 @@ void ImageManager::updateImageTopicList()
   topics.clear();
 
   // fill combo box
-  topics = image_transport_helpers::ListImageTopics(node);
+  topics = ListImageTopics(node);
 
   for (std::string & topic : topics) {
     std::replace(topic.begin(), topic.end(), ' ', '/');

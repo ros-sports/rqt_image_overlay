@@ -14,7 +14,6 @@
   <depend>rqt_gui_cpp</depend>
   <depend>image_transport</depend>
   <depend>qtbase5-dev</depend>
-  <depend>image_transport_helpers</depend>
   <depend>ros_image_to_qimage</depend>
   <depend>rqt_image_overlay_layer</depend>
 

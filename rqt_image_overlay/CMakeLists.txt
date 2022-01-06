@@ -15,7 +15,6 @@ find_package(pluginlib REQUIRED)
 find_package(rqt_gui_cpp REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(Qt5Widgets REQUIRED)
-find_package(image_transport_helpers REQUIRED)
 find_package(ros_image_to_qimage REQUIRED)
 find_package(rqt_image_overlay_layer REQUIRED)
 
@@ -26,7 +25,8 @@ set(SOURCES
   src/compositor.cpp
   src/overlay_manager.cpp
   src/overlay.cpp
-  src/image_manager.cpp)
+  src/image_manager.cpp
+  src/list_image_topics.cpp)
 qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
   src/image_overlay.hpp
   src/composition_frame.hpp
@@ -44,7 +44,6 @@ ament_target_dependencies(rqt_image_overlay
   rqt_gui_cpp
   image_transport
   Qt5Widgets
-  image_transport_helpers
   ros_image_to_qimage
   rqt_image_overlay_layer)
 
@@ -66,6 +65,9 @@ install(PROGRAMS scripts/rqt_image_overlay
 
 # Test
 if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  add_subdirectory(test)
+
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
