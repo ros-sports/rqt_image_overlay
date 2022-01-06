@@ -14,12 +14,12 @@
   <depend>rqt_gui_cpp</depend>
   <depend>image_transport</depend>
   <depend>qtbase5-dev</depend>
-  <depend>image_transport_helpers</depend>
   <depend>ros_image_to_qimage</depend>
   <depend>rqt_image_overlay_layer</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
