@@ -22,7 +22,7 @@
 namespace rqt_image_overlay
 {
 
-std::vector<std::string> ListImageTopics(std::shared_ptr<rclcpp::Node> node)
+std::vector<std::string> ListImageTopics(const rclcpp::Node & node)
 {
   std::vector<std::string> message_types{
     "sensor_msgs/Image",
@@ -33,8 +33,7 @@ std::vector<std::string> ListImageTopics(std::shared_ptr<rclcpp::Node> node)
 
   // get declared transports
   std::vector<std::string> transports;
-  image_transport::ImageTransport it(node);
-  std::vector<std::string> declared = it.getDeclaredTransports();
+  std::vector<std::string> declared = image_transport::getDeclaredTransports();
 
   for (std::string transport : declared) {
     // strip prefix from transport name
@@ -49,7 +48,7 @@ std::vector<std::string> ListImageTopics(std::shared_ptr<rclcpp::Node> node)
   }
 
   // Get topics
-  std::map<std::string, std::vector<std::string>> topic_info = node->get_topic_names_and_types();
+  std::map<std::string, std::vector<std::string>> topic_info = node.get_topic_names_and_types();
 
   std::vector<std::string> all_topics;
   for (auto const & [key, _] : topic_info) {

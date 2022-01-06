@@ -65,7 +65,7 @@ void ImageManager::updateImageTopicList()
   topics.clear();
 
   // fill combo box
-  topics = ListImageTopics(node);
+  topics = ListImageTopics(*node);
 
   for (std::string & topic : topics) {
     std::replace(topic.begin(), topic.end(), ' ', '/');

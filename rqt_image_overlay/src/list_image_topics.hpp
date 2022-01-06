@@ -17,7 +17,6 @@
 
 #include <vector>
 #include <string>
-#include <memory>
 
 // forward declaration
 namespace rclcpp {class Node;}
@@ -25,7 +24,7 @@ namespace rclcpp {class Node;}
 namespace rqt_image_overlay
 {
 
-std::vector<std::string> ListImageTopics(std::shared_ptr<rclcpp::Node> node);
+std::vector<std::string> ListImageTopics(const rclcpp::Node & node);
 
 }  // namespace rqt_image_overlay
 

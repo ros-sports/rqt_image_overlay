@@ -41,7 +41,7 @@ TEST_F(TestListImageTopics, TestNone)
   rclcpp::sleep_for(std::chrono::milliseconds(10));
   rclcpp::spin_some(node);
 
-  auto topics = rqt_image_overlay::ListImageTopics(node);
+  auto topics = rqt_image_overlay::ListImageTopics(*node);
   EXPECT_EQ(topics.size(), 0u);
 }
 
@@ -55,7 +55,7 @@ TEST_F(TestListImageTopics, TestOne)
   rclcpp::sleep_for(std::chrono::milliseconds(10));
   rclcpp::spin_some(node);
 
-  auto topics = rqt_image_overlay::ListImageTopics(node);
+  auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 1u);
   EXPECT_EQ(topics.at(0), "/test_topic");
 }
@@ -72,7 +72,7 @@ TEST_F(TestListImageTopics, TestThree)
   rclcpp::sleep_for(std::chrono::milliseconds(10));
   rclcpp::spin_some(node);
 
-  auto topics = rqt_image_overlay::ListImageTopics(node);
+  auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 3u);
   EXPECT_EQ(std::count(topics.begin(), topics.end(), "/test_ns1/test_topic1"), 1);
   EXPECT_EQ(std::count(topics.begin(), topics.end(), "/test_ns2/test_topic2"), 1);
