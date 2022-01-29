@@ -16,7 +16,7 @@
 #include <memory>
 #include <utility>
 #include <algorithm>
-#include "./composition_frame.hpp"
+#include "composition_frame.hpp"
 
 namespace rqt_image_overlay
 {

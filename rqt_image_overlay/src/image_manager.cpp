@@ -14,8 +14,8 @@
 
 #include <string>
 #include <memory>
-#include "./image_manager.hpp"
-#include "./list_image_topics.hpp"
+#include "image_manager.hpp"
+#include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
 

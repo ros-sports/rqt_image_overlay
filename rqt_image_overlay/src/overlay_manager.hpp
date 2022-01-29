@@ -19,7 +19,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "./overlay.hpp"
+#include "overlay.hpp"
 #include "pluginlib/class_loader.hpp"
 #include "rqt_image_overlay_layer/plugin_interface.hpp"
 

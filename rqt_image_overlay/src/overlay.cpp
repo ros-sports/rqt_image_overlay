@@ -16,7 +16,7 @@
 #include <memory>
 #include <map>
 #include <vector>
-#include "./overlay.hpp"
+#include "overlay.hpp"
 #include "rclcpp/create_generic_subscription.hpp"
 #include "rclcpp/node.hpp"
 #include "rclcpp/time.hpp"

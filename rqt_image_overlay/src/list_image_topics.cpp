@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "./list_image_topics.hpp"
+#include "list_image_topics.hpp"
 #include "rclcpp/node.hpp"
 
 namespace rqt_image_overlay

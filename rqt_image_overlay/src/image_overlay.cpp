@@ -15,11 +15,11 @@
 #include <functional>
 #include <string>
 #include <memory>
-#include "./image_overlay.hpp"
 #include "./ui_image_overlay.h"
-#include "./compositor.hpp"
-#include "./overlay_manager.hpp"
-#include "./image_manager.hpp"
+#include "image_overlay.hpp"
+#include "compositor.hpp"
+#include "overlay_manager.hpp"
+#include "image_manager.hpp"
 #include "pluginlib/class_list_macros.hpp"
 
 namespace rqt_image_overlay

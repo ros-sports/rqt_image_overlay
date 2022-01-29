@@ -15,8 +15,8 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "./overlay_manager.hpp"
-#include "./overlay.hpp"
+#include "overlay_manager.hpp"
+#include "overlay.hpp"
 #include "qt_gui_cpp/settings.h"
 
 #define STATUS_UPDATE_MS 200
