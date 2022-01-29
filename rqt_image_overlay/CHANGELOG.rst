@@ -2,8 +2,8 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2022-01-29)
+------------------
 * adapt to new changes in cpplint about using a leading "./" in include statements
 * Contributors: ijnek
 
