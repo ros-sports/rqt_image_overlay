@@ -16,6 +16,7 @@
 #include <memory>
 #include "image_manager.hpp"
 #include "list_image_topics.hpp"
+#include "try_discover_source.hpp"
 #include "image_transport/image_transport.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
 
@@ -45,11 +46,14 @@ void ImageManager::onTopicChanged(const QString & text)
   QString transport = parts.length() == 2 ? parts.last() : "raw";
 
   if (!topic.isEmpty()) {
-    image_transport::ImageTransport it(node);
     const image_transport::TransportHints hints(node.get(), transport.toStdString());
     try {
-      subscriber =
-        it.subscribe(topic.toStdString(), 1, &ImageManager::callbackImage, this, &hints);
+      auto source_info = tryDiscoverSource(node, topic.toStdString());
+      auto qos = !source_info ? rclcpp::QoS(10) : source_info->second;
+      subscriber = image_transport::create_subscription(
+        node.get(), topic.toStdString(),
+        std::bind(&ImageManager::callbackImage, this, std::placeholders::_1),
+        transport.toStdString(), qos.get_rmw_qos_profile());
       qDebug(
         "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
         topic.toStdString().c_str(), subscriber.getTransport().c_str());

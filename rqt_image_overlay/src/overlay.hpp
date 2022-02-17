@@ -16,6 +16,7 @@
 #define OVERLAY_HPP_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include "pluginlib/class_loader.hpp"
 
@@ -24,6 +25,7 @@ namespace rclcpp
 {
 class Node;
 class GenericSubscription;
+class QoS;
 class SerializedMessage;
 class Time;
 }

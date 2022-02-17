@@ -17,6 +17,7 @@
 #include <map>
 #include <vector>
 #include "overlay.hpp"
+#include "try_discover_source.hpp"
 #include "rclcpp/create_generic_subscription.hpp"
 #include "rclcpp/node.hpp"
 #include "rclcpp/time.hpp"
@@ -38,8 +39,10 @@ void Overlay::setTopic(std::string topic)
 {
   if (topic != "") {
     try {
+      auto source_info = tryDiscoverSource(node, topic);
+      auto qos = !source_info ? rclcpp::QoS(10) : source_info->second;
       subscription = node->create_generic_subscription(
-        topic, msgType, rclcpp::QoS(10),
+        topic, msgType, qos,
         std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;
       std::atomic_store(&lastMsg, std::make_shared<rclcpp::SerializedMessage>());
@@ -103,5 +106,4 @@ void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
   std::atomic_store(&lastMsg, msg);
   std::atomic_store(&timeLastMsgReceived, std::make_shared<rclcpp::Time>(node->now()));
 }
-
 }  // namespace rqt_image_overlay
