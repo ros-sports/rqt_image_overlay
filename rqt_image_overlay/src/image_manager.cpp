@@ -45,11 +45,11 @@ void ImageManager::onTopicChanged(const QString & text)
   QString transport = parts.length() == 2 ? parts.last() : "raw";
 
   if (!topic.isEmpty()) {
-    image_transport::ImageTransport it(node);
-    const image_transport::TransportHints hints(node.get(), transport.toStdString());
     try {
-      subscriber =
-        it.subscribe(topic.toStdString(), 1, &ImageManager::callbackImage, this, &hints);
+      subscriber = image_transport::create_subscription(
+        node.get(), topic.toStdString(),
+        std::bind(&ImageManager::callbackImage, this, std::placeholders::_1),
+        transport.toStdString(), rmw_qos_profile_sensor_data);
       qDebug(
         "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
         topic.toStdString().c_str(), subscriber.getTransport().c_str());
