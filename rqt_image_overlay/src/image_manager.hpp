@@ -41,7 +41,7 @@ protected:
   QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
 
 public slots:
-  void onTopicChanged(const QString & text);
+  void onTopicChanged(const int index);
   void updateImageTopicList();
 
 private:

@@ -33,8 +33,16 @@ void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
 }
 
 
-void ImageManager::onTopicChanged(const QString & text)
+void ImageManager::onTopicChanged(const int index)
 {
+  QString text;
+  try {
+    text = QString::fromStdString(topics.at(index - 1));
+  } catch (const std::out_of_range & ex) {
+    RCLCPP_ERROR_STREAM(node->get_logger(), "Invalid topic index");
+    return;
+  }
+
   subscriber.shutdown();
 
   // reset image on topic change
@@ -67,9 +75,6 @@ void ImageManager::updateImageTopicList()
   // fill combo box
   topics = ListImageTopics(*node);
 
-  for (std::string & topic : topics) {
-    std::replace(topic.begin(), topic.end(), ' ', '/');
-  }
   endResetModel();
 }
 
@@ -86,6 +91,7 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
       return QVariant();
     } else {
       std::string topic = topics.at(index.row() - 1);
+      std::replace(topic.begin(), topic.end(), ' ', '/');
       return QString::fromStdString(topic);
     }
   }

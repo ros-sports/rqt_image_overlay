@@ -51,8 +51,8 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 
   ui->image_topics_combo_box->setCurrentIndex(ui->image_topics_combo_box->findText(""));
   connect(
-    ui->image_topics_combo_box, SIGNAL(currentTextChanged(QString)), imageManager.get(),
-    SLOT(onTopicChanged(QString)));
+    ui->image_topics_combo_box, SIGNAL(currentIndexChanged(int)), imageManager.get(),
+    SLOT(onTopicChanged(int)));
 
   connect(
     ui->refresh_image_topics_button, SIGNAL(pressed()), imageManager.get(),

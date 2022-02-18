@@ -30,6 +30,15 @@ std::vector<std::string> ListImageTopics(const rclcpp::Node & node)
     if (std::count(topic_types.begin(), topic_types.end(), "sensor_msgs/msg/Image") > 0) {
       topics.push_back(topic_name);
     }
+    if (std::count(
+      topic_types.begin(), topic_types.end(), "sensor_msgs/msg/CompressedImage") > 0) {
+      const auto index = topic_name.find_last_of("/");
+      if(index != std::string::npos) {
+        auto compressed_topic_name = topic_name;
+        compressed_topic_name.replace(index, 1, " ");
+        topics.push_back(compressed_topic_name);
+      }
+    }
   }
   return topics;
 }
