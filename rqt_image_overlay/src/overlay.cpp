@@ -50,7 +50,7 @@ void Overlay::setTopic(std::string topic)
   }
 }
 
-void Overlay::overlay(QImage & image)
+void Overlay::overlay(QImage & image, const rclcpp::Time & time)
 {
   // Create a new shared_ptr, since lastMsg may change if a new message arrives.
   const std::shared_ptr<rclcpp::SerializedMessage> lastMsgCopy(std::atomic_load(&lastMsg));

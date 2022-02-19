@@ -41,7 +41,7 @@ public:
   const std::vector<std::string> & getDeclaredPluginClasses() const;
   bool addOverlay(std::string pluginClass);
   void removeOverlay(unsigned index);
-  void overlay(QImage & image) const;
+  void overlay(QImage & image, const rclcpp::Time & time) const;
   void saveSettings(qt_gui_cpp::Settings & settings) const;
   void restoreSettings(const qt_gui_cpp::Settings & settings);
 

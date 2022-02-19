@@ -18,6 +18,7 @@
 #include <QImage>
 #include <QObject>
 #include <memory>
+#include "rclcpp/duration.hpp"
 
 namespace rqt_image_overlay
 {
@@ -31,7 +32,7 @@ class Compositor : public QObject
 public:
   Compositor(
     const ImageManager & imageManager, const OverlayManager & overlayManager,
-    float frequency);
+    float frequency, rclcpp::Duration window);
 
   void setCallableSetImage(std::function<void(std::shared_ptr<QImage>)> setImage);
 
@@ -41,6 +42,8 @@ private:
 
   const ImageManager & imageManager;
   const OverlayManager & overlayManager;
+
+  const rclcpp::Duration window;  // Wait window for messages before composing image in nanoseconds
 
   std::function<void(std::shared_ptr<QImage>)> setImage;
 };

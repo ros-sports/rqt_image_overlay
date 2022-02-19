@@ -41,7 +41,7 @@ public:
     pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
     const std::shared_ptr<rclcpp::Node> & node);
   void setTopic(std::string topic);
-  void overlay(QImage & image);
+  void overlay(QImage & image, const rclcpp::Time & time);
   void setEnabled(bool enabled);
 
   std::string getTopic() const;

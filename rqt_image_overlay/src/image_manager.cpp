@@ -14,6 +14,7 @@
 
 #include <string>
 #include <memory>
+#include <limits>
 #include "image_manager.hpp"
 #include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
@@ -29,7 +30,8 @@ ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node)
 
 void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
-  std::atomic_store(&lastMsg, msg);
+  std::lock_guard<std::mutex> guard(dequeMutex);
+  msgDeque.push_back(msg);
 }
 
 
@@ -37,8 +39,11 @@ void ImageManager::onTopicChanged(int index)
 {
   subscriber.shutdown();
 
-  // reset image on topic change
-  std::atomic_store(&lastMsg, sensor_msgs::msg::Image::ConstSharedPtr{});
+  // reset deque
+  {
+    std::lock_guard<std::mutex> guard(dequeMutex);
+    msgDeque.clear();
+  }
 
   if (index > 0) {
     ImageTopic & imageTopic = imageTopics.at(index - 1);
@@ -93,15 +98,36 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
   return QVariant();
 }
 
-std::shared_ptr<QImage> ImageManager::getImage() const
+std::shared_ptr<QImage> ImageManager::getImage(const rclcpp::Time & time) const
 {
   std::shared_ptr<QImage> image;
 
-  // Create a new shared_ptr, since lastMsg may change if a new message arrives.
-  const sensor_msgs::msg::Image::ConstSharedPtr lastMsgCopy(std::atomic_load(&lastMsg));
-  if (lastMsgCopy) {
-    image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*lastMsgCopy));
+  sensor_msgs::msg::Image::ConstSharedPtr imageToShow;
+
+  {
+    std::lock_guard<std::mutex> guard(dequeMutex);
+
+    if (!msgDeque.empty()) {
+      int64_t timeNs = static_cast<int64_t>(time.nanoseconds());
+
+      int64_t maxDiff = std::numeric_limits<int64_t>::max();
+      imageToShow = msgDeque.front();
+      for (auto const & image : msgDeque) {
+        int64_t imageNs = static_cast<int64_t>(rclcpp::Time{image->header.stamp}.nanoseconds());
+        if (int64_t diff = std::abs(imageNs - timeNs); diff < maxDiff) {
+          maxDiff = diff;
+          imageToShow = image;
+        } else {
+          break;
+        }
+      }
+    }
   }
+
+  if (imageToShow) {
+    image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*imageToShow));
+  }
+
   return image;
 }
 
@@ -120,6 +146,15 @@ void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
   imageTopics.clear();
   imageTopics.push_back(imageTopic);
   endResetModel();
+}
+
+std::optional<rclcpp::Time> ImageManager::getLatestImageTime() const
+{
+  std::lock_guard<std::mutex> guard(dequeMutex);
+  if (!msgDeque.empty()) {
+    return std::optional<rclcpp::Time>{msgDeque.back()->header.stamp};
+  }
+  return std::nullopt;
 }
 
 }  // namespace rqt_image_overlay

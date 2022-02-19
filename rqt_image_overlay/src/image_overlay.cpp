@@ -38,7 +38,9 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   menu = std::make_unique<QMenu>();
   imageManager = std::make_shared<ImageManager>(node_);
   overlayManager = std::make_shared<OverlayManager>(node_);
-  compositor = std::make_unique<Compositor>(*imageManager, *overlayManager, 30.0);
+  compositor = std::make_unique<Compositor>(
+    *imageManager, *overlayManager, 30.0,
+    rclcpp::Duration{0, 300000000});
 
   QWidget * widget = new QWidget();
   ui->setupUi(widget);

@@ -15,11 +15,13 @@
 #ifndef IMAGE_MANAGER_HPP_
 #define IMAGE_MANAGER_HPP_
 
+#include <optional>
 #include <QAbstractListModel>
 #include <QImage>
 #include <memory>
 #include <string>
 #include <vector>
+#include <deque>
 #include "image_transport/subscriber.hpp"
 #include "image_topic.hpp"
 
@@ -34,9 +36,10 @@ class ImageManager : public QAbstractListModel
 
 public:
   explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node);
-  std::shared_ptr<QImage> getImage() const;
+  std::shared_ptr<QImage> getImage(const rclcpp::Time & time) const;
   std::optional<ImageTopic> getImageTopic(unsigned index);
   void addImageTopicExplicitly(ImageTopic imageTopic);
+  std::optional<rclcpp::Time> getLatestImageTime() const;
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;
@@ -54,6 +57,9 @@ private:
   sensor_msgs::msg::Image::ConstSharedPtr lastMsg;
 
   std::vector<ImageTopic> imageTopics;
+
+  mutable std::mutex dequeMutex;
+  std::deque<sensor_msgs::msg::Image::ConstSharedPtr> msgDeque;
 };
 
 }  // namespace rqt_image_overlay
