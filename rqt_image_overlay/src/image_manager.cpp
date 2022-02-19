@@ -94,6 +94,13 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
       std::replace(topic.begin(), topic.end(), ' ', '/');
       return QString::fromStdString(topic);
     }
+  } else if (role == Qt::UserRole) {
+    if (index.row() == 0) {
+      return QVariant();
+    } else {
+      std::string topic = topics.at(index.row() - 1);
+      return QString::fromStdString(topic);
+    }
   }
 
   return QVariant();

@@ -91,7 +91,11 @@ void ImageOverlay::saveSettings(
   qt_gui_cpp::Settings &,
   qt_gui_cpp::Settings & instance_settings) const
 {
-  instance_settings.setValue("image_topic", ui->image_topics_combo_box->currentText());
+  instance_settings.setValue(
+    "image_topic",
+    ui->image_topics_combo_box->itemData(
+      ui->image_topics_combo_box->currentIndex(), Qt::UserRole)
+  );
   overlayManager->saveSettings(instance_settings);
 }
 
