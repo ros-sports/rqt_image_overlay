@@ -23,22 +23,24 @@
 namespace rqt_image_overlay
 {
 
-ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node, unsigned maxDequeSize)
-: node(node), maxDequeSize(maxDequeSize)
+ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node, unsigned msgHistoryLength)
+: node(node), msgHistoryLength(msgHistoryLength)
 {
 }
 
 void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
-  std::lock_guard<std::mutex> guard(dequeMutex);
+  std::lock_guard<std::mutex> guard(msgHistoryMutex);
 
   // Delete old messages because we don't need them anymore
-  if (msgDeque.size() > maxDequeSize)
-  {
-    msgDeque.pop_front();
+  if (msgMap.size() > msgHistoryLength) {
+    msgMap.erase(msgTimeQueue.front());
+    msgTimeQueue.pop();
   }
 
-  msgDeque.push_back(msg);
+  rclcpp::Time time = rclcpp::Time{msg->header.stamp};
+  msgMap.insert(make_pair(time, msg));
+  msgTimeQueue.push(time);
 }
 
 
@@ -46,10 +48,11 @@ void ImageManager::onTopicChanged(int index)
 {
   subscriber.shutdown();
 
-  // reset deque
+  // reset queue and map
   {
-    std::lock_guard<std::mutex> guard(dequeMutex);
-    msgDeque.clear();
+    std::lock_guard<std::mutex> guard(msgHistoryMutex);
+    msgMap.clear();
+    msgTimeQueue = {};
   }
 
   if (index > 0) {
@@ -105,25 +108,28 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
   return QVariant();
 }
 
-std::shared_ptr<QImage> ImageManager::getImage(const rclcpp::Time & time) const
+std::shared_ptr<QImage> ImageManager::getImage(const rclcpp::Time & targetTime) const
 {
   std::shared_ptr<QImage> image;
 
   sensor_msgs::msg::Image::ConstSharedPtr imageToShow;
 
   {
-    std::lock_guard<std::mutex> guard(dequeMutex);
+    std::lock_guard<std::mutex> guard(msgHistoryMutex);
 
-    if (!msgDeque.empty()) {
-      int64_t timeNs = static_cast<int64_t>(time.nanoseconds());
+    if (!msgMap.empty()) {
+      int64_t targetTimeNs = static_cast<int64_t>(targetTime.nanoseconds());
+      imageToShow = msgMap.begin()->second;
 
-      int64_t maxDiff = std::numeric_limits<int64_t>::max();
-      imageToShow = msgDeque.front();
-      for (auto const & image : msgDeque) {
-        int64_t imageNs = static_cast<int64_t>(rclcpp::Time{image->header.stamp}.nanoseconds());
-        if (int64_t diff = std::abs(imageNs - timeNs); diff < maxDiff) {
-          maxDiff = diff;
+      int64_t minDiff = std::numeric_limits<int64_t>::max();
+      for (const auto &[msgTime, image]: msgMap) {
+        int64_t msgTimeNs = static_cast<int64_t>(msgTime.nanoseconds());
+        if (int64_t diff = std::abs(msgTimeNs - targetTimeNs); diff < minDiff) {
+          minDiff = diff;
           imageToShow = image;
+        } else {
+          // A cpp map is sorted, so we won't find anything closer. Break out!
+          break;
         }
       }
     }
@@ -155,9 +161,9 @@ void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
 
 std::optional<rclcpp::Time> ImageManager::getLatestImageTime() const
 {
-  std::lock_guard<std::mutex> guard(dequeMutex);
-  if (!msgDeque.empty()) {
-    return std::optional<rclcpp::Time>{msgDeque.back()->header.stamp};
+  std::lock_guard<std::mutex> guard(msgHistoryMutex);
+  if (!msgTimeQueue.empty()) {
+    return std::optional<rclcpp::Time>{msgTimeQueue.back()};
   }
   return std::nullopt;
 }

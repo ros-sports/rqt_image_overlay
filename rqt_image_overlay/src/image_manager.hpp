@@ -21,7 +21,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <deque>
+#include <queue>
+#include <map>
 #include "image_transport/subscriber.hpp"
 #include "image_topic.hpp"
 
@@ -35,8 +36,8 @@ class ImageManager : public QAbstractListModel
   Q_OBJECT
 
 public:
-  explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node, unsigned maxDequeSize=100);
-  std::shared_ptr<QImage> getImage(const rclcpp::Time & time) const;
+  explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node, unsigned msgHistoryLength = 50);
+  std::shared_ptr<QImage> getImage(const rclcpp::Time & targetTime) const;
   std::optional<ImageTopic> getImageTopic(unsigned index);
   void addImageTopicExplicitly(ImageTopic imageTopic);
   std::optional<rclcpp::Time> getLatestImageTime() const;
@@ -57,9 +58,13 @@ private:
 
   std::vector<ImageTopic> imageTopics;
 
-  const unsigned maxDequeSize;
-  mutable std::mutex dequeMutex;
-  std::deque<sensor_msgs::msg::Image::ConstSharedPtr> msgDeque;
+  const unsigned msgHistoryLength;
+  mutable std::mutex msgHistoryMutex;
+
+  // msgMap and msgTimeQueue two together, create a FIFO Map, as described in
+  // https://stackoverflow.com/a/21315813
+  std::map<const rclcpp::Time, const sensor_msgs::msg::Image::ConstSharedPtr> msgMap;
+  std::queue<rclcpp::Time> msgTimeQueue;
 };
 
 }  // namespace rqt_image_overlay
