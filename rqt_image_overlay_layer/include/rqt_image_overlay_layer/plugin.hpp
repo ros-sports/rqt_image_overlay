@@ -20,8 +20,10 @@
 #include "rqt_image_overlay_layer/plugin_interface.hpp"
 #include "rclcpp/typesupport_helpers.hpp"
 #include "rclcpp/serialization.hpp"
+#include "rclcpp/time.hpp"
 #include "rosidl_runtime_cpp/traits.hpp"
 #include "rcpputils/asserts.hpp"
+#include "message_filters/message_traits.h"
 
 namespace rqt_image_overlay_layer
 {
@@ -44,6 +46,16 @@ public:
     } catch (const rcpputils::IllegalStateException & ex) {
       // ignore exception
     }
+  }
+
+  std::optional<rclcpp::Time> getTime(
+    const std::shared_ptr<rclcpp::SerializedMessage> & msg) override
+  {
+    rclcpp::Time time = message_filters::message_traits::TimeStamp<T>::value(deserialize(msg));
+    if (time != rclcpp::Time()){
+      return std::make_optional<rclcpp::Time>(time);
+    }
+    return std::nullopt;
   }
 
   virtual ~Plugin() {}

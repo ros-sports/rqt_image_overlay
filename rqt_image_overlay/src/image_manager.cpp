@@ -20,13 +20,11 @@
 #include "image_transport/image_transport.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
 
-#define MAX_DEQUE_SIZE 100
-
 namespace rqt_image_overlay
 {
 
-ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node)
-: node(node)
+ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node, unsigned maxDequeSize)
+: node(node), maxDequeSize(maxDequeSize)
 {
 }
 
@@ -35,7 +33,7 @@ void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
   std::lock_guard<std::mutex> guard(dequeMutex);
 
   // Delete old messages because we don't need them anymore
-  if (msgDeque.size() > MAX_DEQUE_SIZE)
+  if (msgDeque.size() > maxDequeSize)
   {
     msgDeque.pop_front();
   }

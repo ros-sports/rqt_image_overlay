@@ -35,7 +35,7 @@ class ImageManager : public QAbstractListModel
   Q_OBJECT
 
 public:
-  explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node);
+  explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node, unsigned maxDequeSize=100);
   std::shared_ptr<QImage> getImage(const rclcpp::Time & time) const;
   std::optional<ImageTopic> getImageTopic(unsigned index);
   void addImageTopicExplicitly(ImageTopic imageTopic);
@@ -54,10 +54,10 @@ private:
 
   image_transport::Subscriber subscriber;
   const std::shared_ptr<rclcpp::Node> & node;
-  sensor_msgs::msg::Image::ConstSharedPtr lastMsg;
 
   std::vector<ImageTopic> imageTopics;
 
+  const unsigned maxDequeSize;
   mutable std::mutex dequeMutex;
   std::deque<sensor_msgs::msg::Image::ConstSharedPtr> msgDeque;
 };

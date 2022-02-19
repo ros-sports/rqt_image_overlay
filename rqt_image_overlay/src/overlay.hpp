@@ -17,6 +17,8 @@
 
 #include <memory>
 #include <string>
+#include <deque>
+#include <mutex>
 #include "pluginlib/class_loader.hpp"
 
 // Forward Declaration
@@ -39,7 +41,8 @@ public:
   Overlay(
     std::string pluginClass,
     pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
-    const std::shared_ptr<rclcpp::Node> & node);
+    const std::shared_ptr<rclcpp::Node> & node,
+    unsigned maxDequeSize = 100);
   void setTopic(std::string topic);
   void overlay(QImage & image, const rclcpp::Time & time);
   void setEnabled(bool enabled);
@@ -60,6 +63,10 @@ private:
   const std::shared_ptr<rclcpp::Node> & node;
   std::shared_ptr<rclcpp::SerializedMessage> lastMsg;
   std::shared_ptr<rclcpp::Time> timeLastMsgReceived;
+
+  const unsigned maxDequeSize;
+  mutable std::mutex dequeMutex;
+  std::deque<std::shared_ptr<rclcpp::SerializedMessage>> msgDeque;
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
 };

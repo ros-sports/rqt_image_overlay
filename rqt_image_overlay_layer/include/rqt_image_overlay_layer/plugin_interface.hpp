@@ -18,6 +18,8 @@
 #include <QImage>
 #include <string>
 #include <memory>
+#include <optional>
+#include "rclcpp/time.hpp"
 
 // forward declaration
 namespace rclcpp {class SerializedMessage;}
@@ -31,6 +33,8 @@ public:
   virtual std::string getTopicType() const = 0;
   virtual void overlay(
     QImage & layer,
+    const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;
+  virtual std::optional<rclcpp::Time> getTime(
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;
   virtual ~PluginInterface() {}
 
