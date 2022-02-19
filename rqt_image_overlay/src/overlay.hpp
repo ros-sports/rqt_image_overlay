@@ -17,8 +17,9 @@
 
 #include <memory>
 #include <string>
-#include <deque>
+#include <queue>
 #include <mutex>
+#include <map>
 #include "pluginlib/class_loader.hpp"
 
 // Forward Declaration
@@ -42,9 +43,9 @@ public:
     std::string pluginClass,
     pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
     const std::shared_ptr<rclcpp::Node> & node,
-    unsigned maxDequeSize = 100);
+    unsigned msgHistoryLength = 100);
   void setTopic(std::string topic);
-  void overlay(QImage & image, const rclcpp::Time & time);
+  void overlay(QImage & image, const rclcpp::Time & targetTime);
   void setEnabled(bool enabled);
 
   std::string getTopic() const;
@@ -61,12 +62,18 @@ private:
   bool enabled = true;
   std::shared_ptr<rclcpp::GenericSubscription> subscription;
   const std::shared_ptr<rclcpp::Node> & node;
-  std::shared_ptr<rclcpp::SerializedMessage> lastMsg;
   std::shared_ptr<rclcpp::Time> timeLastMsgReceived;
 
-  const unsigned maxDequeSize;
-  mutable std::mutex dequeMutex;
-  std::deque<std::shared_ptr<rclcpp::SerializedMessage>> msgDeque;
+  const unsigned msgHistoryLength;
+  mutable std::mutex msgHistoryMutex;
+
+  // msgMap and msgTimeQueue two together, create a FIFO Map, as described in
+  // https://stackoverflow.com/a/21315813
+  std::map<const rclcpp::Time, std::shared_ptr<rclcpp::SerializedMessage>> msgMap;
+  std::queue<rclcpp::Time> msgTimeQueue;
+
+  bool headerStampNotUsed = false;
+  std::shared_ptr<rclcpp::SerializedMessage> lastMsg; // used if headerStampNotUsed == true
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
 };

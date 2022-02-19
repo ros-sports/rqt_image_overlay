@@ -28,9 +28,9 @@ namespace rqt_image_overlay
 Overlay::Overlay(
   std::string pluginClass,
   pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
-  const std::shared_ptr<rclcpp::Node> & node, unsigned maxDequeSize)
+  const std::shared_ptr<rclcpp::Node> & node, unsigned msgHistoryLength)
 : pluginClass(pluginClass), instance(pluginLoader.createSharedInstance(pluginClass)),
-  msgType(instance->getTopicType()), node(node), maxDequeSize(maxDequeSize)
+  msgType(instance->getTopicType()), node(node), msgHistoryLength(msgHistoryLength)
 {
 }
 
@@ -43,10 +43,12 @@ void Overlay::setTopic(std::string topic)
         std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;
 
-      // reset deque
+      // reset queue and map
       {
-        std::lock_guard<std::mutex> guard(dequeMutex);
-        msgDeque.clear();
+        std::lock_guard<std::mutex> guard(msgHistoryMutex);
+        msgMap.clear();
+        msgTimeQueue = {};
+        lastMsg.reset();
       }
     } catch (const std::exception & e) {
       qWarning("(Overlay) Failed to change subscription topic: %s", e.what());
@@ -55,26 +57,25 @@ void Overlay::setTopic(std::string topic)
   }
 }
 
-void Overlay::overlay(QImage & image, const rclcpp::Time & time)
+void Overlay::overlay(QImage & image, const rclcpp::Time & targetTime)
 {
   std::shared_ptr<rclcpp::SerializedMessage> msgToDraw;
-  {
-    std::lock_guard<std::mutex> guard(dequeMutex);
-    if (!msgDeque.empty()) {
-      int64_t timeNs = static_cast<int64_t>(time.nanoseconds());
 
-      int64_t maxDiff = std::numeric_limits<int64_t>::max();
-      msgToDraw = msgDeque.front();
-      for (auto const & msg : msgDeque) {
-        if (auto time = instance->getTime(msg); time.has_value()) {
-          int64_t msgNs = static_cast<int64_t>(time.value().nanoseconds());
-          if (int64_t diff = std::abs(msgNs - timeNs); diff < maxDiff) {
-            maxDiff = diff;
-            msgToDraw = msg;
-          }
+  if (!msgMap.empty()) {
+    std::lock_guard<std::mutex> guard(msgHistoryMutex);
+    if (headerStampNotUsed) {
+      msgToDraw = lastMsg;
+    } else {
+      int64_t targetTimeNs = static_cast<int64_t>(targetTime.nanoseconds());
+      int64_t minDiff = std::numeric_limits<int64_t>::max();
+      msgToDraw = msgMap.begin()->second;
+      for (const auto &[msgTime, msg]: msgMap) {
+        int64_t msgTimeNs = static_cast<int64_t>(msgTime.nanoseconds());
+        if (int64_t diff = std::abs(msgTimeNs - targetTimeNs); diff < minDiff) {
+          minDiff = diff;
+          msgToDraw = msg;
         } else {
-          // Realized this message type doesn't have a header so we can't access the time
-          msgToDraw = msgDeque.back();
+          // A cpp map is sorted, so we won't find anything closer. Break out!
           break;
         }
       }
@@ -125,14 +126,24 @@ bool Overlay::isEnabled() const
 void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
   {
-    std::lock_guard<std::mutex> guard(dequeMutex);
+    std::lock_guard<std::mutex> guard(msgHistoryMutex);
 
     // Delete old messages because we don't need them anymore
-    if (msgDeque.size() > maxDequeSize) {
-      msgDeque.pop_front();
+    if (msgMap.size() > msgHistoryLength) {
+      msgMap.erase(msgTimeQueue.front());
+      msgTimeQueue.pop();
     }
 
-    msgDeque.push_back(msg);
+    auto time = instance->getTime(msg);
+    if (time.has_value()) {
+      // Store the new msg
+      msgMap.insert(make_pair(time.value(), msg));
+      msgTimeQueue.push(time.value());
+    } else {
+      // If there is no timestamp on the msgs, clear the history and just store in lastMsgg
+      lastMsg = msg;
+    }
+
   }
 
   std::atomic_store(&timeLastMsgReceived, std::make_shared<rclcpp::Time>(node->now()));
