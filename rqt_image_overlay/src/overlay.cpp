@@ -71,8 +71,6 @@ void Overlay::overlay(QImage & image, const rclcpp::Time & time)
           if (int64_t diff = std::abs(msgNs - timeNs); diff < maxDiff) {
             maxDiff = diff;
             msgToDraw = msg;
-          } else {
-            break;
           }
         } else {
           // Realized this message type doesn't have a header so we can't access the time

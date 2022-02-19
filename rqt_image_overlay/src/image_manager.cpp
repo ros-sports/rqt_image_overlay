@@ -124,8 +124,6 @@ std::shared_ptr<QImage> ImageManager::getImage(const rclcpp::Time & time) const
         if (int64_t diff = std::abs(imageNs - timeNs); diff < maxDiff) {
           maxDiff = diff;
           imageToShow = image;
-        } else {
-          break;
         }
       }
     }
