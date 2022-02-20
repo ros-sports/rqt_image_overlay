@@ -57,7 +57,7 @@ TEST_F(TestListImageTopics, TestOne)
 
   auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 1u);
-  EXPECT_EQ(topics.at(0), "/test_topic");
+  EXPECT_EQ(topics.at(0).topic, "/test_topic");
 }
 
 TEST_F(TestListImageTopics, TestThree)
@@ -74,7 +74,19 @@ TEST_F(TestListImageTopics, TestThree)
 
   auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 3u);
-  EXPECT_EQ(std::count(topics.begin(), topics.end(), "/test_ns1/test_topic1"), 1);
-  EXPECT_EQ(std::count(topics.begin(), topics.end(), "/test_ns2/test_topic2"), 1);
-  EXPECT_EQ(std::count(topics.begin(), topics.end(), "/test_ns3/test_topic3"), 1);
+  EXPECT_EQ(
+    std::count_if(
+      topics.begin(), topics.end(), [](ImageTopic t) {
+        return t.topic == "/test_ns1/test_topic1";
+      }), 1);
+  EXPECT_EQ(
+    std::count_if(
+      topics.begin(), topics.end(), [](ImageTopic t) {
+        return t.topic == "/test_ns2/test_topic2";
+      }), 1);
+  EXPECT_EQ(
+    std::count_if(
+      topics.begin(), topics.end(), [](ImageTopic t) {
+        return t.topic == "/test_ns3/test_topic3";
+      }), 1);
 }

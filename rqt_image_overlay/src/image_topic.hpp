@@ -1,4 +1,4 @@
-// Copyright 2021 Kenji Brameld
+// Copyright 2022 Kenji Brameld
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIST_IMAGE_TOPICS_HPP_
-#define LIST_IMAGE_TOPICS_HPP_
+#ifndef IMAGE_TOPIC_HPP_
+#define IMAGE_TOPIC_HPP_
 
-#include <vector>
-#include "image_topic.hpp"
-
-// forward declaration
-namespace rclcpp {class Node;}
-
-namespace rqt_image_overlay
+class ImageTopic
 {
+public:
+  ImageTopic(const std::string topic, const std::string transport)
+  : topic(topic), transport(transport) {}
 
-std::vector<ImageTopic> ListImageTopics(const rclcpp::Node & node);
+  const std::string topic;
+  const std::string transport;
+};
 
-}  // namespace rqt_image_overlay
-
-#endif  // LIST_IMAGE_TOPICS_HPP_
+#endif  // IMAGE_TOPIC_HPP_

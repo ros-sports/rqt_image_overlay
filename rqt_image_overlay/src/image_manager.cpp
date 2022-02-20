@@ -33,26 +33,24 @@ void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
 }
 
 
-void ImageManager::onTopicChanged(const QString & text)
+// void ImageManager::onTopicChanged(const QString & text)
+void ImageManager::onTopicChanged(int index)
 {
   subscriber.shutdown();
 
   // reset image on topic change
   std::atomic_store(&lastMsg, sensor_msgs::msg::Image::ConstSharedPtr{});
 
-  QStringList parts = text.split(" ");
-  QString topic = parts.first();
-  QString transport = parts.length() == 2 ? parts.last() : "raw";
-
-  if (!topic.isEmpty()) {
+  if (index > 0) {
+    ImageTopic & imageTopic = topics.at(index - 1);
     try {
       subscriber = image_transport::create_subscription(
-        node.get(), topic.toStdString(),
+        node.get(), imageTopic.topic,
         std::bind(&ImageManager::callbackImage, this, std::placeholders::_1),
-        transport.toStdString(), rmw_qos_profile_sensor_data);
+        imageTopic.transport, rmw_qos_profile_sensor_data);
       qDebug(
         "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
-        topic.toStdString().c_str(), subscriber.getTransport().c_str());
+        imageTopic.topic.c_str(), imageTopic.transport.c_str());
     } catch (image_transport::TransportLoadException & e) {
       qWarning("(ImageManager) Loading image transport plugin failed");
     }
@@ -67,9 +65,6 @@ void ImageManager::updateImageTopicList()
   // fill combo box
   topics = ListImageTopics(*node);
 
-  for (std::string & topic : topics) {
-    std::replace(topic.begin(), topic.end(), ' ', '/');
-  }
   endResetModel();
 }
 
@@ -85,8 +80,9 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
     if (index.row() == 0) {
       return QVariant();
     } else {
-      std::string topic = topics.at(index.row() - 1);
-      return QString::fromStdString(topic);
+      const ImageTopic & imageTopic = topics.at(index.row() - 1);
+      return QString::fromStdString(imageTopic.topic) + " (" + QString::fromStdString(
+        imageTopic.transport) + ")";
     }
   }
 
@@ -105,12 +101,34 @@ std::shared_ptr<QImage> ImageManager::getImage() const
   return image;
 }
 
-void ImageManager::setTopicExplicitly(QString topic)
+void ImageManager::setImageTopicExplicitly(ImageTopic topic)
 {
   beginResetModel();
   topics.clear();
-  topics.push_back(topic.toStdString());
+  topics.push_back(topic);
   endResetModel();
+}
+
+void ImageManager::saveSettings(qt_gui_cpp::Settings & settings) const
+{
+  // int currentItem = ui->image_topics_combo_box->currentData();
+  // if (currentItem != 0) {
+  //   const ImageTopic & imageTopic = topics.at(currentItem - 1);
+  //   settings.setValue("image_topic", imageTopic.topic);
+  //   settings.setValue("image_transport", imageTopic.transport);
+  // }
+}
+
+void ImageManager::restoreSettings(const qt_gui_cpp::Settings & settings)
+{
+  // if (settings.contains("image_topic")) {
+  //   QString topic = settings.value("image_topic").toString();
+  //   if (topic != "") {
+  //     QString transport = settings.value("image_transport").toString();
+  //     imageManager->setTopicExplicitly(ImageTopic{topic, transport});
+  //     ui->image_topics_combo_box->setCurrentIndex(1);
+  //   }
+  // }
 }
 
 }  // namespace rqt_image_overlay

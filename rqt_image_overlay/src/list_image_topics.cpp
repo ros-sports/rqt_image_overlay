@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
 #include <vector>
 #include <map>
 #include "list_image_topics.hpp"
@@ -21,14 +20,15 @@
 namespace rqt_image_overlay
 {
 
-std::vector<std::string> ListImageTopics(const rclcpp::Node & node)
+std::vector<ImageTopic> ListImageTopics(const rclcpp::Node & node)
 {
   std::map<std::string, std::vector<std::string>> topic_info = node.get_topic_names_and_types();
 
-  std::vector<std::string> topics;
+  std::vector<ImageTopic> topics;
   for (auto const & [topic_name, topic_types] : topic_info) {
     if (std::count(topic_types.begin(), topic_types.end(), "sensor_msgs/msg/Image") > 0) {
-      topics.push_back(topic_name);
+      ImageTopic topic(topic_name, "raw");
+      topics.push_back(topic);
     }
   }
   return topics;
