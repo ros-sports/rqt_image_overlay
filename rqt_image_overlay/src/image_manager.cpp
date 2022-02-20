@@ -33,7 +33,6 @@ void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
 }
 
 
-// void ImageManager::onTopicChanged(const QString & text)
 void ImageManager::onTopicChanged(int index)
 {
   subscriber.shutdown();
