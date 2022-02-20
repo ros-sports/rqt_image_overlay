@@ -25,10 +25,29 @@ std::vector<ImageTopic> ListImageTopics(const rclcpp::Node & node)
   std::map<std::string, std::vector<std::string>> topic_info = node.get_topic_names_and_types();
 
   std::vector<ImageTopic> topics;
+
+  std::vector<std::string> types = {"sensor_msgs/msg/Image", "sensor_msgs/msg/CompressedImage"};
+
   for (auto const & [topic_name, topic_types] : topic_info) {
-    if (std::count(topic_types.begin(), topic_types.end(), "sensor_msgs/msg/Image") > 0) {
-      ImageTopic topic(topic_name, "raw");
-      topics.push_back(topic);
+
+    for (auto & type : types) {
+      if (std::count(topic_types.begin(), topic_types.end(), type) > 0) {
+        if (type == "sensor_msgs/msg/Image") {
+          // Raw image transport
+          topics.push_back({topic_name, "raw"});
+        } else {
+          // Some image transport other than raw is being used.
+          // Assume transport name is after the last forward slash, due to image_trasport
+          // conventions.
+          // For example, a topic such as "/foo/bar/compressed" will be decomposed into
+          // topic = "/foo/bar"
+          // transport = "compressed"
+          const auto lastSlashIndex = topic_name.find_last_of("/");
+          std::string topic = topic_name.substr(0, lastSlashIndex);
+          std::string transport = topic_name.substr(lastSlashIndex + 1);
+          topics.push_back({topic, transport});
+        }
+      }
     }
   }
   return topics;
