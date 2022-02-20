@@ -15,6 +15,8 @@
 #ifndef IMAGE_TOPIC_HPP_
 #define IMAGE_TOPIC_HPP_
 
+#include <string>
+
 class ImageTopic
 {
 public:
@@ -23,6 +25,16 @@ public:
 
   const std::string topic;
   const std::string transport;
+
+  bool operator==(const ImageTopic & other) const
+  {
+    return (topic == other.topic) && (transport == other.transport);
+  }
+
+  bool operator!=(const ImageTopic & other) const
+  {
+    return (topic != other.topic) || (transport != other.transport);
+  }
 };
 
 #endif  // IMAGE_TOPIC_HPP_

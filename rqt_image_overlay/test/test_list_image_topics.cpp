@@ -18,6 +18,12 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "image_transport/image_transport.hpp"
+#include "theora_image_transport/msg/packet.hpp"
+#include "std_msgs/msg/string.hpp"
+
+// In this test, there's two types of transports (ie. "raw" and "theora") available.
+// The "theora" transport is declared as a test dependency so we can write tests for
+// image_transport plugins.
 
 class TestListImageTopics : public ::testing::Test
 {
@@ -49,7 +55,52 @@ TEST_F(TestListImageTopics, TestOne)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
 
-  auto publisher = image_transport::create_publisher(node.get(), "test_topic");
+  auto publisher = image_transport::create_publisher(node.get(), "/test_topic");
+
+  // Give a chance for the topic to be picked up
+  rclcpp::sleep_for(std::chrono::milliseconds(10));
+  rclcpp::spin_some(node);
+
+  auto topics = rqt_image_overlay::ListImageTopics(*node);
+  ASSERT_EQ(topics.size(), 2u);
+  EXPECT_EQ(std::count(topics.begin(), topics.end(), ImageTopic{"/test_topic", "raw"}), 1);
+  EXPECT_EQ(std::count(topics.begin(), topics.end(), ImageTopic{"/test_topic", "theora"}), 1);
+}
+
+TEST_F(TestListImageTopics, TestThree)
+{
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+
+  auto publisher1 = image_transport::create_publisher(node.get(), "/test_ns1/test_topic1");
+  auto publisher2 = image_transport::create_publisher(node.get(), "/test_ns2/test_topic2");
+  auto publisher3 = image_transport::create_publisher(node.get(), "/test_ns3/test_topic3");
+
+  // Give a chance for the topic to be picked up
+  rclcpp::sleep_for(std::chrono::milliseconds(10));
+  rclcpp::spin_some(node);
+
+  auto topics = rqt_image_overlay::ListImageTopics(*node);
+  ASSERT_EQ(topics.size(), 6u);
+  EXPECT_EQ(
+    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns1/test_topic1", "raw"}), 1);
+  EXPECT_EQ(
+    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns1/test_topic1", "theora"}), 1);
+  EXPECT_EQ(
+    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns2/test_topic2", "raw"}), 1);
+  EXPECT_EQ(
+    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns2/test_topic2", "theora"}), 1);
+  EXPECT_EQ(
+    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns3/test_topic3", "raw"}), 1);
+  EXPECT_EQ(
+    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns3/test_topic3", "theora"}), 1);
+}
+
+TEST_F(TestListImageTopics, TestOnlyTheoraTransport)
+{
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+
+  auto publisher =
+    node->create_publisher<theora_image_transport::msg::Packet>("/test_topic/theora", 1);
 
   // Give a chance for the topic to be picked up
   rclcpp::sleep_for(std::chrono::milliseconds(10));
@@ -57,36 +108,23 @@ TEST_F(TestListImageTopics, TestOne)
 
   auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 1u);
-  EXPECT_EQ(topics.at(0).topic, "/test_topic");
+  EXPECT_EQ(
+    std::count(topics.begin(), topics.end(), ImageTopic{"/test_topic", "theora"}), 1);
 }
 
-TEST_F(TestListImageTopics, TestThree)
+TEST_F(TestListImageTopics, TestFakeTheoraTransport)
 {
+  // In this example, we test a case where the topic name ends with a transport type, but the msg
+  // type is not theora_image_transport::msg::Packet.
   auto node = std::make_shared<rclcpp::Node>("test_node");
 
-  auto publisher1 = image_transport::create_publisher(node.get(), "test_ns1/test_topic1");
-  auto publisher2 = image_transport::create_publisher(node.get(), "test_ns2/test_topic2");
-  auto publisher3 = image_transport::create_publisher(node.get(), "test_ns3/test_topic3");
+  auto publisher =
+    node->create_publisher<std_msgs::msg::String>("/test_topic/theora", 1);
 
   // Give a chance for the topic to be picked up
   rclcpp::sleep_for(std::chrono::milliseconds(10));
   rclcpp::spin_some(node);
 
   auto topics = rqt_image_overlay::ListImageTopics(*node);
-  ASSERT_EQ(topics.size(), 3u);
-  EXPECT_EQ(
-    std::count_if(
-      topics.begin(), topics.end(), [](ImageTopic t) {
-        return t.topic == "/test_ns1/test_topic1";
-      }), 1);
-  EXPECT_EQ(
-    std::count_if(
-      topics.begin(), topics.end(), [](ImageTopic t) {
-        return t.topic == "/test_ns2/test_topic2";
-      }), 1);
-  EXPECT_EQ(
-    std::count_if(
-      topics.begin(), topics.end(), [](ImageTopic t) {
-        return t.topic == "/test_ns3/test_topic3";
-      }), 1);
+  ASSERT_TRUE(topics.empty());
 }
