@@ -18,6 +18,7 @@
 #include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
+#include "qt_gui_cpp/settings.h"
 
 namespace rqt_image_overlay
 {
@@ -64,6 +65,12 @@ void ImageManager::updateImageTopicList()
   // fill combo box
   topics = ListImageTopics(*node);
 
+  // if there are no publishers on the subscribed topic, delete the subscription
+  if (subscriber.getNumPublishers() == 0) {
+    subscriber.shutdown();
+    subscriber = image_transport::Subscriber{};
+  }
+
   endResetModel();
 }
 
@@ -100,7 +107,7 @@ std::shared_ptr<QImage> ImageManager::getImage() const
   return image;
 }
 
-void ImageManager::setImageTopicExplicitly(ImageTopic topic)
+void ImageManager::addImageTopicExplicitly(ImageTopic topic)
 {
   beginResetModel();
   topics.clear();
@@ -108,26 +115,24 @@ void ImageManager::setImageTopicExplicitly(ImageTopic topic)
   endResetModel();
 }
 
-void ImageManager::saveSettings(qt_gui_cpp::Settings & settings) const
+void ImageManager::saveSettings(qt_gui_cpp::Settings & settings, int currentIndex) const
 {
-  // int currentItem = ui->image_topics_combo_box->currentData();
-  // if (currentItem != 0) {
-  //   const ImageTopic & imageTopic = topics.at(currentItem - 1);
-  //   settings.setValue("image_topic", imageTopic.topic);
-  //   settings.setValue("image_transport", imageTopic.transport);
-  // }
+  if (currentIndex != 0) {
+    const ImageTopic & imageTopic = topics.at(currentIndex - 1);
+    settings.setValue("image_topic", QString::fromStdString(imageTopic.topic));
+    settings.setValue("image_transport", QString::fromStdString(imageTopic.transport));
+  }
 }
 
-void ImageManager::restoreSettings(const qt_gui_cpp::Settings & settings)
+bool ImageManager::restoreSettings(const qt_gui_cpp::Settings & settings)
 {
-  // if (settings.contains("image_topic")) {
-  //   QString topic = settings.value("image_topic").toString();
-  //   if (topic != "") {
-  //     QString transport = settings.value("image_transport").toString();
-  //     imageManager->setTopicExplicitly(ImageTopic{topic, transport});
-  //     ui->image_topics_combo_box->setCurrentIndex(1);
-  //   }
-  // }
+  if (settings.contains("image_topic") && settings.contains("image_transport")) {
+    std::string topic = settings.value("image_topic").toString().toStdString();
+    std::string transport = settings.value("image_transport").toString().toStdString();
+    addImageTopicExplicitly(ImageTopic{topic, transport});
+    return true;
+  }
+  return false;
 }
 
 }  // namespace rqt_image_overlay

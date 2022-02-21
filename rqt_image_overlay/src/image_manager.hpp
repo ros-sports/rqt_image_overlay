@@ -36,9 +36,10 @@ class ImageManager : public QAbstractListModel
 public:
   explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node);
   std::shared_ptr<QImage> getImage() const;
-  void setImageTopicExplicitly(ImageTopic topic);
-  void saveSettings(qt_gui_cpp::Settings & settings) const;
-  void restoreSettings(const qt_gui_cpp::Settings & settings);
+  void saveSettings(qt_gui_cpp::Settings & settings, int currentIndex) const;
+
+  // return whether a topic and transport was found from settings, and added to the model at index 1
+  bool restoreSettings(const qt_gui_cpp::Settings & settings);
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;
@@ -50,6 +51,8 @@ public slots:
 
 private:
   void callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
+
+  void addImageTopicExplicitly(ImageTopic topic);
 
   image_transport::Subscriber subscriber;
   const std::shared_ptr<rclcpp::Node> & node;

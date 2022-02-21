@@ -37,20 +37,20 @@ std::vector<ImageTopic> ListImageTopics(rclcpp::Node & node)
     }
   }
 
-  std::vector<ImageTopic> topics;
+  std::vector<ImageTopic> imageTopicCandidates;
   for (auto const & [topic_name, topic_types] : node.get_topic_names_and_types()) {
-    for (auto & type : topic_types) {
-      if (std::count(topic_types.begin(), topic_types.end(), type) > 0) {
-        if (type == "sensor_msgs/msg/Image") {
+    for (auto & topic_type : topic_types) {
+      if (std::count(topic_types.begin(), topic_types.end(), topic_type) > 0) {
+        if (topic_type == "sensor_msgs/msg/Image") {
           // Raw image transport
-          topics.push_back({topic_name, "raw"});
+          imageTopicCandidates.push_back({topic_name, "raw"});
         } else {
           // Some image transport other than raw is being used.
           // Assume transport name is after the last forward slash, due to image_trasport
           // conventions.
-          // For example, a topic such as "/foo/bar/compressed" will be decomposed into
-          // topic = "/foo/bar"
-          // transport = "compressed"
+          // For example, a topic such as "/foo/bar/compressed" will be decomposed into:
+          //   topic - "/foo/bar"
+          //   transport - "compressed"
 
           const auto lastSlashIndex = topic_name.find_last_of("/");
           std::string topic = topic_name.substr(0, lastSlashIndex);
@@ -58,25 +58,36 @@ std::vector<ImageTopic> ListImageTopics(rclcpp::Node & node)
 
           // If the transport is in the list of declared transports
           if (std::count(declaredTransports.begin(), declaredTransports.end(), transport) > 0) {
-            // If we can make an image_transport subscription
-            try {
-              auto subscriber = image_transport::create_subscription(
-                &node, topic, image_transport::Subscriber::Callback{}, transport);
-
-              // If we get here, then we're certain we can subscribe to the topic
-              topics.push_back({topic, transport});
-            } catch (image_transport::TransportLoadException & e) {
-              // Wasn't a valid transport. Don't add to list
-            } catch (rclcpp::exceptions::RCLError & e) {
-              // Msg type of the subscription didn't match the one being published by an existing
-              // publisher. Don't add to list.
-            }
+            imageTopicCandidates.push_back({topic, transport});
           }
         }
       }
     }
   }
-  return topics;
+
+  std::vector<ImageTopic> imageTopics;
+  // Check if a subscription can be made successfully, with more than one valid publisher
+  for (auto & imageTopic : imageTopicCandidates) {
+    const std::string & topic = imageTopic.topic;
+    const std::string & transport = imageTopic.transport;
+    try {
+      auto subscriber = image_transport::create_subscription(
+        &node, topic, image_transport::Subscriber::Callback{}, transport);
+
+      // Check if the image subscriber managed to successfully connect to any publishers
+      // This considers cases where the msg type of publisher and subscriber don't match.
+      if (subscriber.getNumPublishers() > 0) {
+        imageTopics.push_back(imageTopic);
+      }
+    } catch (image_transport::TransportLoadException & e) {
+      // Wasn't a valid transport. Don't add to list
+    } catch (rclcpp::exceptions::RCLError & e) {
+      // Msg type of the subscription didn't match the one being published by an existing
+      // publisher. Don't add to list.
+    }
+  }
+
+  return imageTopics;
 }
 
 }  // namespace rqt_image_overlay
