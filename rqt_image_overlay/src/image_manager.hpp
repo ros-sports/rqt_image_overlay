@@ -24,7 +24,6 @@
 #include "image_topic.hpp"
 
 namespace rclcpp {class Node;}
-namespace qt_gui_cpp {class Settings;}
 
 namespace rqt_image_overlay
 {
@@ -36,10 +35,8 @@ class ImageManager : public QAbstractListModel
 public:
   explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node);
   std::shared_ptr<QImage> getImage() const;
-  void saveSettings(qt_gui_cpp::Settings & settings, int currentIndex) const;
-
-  // return whether a topic and transport was found from settings, and added to the model at index 1
-  bool restoreSettings(const qt_gui_cpp::Settings & settings);
+  std::optional<ImageTopic> getImageTopic(unsigned index);
+  void addImageTopicExplicitly(ImageTopic topic);
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;
@@ -51,8 +48,6 @@ public slots:
 
 private:
   void callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
-
-  void addImageTopicExplicitly(ImageTopic topic);
 
   image_transport::Subscriber subscriber;
   const std::shared_ptr<rclcpp::Node> & node;

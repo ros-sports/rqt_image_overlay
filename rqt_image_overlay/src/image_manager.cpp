@@ -18,7 +18,6 @@
 #include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
-#include "qt_gui_cpp/settings.h"
 
 namespace rqt_image_overlay
 {
@@ -107,32 +106,21 @@ std::shared_ptr<QImage> ImageManager::getImage() const
   return image;
 }
 
+std::optional<ImageTopic> ImageManager::getImageTopic(unsigned index)
+{
+  if (index > 0 && index < topics.size()) {
+    const ImageTopic & it = topics.at(index);
+    return std::make_optional<ImageTopic>(it);
+  }
+  return std::nullopt;
+}
+
 void ImageManager::addImageTopicExplicitly(ImageTopic topic)
 {
   beginResetModel();
   topics.clear();
   topics.push_back(topic);
   endResetModel();
-}
-
-void ImageManager::saveSettings(qt_gui_cpp::Settings & settings, int currentIndex) const
-{
-  if (currentIndex != 0) {
-    const ImageTopic & imageTopic = topics.at(currentIndex - 1);
-    settings.setValue("image_topic", QString::fromStdString(imageTopic.topic));
-    settings.setValue("image_transport", QString::fromStdString(imageTopic.transport));
-  }
-}
-
-bool ImageManager::restoreSettings(const qt_gui_cpp::Settings & settings)
-{
-  if (settings.contains("image_topic") && settings.contains("image_transport")) {
-    std::string topic = settings.value("image_topic").toString().toStdString();
-    std::string transport = settings.value("image_transport").toString().toStdString();
-    addImageTopicExplicitly(ImageTopic{topic, transport});
-    return true;
-  }
-  return false;
 }
 
 }  // namespace rqt_image_overlay

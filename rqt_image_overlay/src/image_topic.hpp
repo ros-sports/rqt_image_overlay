@@ -23,6 +23,9 @@ public:
   ImageTopic(const std::string topic, const std::string transport)
   : topic(topic), transport(transport) {}
 
+  ImageTopic(const ImageTopic & other)
+  : topic(other.topic), transport(other.transport) {}
+
   const std::string topic;
   const std::string transport;
 
@@ -35,10 +38,6 @@ public:
   {
     return (topic != other.topic) || (transport != other.transport);
   }
-
-  // Copy constructor
-  ImageTopic(const ImageTopic & other)
-  : topic(other.topic), transport(other.transport) {}
 };
 
 #endif  // IMAGE_TOPIC_HPP_
