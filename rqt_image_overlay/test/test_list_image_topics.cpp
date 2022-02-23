@@ -14,11 +14,17 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <vector>
 #include "../src/list_image_topics.hpp"
 #include "rclcpp/node.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "image_transport/image_transport.hpp"
+#include "theora_image_transport/msg/packet.hpp"
+#include "std_msgs/msg/string.hpp"
 
+// In this test, there's two types of transports (ie. "raw" and "theora") available.
+// The "theora" transport is declared as a test dependency so we can write tests for
+// image_transport plugins.
 class TestListImageTopics : public ::testing::Test
 {
 protected:
@@ -31,6 +37,13 @@ protected:
   {
     rclcpp::shutdown();
   }
+
+  static bool checkContains(
+    const std::vector<rqt_image_overlay::ImageTopic> & imageTopics,
+    const rqt_image_overlay::ImageTopic & imageTopic)
+  {
+    return std::count(imageTopics.begin(), imageTopics.end(), imageTopic) > 0;
+  }
 };
 
 TEST_F(TestListImageTopics, TestNone)
@@ -41,8 +54,8 @@ TEST_F(TestListImageTopics, TestNone)
   rclcpp::sleep_for(std::chrono::milliseconds(10));
   rclcpp::spin_some(node);
 
-  auto topics = rqt_image_overlay::ListImageTopics(*node);
-  EXPECT_EQ(topics.size(), 0u);
+  auto imageTopics = rqt_image_overlay::ListImageTopics(*node);
+  EXPECT_EQ(imageTopics.size(), 0u);
 }
 
 TEST_F(TestListImageTopics, TestOne)
@@ -55,12 +68,10 @@ TEST_F(TestListImageTopics, TestOne)
   rclcpp::sleep_for(std::chrono::milliseconds(10));
   rclcpp::spin_some(node);
 
-  auto topics = rqt_image_overlay::ListImageTopics(*node);
-  ASSERT_EQ(topics.size(), 1u);
-  EXPECT_EQ(
-    std::count(
-      topics.begin(), topics.end(),
-      rqt_image_overlay::ImageTopic{"/test_topic", "raw"}), 1);
+  auto imageTopics = rqt_image_overlay::ListImageTopics(*node);
+  ASSERT_EQ(imageTopics.size(), 2u);
+  EXPECT_TRUE(checkContains(imageTopics, rqt_image_overlay::ImageTopic{"/test_topic", "raw"}));
+  EXPECT_TRUE(checkContains(imageTopics, rqt_image_overlay::ImageTopic{"/test_topic", "theora"}));
 }
 
 TEST_F(TestListImageTopics, TestThree)
@@ -75,18 +86,30 @@ TEST_F(TestListImageTopics, TestThree)
   rclcpp::sleep_for(std::chrono::milliseconds(10));
   rclcpp::spin_some(node);
 
-  auto topics = rqt_image_overlay::ListImageTopics(*node);
-  ASSERT_EQ(topics.size(), 3u);
-  EXPECT_EQ(
-    std::count(
-      topics.begin(), topics.end(),
-      rqt_image_overlay::ImageTopic{"/test_ns1/test_topic1", "raw"}), 1);
-  EXPECT_EQ(
-    std::count(
-      topics.begin(), topics.end(),
-      rqt_image_overlay::ImageTopic{"/test_ns2/test_topic2", "raw"}), 1);
-  EXPECT_EQ(
-    std::count(
-      topics.begin(), topics.end(),
-      rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "raw"}), 1);
+  auto imageTopics = rqt_image_overlay::ListImageTopics(*node);
+  ASSERT_EQ(imageTopics.size(), 6u);
+  EXPECT_TRUE(
+    checkContains(
+      imageTopics,
+      rqt_image_overlay::ImageTopic{"/test_ns1/test_topic1", "raw"}));
+  EXPECT_TRUE(
+    checkContains(
+      imageTopics,
+      rqt_image_overlay::ImageTopic{"/test_ns1/test_topic1", "theora"}));
+  EXPECT_TRUE(
+    checkContains(
+      imageTopics,
+      rqt_image_overlay::ImageTopic{"/test_ns2/test_topic2", "raw"}));
+  EXPECT_TRUE(
+    checkContains(
+      imageTopics,
+      rqt_image_overlay::ImageTopic{"/test_ns2/test_topic2", "theora"}));
+  EXPECT_TRUE(
+    checkContains(
+      imageTopics,
+      rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "raw"}));
+  EXPECT_TRUE(
+    checkContains(
+      imageTopics,
+      rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "theora"}));
 }
