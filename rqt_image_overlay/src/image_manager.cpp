@@ -86,8 +86,7 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
       return QVariant();
     } else {
       const ImageTopic & imageTopic = topics.at(index.row() - 1);
-      return QString::fromStdString(imageTopic.topic) + " (" + QString::fromStdString(
-        imageTopic.transport) + ")";
+      return QString::fromStdString(imageTopic.toString());
     }
   }
 

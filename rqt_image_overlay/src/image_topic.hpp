@@ -38,6 +38,15 @@ public:
   {
     return (topic != other.topic) || (transport != other.transport);
   }
+
+  std::string toString() const
+  {
+    return topic + " (" + transport + ")";
+  }
 };
 
+inline std::ostream & operator<<(std::ostream & strm, const ImageTopic & imageTopic)
+{
+  return strm << imageTopic.toString();
+}
 #endif  // IMAGE_TOPIC_HPP_
