@@ -17,6 +17,9 @@
 
 #include <string>
 
+namespace rqt_image_overlay
+{
+
 class ImageTopic
 {
 public:
@@ -49,4 +52,7 @@ inline std::ostream & operator<<(std::ostream & strm, const ImageTopic & imageTo
 {
   return strm << imageTopic.toString();
 }
+
+}  // namespace rqt_image_overlay
+
 #endif  // IMAGE_TOPIC_HPP_

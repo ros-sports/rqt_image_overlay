@@ -63,8 +63,14 @@ TEST_F(TestListImageTopics, TestOne)
 
   auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 2u);
-  EXPECT_EQ(std::count(topics.begin(), topics.end(), ImageTopic{"/test_topic", "raw"}), 1);
-  EXPECT_EQ(std::count(topics.begin(), topics.end(), ImageTopic{"/test_topic", "theora"}), 1);
+  EXPECT_EQ(
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_topic", "raw"}), 1);
+  EXPECT_EQ(
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_topic", "theora"}), 1);
 }
 
 TEST_F(TestListImageTopics, TestThree)
@@ -82,17 +88,29 @@ TEST_F(TestListImageTopics, TestThree)
   auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 6u);
   EXPECT_EQ(
-    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns1/test_topic1", "raw"}), 1);
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns1/test_topic1", "raw"}), 1);
   EXPECT_EQ(
-    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns1/test_topic1", "theora"}), 1);
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns1/test_topic1", "theora"}), 1);
   EXPECT_EQ(
-    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns2/test_topic2", "raw"}), 1);
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns2/test_topic2", "raw"}), 1);
   EXPECT_EQ(
-    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns2/test_topic2", "theora"}), 1);
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns2/test_topic2", "theora"}), 1);
   EXPECT_EQ(
-    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns3/test_topic3", "raw"}), 1);
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "raw"}), 1);
   EXPECT_EQ(
-    std::count(topics.begin(), topics.end(), ImageTopic{"/test_ns3/test_topic3", "theora"}), 1);
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "theora"}), 1);
 }
 
 TEST_F(TestListImageTopics, TestOnlyTheoraTransport)
@@ -109,7 +127,9 @@ TEST_F(TestListImageTopics, TestOnlyTheoraTransport)
   auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 1u);
   EXPECT_EQ(
-    std::count(topics.begin(), topics.end(), ImageTopic{"/test_topic", "theora"}), 1);
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_topic", "theora"}), 1);
 }
 
 TEST_F(TestListImageTopics, TestFakeTheoraTransport)
