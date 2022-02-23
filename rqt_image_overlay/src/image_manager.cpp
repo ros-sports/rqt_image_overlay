@@ -64,6 +64,12 @@ void ImageManager::updateImageTopicList()
   // fill combo box
   imageTopics = ListImageTopics(*node);
 
+  // if there are no publishers on the subscribed topic, delete the subscription
+  if (subscriber.getNumPublishers() == 0) {
+    subscriber.shutdown();
+    subscriber = image_transport::Subscriber{};
+  }
+
   endResetModel();
 }
 
