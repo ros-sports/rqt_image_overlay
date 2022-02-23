@@ -22,7 +22,7 @@
 namespace rqt_image_overlay
 {
 
-std::vector<ImageTopic> ListImageTopics(const rclcpp::Node & node)
+std::vector<ImageTopic> ListImageTopics(rclcpp::Node & node)
 {
   // Get declared transports. getDeclaredTransports returns a vector of transports prefixed with
   // 'image_transport/', but we strip it because when we create the subscription
@@ -37,13 +37,13 @@ std::vector<ImageTopic> ListImageTopics(const rclcpp::Node & node)
     }
   }
 
-  std::vector<ImageTopic> imageTopics;
+  std::vector<ImageTopic> imageTopicCandidates;
   for (auto const & [topicName, topicTypes] : node.get_topic_names_and_types()) {
     for (auto & topicType : topicTypes) {
       if (std::count(topicTypes.begin(), topicTypes.end(), topicType) > 0) {
         if (topicType == "sensor_msgs/msg/Image") {
           // Raw image transport
-          imageTopics.push_back({topicName, "raw"});
+          imageTopicCandidates.push_back({topicName, "raw"});
         } else {
           // Some image transport other than raw is being used.
           // Assume transport name is after the last forward slash, due to image_trasport
@@ -57,10 +57,30 @@ std::vector<ImageTopic> ListImageTopics(const rclcpp::Node & node)
 
           // If the transport is in the list of declared transports
           if (std::count(declaredTransports.begin(), declaredTransports.end(), transport) > 0) {
-            imageTopics.push_back({topic, transport});
+            imageTopicCandidates.push_back({topic, transport});
           }
         }
       }
+    }
+  }
+
+  std::vector<ImageTopic> imageTopics;
+  // Check if a subscription can be made successfully, with more than one valid publisher
+  for (auto & imageTopic : imageTopicCandidates) {
+    try {
+      auto subscriber = image_transport::create_subscription(
+        &node, imageTopic.topic, image_transport::Subscriber::Callback{}, imageTopic.transport);
+
+      // Check if the image subscriber managed to successfully connect to any publishers
+      // This considers cases where the msg type of publisher and subscriber don't match.
+      if (subscriber.getNumPublishers() > 0) {
+        imageTopics.push_back(imageTopic);
+      }
+    } catch (image_transport::TransportLoadException & e) {
+      // Wasn't a valid transport. Don't add to list
+    } catch (rclcpp::exceptions::RCLError & e) {
+      // Msg type of the subscription didn't match the one being published by an existing
+      // publisher. Don't add to list.
     }
   }
 
