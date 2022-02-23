@@ -114,6 +114,25 @@ TEST_F(TestListImageTopics, TestThree)
       rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "theora"}));
 }
 
+TEST_F(TestListImageTopics, TestOnlyTheoraTransport)
+{
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+
+  auto publisher =
+    node->create_publisher<theora_image_transport::msg::Packet>("/test_topic/theora", 1);
+
+  // Give a chance for the topic to be picked up
+  rclcpp::sleep_for(std::chrono::milliseconds(10));
+  rclcpp::spin_some(node);
+
+  auto imageTopics = rqt_image_overlay::ListImageTopics(*node);
+  ASSERT_EQ(imageTopics.size(), 1u);
+  EXPECT_TRUE(
+    checkContains(
+      imageTopics,
+      rqt_image_overlay::ImageTopic{"/test_topic", "theora"}));
+}
+
 TEST_F(TestListImageTopics, TestFakeTheoraTransport)
 {
   // In this example, we test a case where the topic name ends with a transport type, but the msg
