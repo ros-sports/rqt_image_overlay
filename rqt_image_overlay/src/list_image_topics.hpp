@@ -24,7 +24,7 @@ namespace rclcpp {class Node;}
 namespace rqt_image_overlay
 {
 
-std::vector<ImageTopic> ListImageTopics(const rclcpp::Node & node);
+std::vector<ImageTopic> ListImageTopics(rclcpp::Node & node);
 
 }  // namespace rqt_image_overlay
 
