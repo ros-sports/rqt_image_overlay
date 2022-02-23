@@ -49,7 +49,7 @@ TEST_F(TestListImageTopics, TestOne)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
 
-  auto publisher = image_transport::create_publisher(node.get(), "test_topic");
+  auto publisher = image_transport::create_publisher(node.get(), "/test_topic");
 
   // Give a chance for the topic to be picked up
   rclcpp::sleep_for(std::chrono::milliseconds(10));
@@ -57,16 +57,19 @@ TEST_F(TestListImageTopics, TestOne)
 
   auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 1u);
-  EXPECT_EQ(topics.at(0), "/test_topic");
+  EXPECT_EQ(
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_topic", "raw"}), 1);
 }
 
 TEST_F(TestListImageTopics, TestThree)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
 
-  auto publisher1 = image_transport::create_publisher(node.get(), "test_ns1/test_topic1");
-  auto publisher2 = image_transport::create_publisher(node.get(), "test_ns2/test_topic2");
-  auto publisher3 = image_transport::create_publisher(node.get(), "test_ns3/test_topic3");
+  auto publisher1 = image_transport::create_publisher(node.get(), "/test_ns1/test_topic1");
+  auto publisher2 = image_transport::create_publisher(node.get(), "/test_ns2/test_topic2");
+  auto publisher3 = image_transport::create_publisher(node.get(), "/test_ns3/test_topic3");
 
   // Give a chance for the topic to be picked up
   rclcpp::sleep_for(std::chrono::milliseconds(10));
@@ -74,7 +77,16 @@ TEST_F(TestListImageTopics, TestThree)
 
   auto topics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(topics.size(), 3u);
-  EXPECT_EQ(std::count(topics.begin(), topics.end(), "/test_ns1/test_topic1"), 1);
-  EXPECT_EQ(std::count(topics.begin(), topics.end(), "/test_ns2/test_topic2"), 1);
-  EXPECT_EQ(std::count(topics.begin(), topics.end(), "/test_ns3/test_topic3"), 1);
+  EXPECT_EQ(
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns1/test_topic1", "raw"}), 1);
+  EXPECT_EQ(
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns2/test_topic2", "raw"}), 1);
+  EXPECT_EQ(
+    std::count(
+      topics.begin(), topics.end(),
+      rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "raw"}), 1);
 }
