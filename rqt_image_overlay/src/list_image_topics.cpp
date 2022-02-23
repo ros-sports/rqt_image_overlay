@@ -21,17 +21,17 @@
 namespace rqt_image_overlay
 {
 
-std::vector<std::string> ListImageTopics(const rclcpp::Node & node)
+std::vector<ImageTopic> ListImageTopics(const rclcpp::Node & node)
 {
-  std::map<std::string, std::vector<std::string>> topic_info = node.get_topic_names_and_types();
+  std::map<std::string, std::vector<std::string>> topicInfo = node.get_topic_names_and_types();
 
-  std::vector<std::string> topics;
-  for (auto const & [topic_name, topic_types] : topic_info) {
-    if (std::count(topic_types.begin(), topic_types.end(), "sensor_msgs/msg/Image") > 0) {
-      topics.push_back(topic_name);
+  std::vector<ImageTopic> imageTopics;
+  for (auto const & [topicName, topicTypes] : topicInfo) {
+    if (std::count(topicTypes.begin(), topicTypes.end(), "sensor_msgs/msg/Image") > 0) {
+      imageTopics.push_back({topicName, "raw"});
     }
   }
-  return topics;
+  return imageTopics;
 }
 
 }  // namespace rqt_image_overlay

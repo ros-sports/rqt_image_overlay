@@ -51,8 +51,8 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 
   ui->image_topics_combo_box->setCurrentIndex(ui->image_topics_combo_box->findText(""));
   connect(
-    ui->image_topics_combo_box, SIGNAL(currentTextChanged(QString)), imageManager.get(),
-    SLOT(onTopicChanged(QString)));
+    ui->image_topics_combo_box, SIGNAL(currentIndexChanged(int)), imageManager.get(),
+    SLOT(onTopicChanged(int)));
 
   connect(
     ui->refresh_image_topics_button, SIGNAL(pressed()), imageManager.get(),
@@ -91,7 +91,13 @@ void ImageOverlay::saveSettings(
   qt_gui_cpp::Settings &,
   qt_gui_cpp::Settings & instance_settings) const
 {
-  instance_settings.setValue("image_topic", ui->image_topics_combo_box->currentText());
+  auto optionalImageTopic = imageManager->getImageTopic(ui->image_topics_combo_box->currentIndex());
+  if (optionalImageTopic.has_value()) {
+    auto imageTopic = optionalImageTopic.value();
+    instance_settings.setValue("image_topic", QString::fromStdString(imageTopic.topic));
+    instance_settings.setValue("image_transport", QString::fromStdString(imageTopic.transport));
+  }
+
   overlayManager->saveSettings(instance_settings);
 }
 
@@ -99,12 +105,11 @@ void ImageOverlay::restoreSettings(
   const qt_gui_cpp::Settings &,
   const qt_gui_cpp::Settings & instance_settings)
 {
-  if (instance_settings.contains("image_topic")) {
-    QString topic = instance_settings.value("image_topic").toString();
-    if (topic != "") {
-      imageManager->setTopicExplicitly(topic);
-      ui->image_topics_combo_box->setCurrentIndex(1);
-    }
+  if (instance_settings.contains("image_topic") && instance_settings.contains("image_transport")) {
+    std::string topic = instance_settings.value("image_topic").toString().toStdString();
+    std::string transport = instance_settings.value("image_transport").toString().toStdString();
+    imageManager->addImageTopicExplicitly(ImageTopic{topic, transport});
+    ui->image_topics_combo_box->setCurrentIndex(1);
   }
 
   overlayManager->restoreSettings(instance_settings);

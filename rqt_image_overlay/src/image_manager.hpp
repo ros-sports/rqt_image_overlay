@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include "image_transport/subscriber.hpp"
+#include "image_topic.hpp"
 
 namespace rclcpp {class Node;}
 
@@ -34,14 +35,15 @@ class ImageManager : public QAbstractListModel
 public:
   explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node);
   std::shared_ptr<QImage> getImage() const;
-  void setTopicExplicitly(QString topic);
+  std::optional<ImageTopic> getImageTopic(unsigned index);
+  void addImageTopicExplicitly(ImageTopic imageTopic);
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;
   QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
 
 public slots:
-  void onTopicChanged(const QString & text);
+  void onTopicChanged(int index);
   void updateImageTopicList();
 
 private:
@@ -51,7 +53,7 @@ private:
   const std::shared_ptr<rclcpp::Node> & node;
   sensor_msgs::msg::Image::ConstSharedPtr lastMsg;
 
-  std::vector<std::string> topics;
+  std::vector<ImageTopic> imageTopics;
 };
 
 }  // namespace rqt_image_overlay
