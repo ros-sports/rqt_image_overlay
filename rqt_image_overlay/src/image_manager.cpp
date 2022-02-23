@@ -41,7 +41,7 @@ void ImageManager::onTopicChanged(int index)
   std::atomic_store(&lastMsg, sensor_msgs::msg::Image::ConstSharedPtr{});
 
   if (index > 0) {
-    ImageTopic & imageTopic = topics.at(index - 1);
+    ImageTopic & imageTopic = imageTopics.at(index - 1);
     try {
       subscriber = image_transport::create_subscription(
         node.get(), imageTopic.topic,
@@ -59,10 +59,10 @@ void ImageManager::onTopicChanged(int index)
 void ImageManager::updateImageTopicList()
 {
   beginResetModel();
-  topics.clear();
+  imageTopics.clear();
 
   // fill combo box
-  topics = ListImageTopics(*node);
+  imageTopics = ListImageTopics(*node);
 
   // if there are no publishers on the subscribed topic, delete the subscription
   if (subscriber.getNumPublishers() == 0) {
@@ -76,7 +76,7 @@ void ImageManager::updateImageTopicList()
 
 int ImageManager::rowCount(const QModelIndex &) const
 {
-  return topics.size() + 1;
+  return imageTopics.size() + 1;
 }
 
 QVariant ImageManager::data(const QModelIndex & index, int role) const
@@ -85,7 +85,7 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
     if (index.row() == 0) {
       return QVariant();
     } else {
-      const ImageTopic & imageTopic = topics.at(index.row() - 1);
+      const ImageTopic & imageTopic = imageTopics.at(index.row() - 1);
       return QString::fromStdString(imageTopic.toString());
     }
   }
@@ -107,18 +107,18 @@ std::shared_ptr<QImage> ImageManager::getImage() const
 
 std::optional<ImageTopic> ImageManager::getImageTopic(unsigned index)
 {
-  if (index > 0 && index < topics.size()) {
-    const ImageTopic & it = topics.at(index);
+  if (index > 0 && index < imageTopics.size()) {
+    const ImageTopic & it = imageTopics.at(index);
     return std::make_optional<ImageTopic>(it);
   }
   return std::nullopt;
 }
 
-void ImageManager::addImageTopicExplicitly(ImageTopic topic)
+void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
 {
   beginResetModel();
-  topics.clear();
-  topics.push_back(topic);
+  imageTopics.clear();
+  imageTopics.push_back(imageTopic);
   endResetModel();
 }
 

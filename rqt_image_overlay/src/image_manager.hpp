@@ -36,7 +36,7 @@ public:
   explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node);
   std::shared_ptr<QImage> getImage() const;
   std::optional<ImageTopic> getImageTopic(unsigned index);
-  void addImageTopicExplicitly(ImageTopic topic);
+  void addImageTopicExplicitly(ImageTopic imageTopic);
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;
@@ -53,7 +53,7 @@ private:
   const std::shared_ptr<rclcpp::Node> & node;
   sensor_msgs::msg::Image::ConstSharedPtr lastMsg;
 
-  std::vector<ImageTopic> topics;
+  std::vector<ImageTopic> imageTopics;
 };
 
 }  // namespace rqt_image_overlay
