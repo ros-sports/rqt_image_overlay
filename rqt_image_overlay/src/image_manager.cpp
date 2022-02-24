@@ -108,35 +108,16 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
   return QVariant();
 }
 
-std::shared_ptr<QImage> ImageManager::getImage(const rclcpp::Time & targetTime) const
+std::shared_ptr<QImage> ImageManager::getImage(const rclcpp::Time & exactTime) const
 {
+  std::lock_guard<std::mutex> guard(msgHistoryMutex);
+
   std::shared_ptr<QImage> image;
 
-  sensor_msgs::msg::Image::ConstSharedPtr imageToShow;
-
-  {
-    std::lock_guard<std::mutex> guard(msgHistoryMutex);
-
-    if (!msgMap.empty()) {
-      int64_t targetTimeNs = static_cast<int64_t>(targetTime.nanoseconds());
-      imageToShow = msgMap.begin()->second;
-
-      int64_t minDiff = std::numeric_limits<int64_t>::max();
-      for (const auto &[msgTime, image]: msgMap) {
-        int64_t msgTimeNs = static_cast<int64_t>(msgTime.nanoseconds());
-        if (int64_t diff = std::abs(msgTimeNs - targetTimeNs); diff < minDiff) {
-          minDiff = diff;
-          imageToShow = image;
-        } else {
-          // A cpp map is sorted, so we won't find anything closer. Break out!
-          break;
-        }
-      }
-    }
-  }
-
-  if (imageToShow) {
-    image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*imageToShow));
+  try {
+    image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*msgMap.at(exactTime)));
+  } catch (std::out_of_range &) {
+    // Image at requested time doesn't exist. Shouldn't reach here.
   }
 
   return image;
@@ -166,6 +147,35 @@ std::optional<rclcpp::Time> ImageManager::getLatestImageTime() const
     return std::optional<rclcpp::Time>{msgTimeQueue.back()};
   }
   return std::nullopt;
+}
+
+std::optional<rclcpp::Time> ImageManager::getClosestExactImageTime(
+  const rclcpp::Time & targetTime) const
+{
+  {
+    std::lock_guard<std::mutex> guard(msgHistoryMutex);
+
+    if (!msgMap.empty()) {
+      int64_t targetTimeNs = static_cast<int64_t>(targetTime.nanoseconds());
+
+      rclcpp::Time closestImageTime;
+
+      int64_t minDiff = std::numeric_limits<int64_t>::max();
+      for (const auto &[msgTime, image]: msgMap) {
+        int64_t msgTimeNs = static_cast<int64_t>(msgTime.nanoseconds());
+        if (int64_t diff = std::abs(msgTimeNs - targetTimeNs); diff < minDiff) {
+          minDiff = diff;
+          closestImageTime = msgTime;
+        } else {
+          // A cpp map is sorted, so we won't find anything closer. Break out!
+          break;
+        }
+      }
+      return std::make_optional<rclcpp::Time>(closestImageTime);
+    } else {
+      return std::nullopt;
+    }
+  }
 }
 
 }  // namespace rqt_image_overlay

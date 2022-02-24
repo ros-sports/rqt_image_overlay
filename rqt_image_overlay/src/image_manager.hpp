@@ -37,10 +37,11 @@ class ImageManager : public QAbstractListModel
 
 public:
   explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node, unsigned msgHistoryLength = 50);
-  std::shared_ptr<QImage> getImage(const rclcpp::Time & targetTime) const;
+  std::shared_ptr<QImage> getImage(const rclcpp::Time & exactTime) const;
   std::optional<ImageTopic> getImageTopic(unsigned index);
   void addImageTopicExplicitly(ImageTopic imageTopic);
   std::optional<rclcpp::Time> getLatestImageTime() const;
+  std::optional<rclcpp::Time> getClosestExactImageTime(const rclcpp::Time & targetTime) const;
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;

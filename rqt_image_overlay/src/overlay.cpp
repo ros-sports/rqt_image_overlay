@@ -21,6 +21,7 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/time.hpp"
 #include "rqt_image_overlay_layer/plugin_interface.hpp"
+#include "image_manager.hpp"
 
 namespace rqt_image_overlay
 {
@@ -43,7 +44,7 @@ void Overlay::setTopic(std::string topic)
         std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;
 
-      // reset queue and map
+      // reset history variables
       {
         std::lock_guard<std::mutex> guard(msgHistoryMutex);
         msgMap.clear();
@@ -59,30 +60,28 @@ void Overlay::setTopic(std::string topic)
 
 void Overlay::overlay(QImage & image, const rclcpp::Time & targetTime)
 {
+  if (!firstMsgReceived) {
+    return;
+  }
+
   std::shared_ptr<rclcpp::SerializedMessage> msgToDraw;
 
-  if (!msgMap.empty()) {
+  {
     std::lock_guard<std::mutex> guard(msgHistoryMutex);
-    if (headerStampNotUsed) {
-      msgToDraw = lastMsg;
-    } else {
-      int64_t targetTimeNs = static_cast<int64_t>(targetTime.nanoseconds());
-      int64_t minDiff = std::numeric_limits<int64_t>::max();
-      msgToDraw = msgMap.begin()->second;
-      for (const auto &[msgTime, msg]: msgMap) {
-        int64_t msgTimeNs = static_cast<int64_t>(msgTime.nanoseconds());
-        if (int64_t diff = std::abs(msgTimeNs - targetTimeNs); diff < minDiff) {
-          minDiff = diff;
-          msgToDraw = msg;
-        } else {
-          // A cpp map is sorted, so we won't find anything closer. Break out!
-          break;
-        }
+    if (useHeaderTimestamp) {
+      try {
+        msgToDraw = msgMap.at(targetTime);
+      } catch (std::out_of_range & e) {
+        // Message not received for the targetTime, ignore.
       }
+    } else {
+      msgToDraw = lastMsg;
     }
   }
 
-  instance->overlay(image, msgToDraw);
+  if (msgToDraw) {
+    instance->overlay(image, msgToDraw);
+  }
 }
 
 std::string Overlay::getTopic() const
@@ -125,6 +124,12 @@ bool Overlay::isEnabled() const
 
 void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
+  // On first msg, check if the time can be deduced from the msg
+  if (!firstMsgReceived) {
+    firstMsgReceived = true;
+    useHeaderTimestamp = instance->getTime(msg).has_value();
+  }
+
   {
     std::lock_guard<std::mutex> guard(msgHistoryMutex);
 
@@ -134,16 +139,18 @@ void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
       msgTimeQueue.pop();
     }
 
-    auto time = instance->getTime(msg);
-    if (time.has_value()) {
-      // Store the new msg
-      msgMap.insert(make_pair(time.value(), msg));
-      msgTimeQueue.push(time.value());
+    if (useHeaderTimestamp) {
+      auto time = instance->getTime(msg).value();
+
+      // Must convert the time from RCL_SYSTEM_TIME to RCL_ROS_TIME. Remove the line below when
+      // changes sugggested in https://github.com/ros2/message_filters/issues/32 get merged.
+      time = rclcpp::Time{time.nanoseconds(), RCL_ROS_TIME};
+
+      msgMap.insert(make_pair(time, msg));
+      msgTimeQueue.push(time);
     } else {
-      // If there is no timestamp on the msgs, clear the history and just store in lastMsgg
       lastMsg = msg;
     }
-
   }
 
   std::atomic_store(&timeLastMsgReceived, std::make_shared<rclcpp::Time>(node->now()));

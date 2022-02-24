@@ -72,10 +72,14 @@ private:
   std::map<const rclcpp::Time, std::shared_ptr<rclcpp::SerializedMessage>> msgMap;
   std::queue<rclcpp::Time> msgTimeQueue;
 
-  bool headerStampNotUsed = false;
-  std::shared_ptr<rclcpp::SerializedMessage> lastMsg; // used if headerStampNotUsed == true
+  bool useHeaderTimestamp;
+  std::shared_ptr<rclcpp::SerializedMessage> lastMsg; // used if useHeaderTimestamp == false
+
+  bool firstMsgReceived = false;
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
+
+  int callbackCounter = 0;
 };
 
 }  // namespace rqt_image_overlay

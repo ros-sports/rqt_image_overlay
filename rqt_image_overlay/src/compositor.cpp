@@ -40,9 +40,11 @@ std::shared_ptr<QImage> Compositor::compose()
 
   std::optional<rclcpp::Time> latestImageTime = imageManager.getLatestImageTime();
   if (latestImageTime.has_value()) {
-    rclcpp::Time time = latestImageTime.value() - window;
-    composition = imageManager.getImage(time);
-    overlayManager.overlay(*composition, time);
+    rclcpp::Time approximateImageTime = latestImageTime.value() - window;
+    rclcpp::Time exactImageTime =
+      imageManager.getClosestExactImageTime(approximateImageTime).value();
+    composition = imageManager.getImage(exactImageTime);
+    overlayManager.overlay(*composition, exactImageTime);
   }
 
   return composition;
