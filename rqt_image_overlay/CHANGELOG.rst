@@ -2,8 +2,8 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.3 (2022-02-26)
+------------------
 * Replace #!/usr/bin/env python with #!/usr/bin/env python3
 * Delete the subscription if there are no publishers on the subscribed topic when refreshed
 * Handle fake transports that end with a transport ending, but aren't actually image topics
