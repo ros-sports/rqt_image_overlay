@@ -2,6 +2,16 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Replace #!/usr/bin/env python with #!/usr/bin/env python3
+* Delete the subscription if there are no publishers on the subscribed topic when refreshed
+* Handle fake transports that end with a transport ending, but aren't actually image topics
+* Handle multiple image transports
+* Convert type used to store image topic from std::string to rqt_image_overlay::ImageTopic
+* Use sensor qos for image subscription
+* Contributors: Kenji Brameld, Scott K Logan, wep21
+
 0.0.2 (2022-01-29)
 ------------------
 * adapt to new changes in cpplint about using a leading "./" in include statements
