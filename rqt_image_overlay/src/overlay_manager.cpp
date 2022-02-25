@@ -38,7 +38,12 @@ OverlayManager::OverlayManager(const std::shared_ptr<rclcpp::Node> & node)
 bool OverlayManager::addOverlay(std::string pluginClass)
 {
   try {
-    overlays.push_back(std::make_unique<Overlay>(pluginClass, pluginLoader, node));
+    auto instance = pluginLoader.createSharedInstance(pluginClass);
+    if (instance->hasTime()) {
+      overlays.push_back(std::make_unique<HeaderTimeOverlay>());
+    } else {
+      overlays.push_back(std::make_unique<ReceiveTimeOverlay>());
+    }
   } catch (const std::exception & e) {
     qWarning("(OverlayManager) Failed to add overlay: %s", e.what());
     return false;
@@ -162,11 +167,12 @@ bool OverlayManager::removeRows(int row, int, const QModelIndex & parent)
   return true;
 }
 
-void OverlayManager::overlay(QImage & image, const rclcpp::Time & time) const
+void OverlayManager::overlay(
+  QImage & image, const OverlayRequest & overlayRequest) const
 {
   for (auto & overlay : overlays) {
     if (overlay->isEnabled()) {
-      overlay->overlay(image, time);
+      overlay->overlay(image, overlayRequest);
     }
   }
 }

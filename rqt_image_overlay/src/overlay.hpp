@@ -32,6 +32,7 @@ class Time;
 }
 class QImage;
 namespace rqt_image_overlay_layer {class PluginInterface;}
+namespace rqt_image_overlay {class OverlayRequest;}
 
 namespace rqt_image_overlay
 {
@@ -45,7 +46,7 @@ public:
     const std::shared_ptr<rclcpp::Node> & node,
     unsigned msgHistoryLength = 100);
   void setTopic(std::string topic);
-  void overlay(QImage & image, const rclcpp::Time & targetTime);
+  void overlay(QImage & image, const OverlayRequest & overlayRequest);
   void setEnabled(bool enabled);
 
   std::string getTopic() const;

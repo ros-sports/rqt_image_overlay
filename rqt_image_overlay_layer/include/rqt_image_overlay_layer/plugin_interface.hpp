@@ -34,6 +34,7 @@ public:
   virtual void overlay(
     QImage & layer,
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;
+  virtual bool hasTime() = 0;
   virtual std::optional<rclcpp::Time> getTime(
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;
   virtual ~PluginInterface() {}

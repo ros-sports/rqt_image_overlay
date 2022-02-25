@@ -16,6 +16,7 @@
 #include <memory>
 #include <limits>
 #include "image_manager.hpp"
+#include "overlay_request.hpp"
 #include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
@@ -38,7 +39,7 @@ void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr &
     msgTimeQueue.pop();
   }
 
-  rclcpp::Time time = rclcpp::Time{msg->header.stamp};
+  rclcpp::Time time = systemClock.now();
   msgMap.insert(make_pair(time, msg));
   msgTimeQueue.push(time);
 }
@@ -140,16 +141,7 @@ void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
   endResetModel();
 }
 
-std::optional<rclcpp::Time> ImageManager::getLatestImageTime() const
-{
-  std::lock_guard<std::mutex> guard(msgHistoryMutex);
-  if (!msgTimeQueue.empty()) {
-    return std::optional<rclcpp::Time>{msgTimeQueue.back()};
-  }
-  return std::nullopt;
-}
-
-std::optional<rclcpp::Time> ImageManager::getClosestExactImageTime(
+std::optional<OverlayRequest> ImageManager::createOverlayRequest(
   const rclcpp::Time & targetTime) const
 {
   {
@@ -158,20 +150,21 @@ std::optional<rclcpp::Time> ImageManager::getClosestExactImageTime(
     if (!msgMap.empty()) {
       int64_t targetTimeNs = static_cast<int64_t>(targetTime.nanoseconds());
 
-      rclcpp::Time closestImageTime;
+      rclcpp::Time closestTimeReceived;
 
       int64_t minDiff = std::numeric_limits<int64_t>::max();
-      for (const auto &[msgTime, image]: msgMap) {
-        int64_t msgTimeNs = static_cast<int64_t>(msgTime.nanoseconds());
-        if (int64_t diff = std::abs(msgTimeNs - targetTimeNs); diff < minDiff) {
+      for (const auto &[timeReceived, image]: msgMap) {
+        int64_t timeReceivedNs = static_cast<int64_t>(timeReceived.nanoseconds());
+        if (int64_t diff = std::abs(timeReceivedNs - targetTimeNs); diff < minDiff) {
           minDiff = diff;
-          closestImageTime = msgTime;
+          closestTimeReceived = timeReceived;
         } else {
           // A cpp map is sorted, so we won't find anything closer. Break out!
           break;
         }
       }
-      return std::make_optional<rclcpp::Time>(closestImageTime);
+      return std::make_optional<OverlayRequest>(
+        closestTimeReceived, rclcpp::Time{msgMap.at(closestTimeReceived)->header.stamp});
     } else {
       return std::nullopt;
     }

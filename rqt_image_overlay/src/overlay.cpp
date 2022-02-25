@@ -22,6 +22,7 @@
 #include "rclcpp/time.hpp"
 #include "rqt_image_overlay_layer/plugin_interface.hpp"
 #include "image_manager.hpp"
+#include "overlay_request.hpp"
 
 namespace rqt_image_overlay
 {
@@ -33,6 +34,7 @@ Overlay::Overlay(
 : pluginClass(pluginClass), instance(pluginLoader.createSharedInstance(pluginClass)),
   msgType(instance->getTopicType()), node(node), msgHistoryLength(msgHistoryLength)
 {
+  useHeaderTimestamp = instance->hasTime();
 }
 
 void Overlay::setTopic(std::string topic)
@@ -58,7 +60,9 @@ void Overlay::setTopic(std::string topic)
   }
 }
 
-void Overlay::overlay(QImage & image, const rclcpp::Time & targetTime)
+void Overlay::overlay(
+  QImage & image,
+  const OverlayRequest & overlayRequest)
 {
   if (!firstMsgReceived) {
     return;
@@ -70,9 +74,9 @@ void Overlay::overlay(QImage & image, const rclcpp::Time & targetTime)
     std::lock_guard<std::mutex> guard(msgHistoryMutex);
     if (useHeaderTimestamp) {
       try {
-        msgToDraw = msgMap.at(targetTime);
+        msgToDraw = msgMap.at(overlayRequest.exactImageTime);
       } catch (std::out_of_range & e) {
-        // Message not received for the targetTime, ignore.
+        // Message not received for the overlayRequest.exactImageTime, ignore.
       }
     } else {
       msgToDraw = lastMsg;
@@ -127,7 +131,6 @@ void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
   // On first msg, check if the time can be deduced from the msg
   if (!firstMsgReceived) {
     firstMsgReceived = true;
-    useHeaderTimestamp = instance->getTime(msg).has_value();
   }
 
   {

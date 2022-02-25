@@ -27,6 +27,7 @@
 #include "image_topic.hpp"
 
 namespace rclcpp {class Node;}
+namespace rqt_image_overlay {class OverlayRequest;}
 
 namespace rqt_image_overlay
 {
@@ -40,8 +41,7 @@ public:
   std::shared_ptr<QImage> getImage(const rclcpp::Time & exactTime) const;
   std::optional<ImageTopic> getImageTopic(unsigned index);
   void addImageTopicExplicitly(ImageTopic imageTopic);
-  std::optional<rclcpp::Time> getLatestImageTime() const;
-  std::optional<rclcpp::Time> getClosestExactImageTime(const rclcpp::Time & targetTime) const;
+  std::optional<OverlayRequest> createOverlayRequest(const rclcpp::Time & targetTime) const;
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;
@@ -66,6 +66,8 @@ private:
   // https://stackoverflow.com/a/21315813
   std::map<const rclcpp::Time, const sensor_msgs::msg::Image::ConstSharedPtr> msgMap;
   std::queue<rclcpp::Time> msgTimeQueue;
+
+  rclcpp::Clock systemClock{RCL_SYSTEM_TIME};
 };
 
 }  // namespace rqt_image_overlay

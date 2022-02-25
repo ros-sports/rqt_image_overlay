@@ -17,6 +17,7 @@
 #include "compositor.hpp"
 #include "image_manager.hpp"
 #include "overlay_manager.hpp"
+#include "overlay_request.hpp"
 
 namespace rqt_image_overlay
 {
@@ -38,18 +39,16 @@ std::shared_ptr<QImage> Compositor::compose()
 {
   std::shared_ptr<QImage> composition;
 
-  std::optional<rclcpp::Time> latestImageTime = imageManager.getLatestImageTime();
-  if (latestImageTime.has_value()) {
-    rclcpp::Time approximateImageTime = latestImageTime.value() - window;
-    rclcpp::Time exactImageTime =
-      imageManager.getClosestExactImageTime(approximateImageTime).value();
-    composition = imageManager.getImage(exactImageTime);
-    overlayManager.overlay(*composition, exactImageTime);
+  rclcpp::Time targetTime = systemClock.now() - window;
+  std::optional<OverlayRequest> overlayRequest =
+    imageManager.createOverlayRequest(targetTime);
+  if (overlayRequest.has_value()) {
+    composition = imageManager.getImage(overlayRequest.value().exactImageTime);
+    overlayManager.overlay(*composition, overlayRequest.value());
   }
 
   return composition;
 }
-
 
 void Compositor::timerEvent(QTimerEvent * event)
 {

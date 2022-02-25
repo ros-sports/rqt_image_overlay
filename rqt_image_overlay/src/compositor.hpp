@@ -19,6 +19,7 @@
 #include <QObject>
 #include <memory>
 #include "rclcpp/duration.hpp"
+#include "rclcpp/clock.hpp"
 
 namespace rqt_image_overlay
 {
@@ -44,6 +45,8 @@ private:
   const OverlayManager & overlayManager;
 
   const rclcpp::Duration window;  // Wait window for messages before composing image in nanoseconds
+
+  rclcpp::Clock systemClock{RCL_SYSTEM_TIME};
 
   std::function<void(std::shared_ptr<QImage>)> setImage;
 };

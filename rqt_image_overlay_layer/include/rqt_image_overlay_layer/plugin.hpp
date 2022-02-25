@@ -48,14 +48,21 @@ public:
     }
   }
 
+  bool hasTime() override
+  {
+    return message_filters::message_traits::HasHeader<T>::value;
+  }
+
   std::optional<rclcpp::Time> getTime(
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) override
   {
-    rclcpp::Time time = message_filters::message_traits::TimeStamp<T>::value(deserialize(msg));
-    if (time != rclcpp::Time()){
-      return std::make_optional<rclcpp::Time>(time);
+    if (hasTime()) {
+      return std::make_optional<rclcpp::Time>(
+        message_filters::message_traits::TimeStamp<T>::value(
+          deserialize(msg)));
+    } else {
+      return std::nullopt;
     }
-    return std::nullopt;
   }
 
   virtual ~Plugin() {}
