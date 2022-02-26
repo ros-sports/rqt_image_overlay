@@ -18,6 +18,7 @@
 #include <QImage>
 #include <QObject>
 #include <memory>
+#include "rclcpp/clock.hpp"
 
 namespace rqt_image_overlay
 {
@@ -43,6 +44,8 @@ private:
   const OverlayManager & overlayManager;
 
   std::function<void(std::shared_ptr<QImage>)> setImage;
+
+  rclcpp::Clock systemClock{RCL_SYSTEM_TIME};
 };
 
 }  // namespace rqt_image_overlay

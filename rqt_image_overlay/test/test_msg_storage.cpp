@@ -34,8 +34,7 @@ TEST(TestMsgStorage, GetMsgNoValue)
 {
   rqt_image_overlay::MsgStorage<std::string> storage;
 
-  auto ret = storage.getMsg(rclcpp::Time{});
-  EXPECT_FALSE(ret.has_value());
+  EXPECT_THROW(storage.getMsg(rclcpp::Time{}), std::out_of_range);
 }
 
 TEST(TestMsgStorage, GetMsgNoValueWrongTime)
@@ -44,8 +43,7 @@ TEST(TestMsgStorage, GetMsgNoValueWrongTime)
   std::string msg = "hello world";
   storage.store(rclcpp::Time{1, 0}, msg);
 
-  auto ret = storage.getMsg(rclcpp::Time{2, 0});
-  EXPECT_FALSE(ret.has_value());
+  EXPECT_THROW(storage.getMsg(rclcpp::Time{2, 0}), std::out_of_range);
 }
 
 TEST(TestMsgStorage, GetMsg)
@@ -55,7 +53,50 @@ TEST(TestMsgStorage, GetMsg)
   std::string msg = "hello world";
   storage.store(time, msg);
 
-  auto ret = storage.getMsg(time);
-  ASSERT_TRUE(ret.has_value());
-  EXPECT_EQ(ret.value(), msg);
+  ASSERT_NO_THROW(
+  {
+    auto ret = storage.getMsg(time);
+    EXPECT_EQ(ret, msg);
+  });
+}
+
+TEST(TestMsgStorage, GetClosestTimeException)
+{
+  rqt_image_overlay::MsgStorage<std::string> storage;
+
+  EXPECT_THROW(storage.getClosestTime(rclcpp::Time{}), rqt_image_overlay::StorageEmptyException);
+}
+
+TEST(TestMsgStorage, GetClosestTimeExceptionTimeSource)
+{
+  rqt_image_overlay::MsgStorage<std::string> storage;
+  storage.store(rclcpp::Time{1, 0, RCL_SYSTEM_TIME}, "");
+
+  ASSERT_THROW(storage.getClosestTime(rclcpp::Time{0, 0, RCL_ROS_TIME}), std::runtime_error);
+}
+
+TEST(TestMsgStorage, GetClosestTime)
+{
+  rqt_image_overlay::MsgStorage<std::string> storage;
+  storage.store(rclcpp::Time{1, 0}, "");
+  storage.store(rclcpp::Time{5, 0}, "");
+  storage.store(rclcpp::Time{10, 0}, "");
+
+  ASSERT_NO_THROW(
+  {
+    EXPECT_EQ(storage.getClosestTime(rclcpp::Time{0, 0}), rclcpp::Time(1, 0));
+    EXPECT_EQ(storage.getClosestTime(rclcpp::Time{4, 0}), rclcpp::Time(5, 0));
+    EXPECT_EQ(storage.getClosestTime(rclcpp::Time{7, 0}), rclcpp::Time(5, 0));
+    EXPECT_EQ(storage.getClosestTime(rclcpp::Time{100, 0}), rclcpp::Time(10, 0));
+  });
+}
+
+TEST(TestMsgStorage, TestClear)
+{
+  rqt_image_overlay::MsgStorage<std::string> storage;
+  storage.store(rclcpp::Time{}, "");
+  EXPECT_FALSE(storage.empty());
+
+  storage.clear();
+  EXPECT_TRUE(storage.empty());
 }

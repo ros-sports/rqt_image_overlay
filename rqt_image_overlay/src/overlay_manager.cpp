@@ -162,7 +162,7 @@ bool OverlayManager::removeRows(int row, int, const QModelIndex & parent)
   return true;
 }
 
-void OverlayManager::overlay(QImage & image) const
+void OverlayManager::overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const
 {
   for (auto & overlay : overlays) {
     if (overlay->isEnabled()) {

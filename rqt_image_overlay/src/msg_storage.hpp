@@ -19,6 +19,7 @@
 #include <deque>
 #include <utility>
 #include "rclcpp/time.hpp"
+#include "exceptions.hpp"
 
 namespace rqt_image_overlay
 {
@@ -27,18 +28,35 @@ template<typename T>
 class MsgStorage
 {
 public:
-  // std::optional<rclcpp::Time> getClosestTime() const
-  // {
-  //   return std::nullopt;
-  // }
-
-  std::optional<T> getMsg(const rclcpp::Time & time) const
+  // throws StorageEmptyException if storage is empty
+  // throws std::runtime_error("can't compare times with different time sources") if ros time source
+  //        doesn't match
+  rclcpp::Time getClosestTime(const rclcpp::Time & targetTime) const
   {
-    try {
-      return std::make_optional<T>(msgMap.at(time));
-    } catch (std::out_of_range &) {
-      return std::nullopt;
+    if (empty()) {
+      throw StorageEmptyException();
     }
+
+    rclcpp::Time closestTimeReceived;
+    rclcpp::Duration minDiff = rclcpp::Duration::max();
+    for (const auto &[timeReceived, msg] : msgMap) {
+      rclcpp::Duration diff =
+        (timeReceived < targetTime) ? (targetTime - timeReceived) : (timeReceived - targetTime);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestTimeReceived = timeReceived;
+      } else {
+        // A cpp map is sorted, so we won't find anything closer. Break out!
+        break;
+      }
+    }
+    return closestTimeReceived;
+  }
+
+  // throws std::out_of_range if doesn't exist
+  T getMsg(const rclcpp::Time & time) const
+  {
+    return msgMap.at(time);
   }
 
   bool empty() const
@@ -50,6 +68,12 @@ public:
   {
     msgMap.insert(make_pair(time, msg));
     msgTimeDeque.push_back(time);
+  }
+
+  void clear()
+  {
+    msgMap.clear();
+    msgTimeDeque.clear();
   }
 
 private:

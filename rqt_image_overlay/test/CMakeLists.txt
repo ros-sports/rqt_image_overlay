@@ -22,3 +22,11 @@ ament_add_gtest(test_msg_storage
 target_link_libraries(test_msg_storage
   rqt_image_overlay
 )
+
+# Build test_image_manager
+ament_add_gtest(test_image_manager
+  test_image_manager.cpp)
+
+target_link_libraries(test_image_manager
+  rqt_image_overlay
+)

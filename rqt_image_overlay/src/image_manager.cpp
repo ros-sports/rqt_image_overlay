@@ -14,6 +14,7 @@
 
 #include <string>
 #include <memory>
+#include <tuple>
 #include "image_manager.hpp"
 #include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
@@ -29,7 +30,7 @@ ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node)
 
 void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
-  std::atomic_store(&lastMsg, msg);
+  msgStorage.store(systemClock.now(), msg);
 }
 
 
@@ -38,7 +39,7 @@ void ImageManager::onTopicChanged(int index)
   subscriber.shutdown();
 
   // reset image on topic change
-  std::atomic_store(&lastMsg, sensor_msgs::msg::Image::ConstSharedPtr{});
+  msgStorage.clear();
 
   if (index > 0) {
     ImageTopic & imageTopic = imageTopics.at(index - 1);
@@ -93,16 +94,18 @@ QVariant ImageManager::data(const QModelIndex & index, int role) const
   return QVariant();
 }
 
-std::shared_ptr<QImage> ImageManager::getImage() const
+std::tuple<std::shared_ptr<QImage>, rclcpp::Time> ImageManager::getClosestImageAndHeaderTime(
+  const rclcpp::Time & targetTimeReceived) const
 {
-  std::shared_ptr<QImage> image;
+  auto closestTime = msgStorage.getClosestTime(targetTimeReceived);
+  auto msg = msgStorage.getMsg(closestTime);
+  auto image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*msg));
+  return std::make_tuple(image, rclcpp::Time{msg->header.stamp});
+}
 
-  // Create a new shared_ptr, since lastMsg may change if a new message arrives.
-  const sensor_msgs::msg::Image::ConstSharedPtr lastMsgCopy(std::atomic_load(&lastMsg));
-  if (lastMsgCopy) {
-    image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*lastMsgCopy));
-  }
-  return image;
+bool ImageManager::imageAvailable() const
+{
+  return !msgStorage.empty();
 }
 
 std::optional<ImageTopic> ImageManager::getImageTopic(unsigned index)

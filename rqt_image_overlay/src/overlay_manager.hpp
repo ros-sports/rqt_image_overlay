@@ -27,6 +27,7 @@
 namespace qt_gui_cpp {class Settings;}
 namespace rclcpp {class Node;}
 class Overlay;
+namespace rqt_image_overlay {class OverlayTimeInfo;}
 
 namespace rqt_image_overlay
 {
@@ -41,7 +42,7 @@ public:
   const std::vector<std::string> & getDeclaredPluginClasses() const;
   bool addOverlay(std::string pluginClass);
   void removeOverlay(unsigned index);
-  void overlay(QImage & image) const;
+  void overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const;
   void saveSettings(qt_gui_cpp::Settings & settings) const;
   void restoreSettings(const qt_gui_cpp::Settings & settings);
 

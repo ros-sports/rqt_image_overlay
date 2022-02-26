@@ -36,11 +36,14 @@ void Compositor::setCallableSetImage(std::function<void(std::shared_ptr<QImage>)
 
 std::shared_ptr<QImage> Compositor::compose()
 {
-  std::shared_ptr<QImage> composition = imageManager.getImage();
-  if (composition != nullptr) {
-    overlayManager.overlay(*composition);
+  if (!imageManager.imageAvailable()) {
+    return nullptr;
   }
 
+  rclcpp::Time targetTime = systemClock.now() - rclcpp::Duration{0, 300000000};
+  auto [composition, imageHeaderTime] = imageManager.getClosestImageAndHeaderTime(targetTime);
+  OverlayTimeInfo overlayTimeInfo{targetTime, imageHeaderTime};
+  overlayManager.overlay(*composition, overlayTimeInfo);
   return composition;
 }
 
@@ -54,13 +57,9 @@ void Compositor::timerEvent(QTimerEvent * event)
     return;
   }
 
-  std::shared_ptr<QImage> image = compose();
-
-  if (!image) {
-    return;
+  if (auto image = compose(); image) {
+    setImage(std::move(image));
   }
-
-  setImage(std::move(image));
 }
 
 }  // namespace rqt_image_overlay
