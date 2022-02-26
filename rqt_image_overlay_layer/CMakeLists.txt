@@ -11,6 +11,7 @@ find_package(rosidl_runtime_cpp REQUIRED)
 find_package(rcpputils REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(Qt5Widgets REQUIRED)
+find_package(message_filters REQUIRED)
 
 install(
   DIRECTORY include/
@@ -31,5 +32,6 @@ ament_export_dependencies(rosidl_runtime_cpp)
 ament_export_dependencies(rcpputils)
 ament_export_dependencies(pluginlib)
 ament_export_dependencies(Qt5Widgets)
+ament_export_dependencies(message_filters)
 
 ament_package()

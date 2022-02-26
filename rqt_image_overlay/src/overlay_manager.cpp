@@ -166,7 +166,7 @@ void OverlayManager::overlay(QImage & image, const OverlayTimeInfo & overlayTime
 {
   for (auto & overlay : overlays) {
     if (overlay->isEnabled()) {
-      overlay->overlay(image);
+      overlay->overlay(image, overlayTimeInfo);
     }
   }
 }

@@ -100,3 +100,16 @@ TEST(TestMsgStorage, TestClear)
   storage.clear();
   EXPECT_TRUE(storage.empty());
 }
+
+TEST(TestMsgStorage, TestCapacity)
+{
+  rqt_image_overlay::MsgStorage<std::string> storage(3);
+  storage.store(rclcpp::Time{1, 0}, "");
+  storage.store(rclcpp::Time{2, 0}, "");
+  storage.store(rclcpp::Time{3, 0}, "");
+
+  EXPECT_NO_THROW(storage.getMsg(rclcpp::Time{1, 0}));
+
+  storage.store(rclcpp::Time{4, 0}, "");
+  EXPECT_THROW(storage.getMsg(rclcpp::Time{1, 0}), std::out_of_range);
+}

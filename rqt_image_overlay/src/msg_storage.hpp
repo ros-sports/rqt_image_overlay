@@ -17,6 +17,7 @@
 
 #include <map>
 #include <deque>
+#include <mutex>
 #include <utility>
 #include "rclcpp/time.hpp"
 #include "exceptions.hpp"
@@ -28,6 +29,9 @@ template<typename T>
 class MsgStorage
 {
 public:
+  explicit MsgStorage(unsigned capacity = 50)
+  : capacity(capacity) {}
+
   // throws StorageEmptyException if storage is empty
   // throws std::runtime_error("can't compare times with different time sources") if ros time source
   //        doesn't match
@@ -36,6 +40,8 @@ public:
     if (empty()) {
       throw StorageEmptyException();
     }
+
+    std::lock_guard<std::mutex> guard(mutex);
 
     rclcpp::Time closestTimeReceived;
     rclcpp::Duration minDiff = rclcpp::Duration::max();
@@ -56,31 +62,46 @@ public:
   // throws std::out_of_range if doesn't exist
   T getMsg(const rclcpp::Time & time) const
   {
+    std::lock_guard<std::mutex> guard(mutex);
     return msgMap.at(time);
   }
 
   bool empty() const
   {
+    std::lock_guard<std::mutex> guard(mutex);
     return msgTimeDeque.empty();
   }
 
   void store(const rclcpp::Time & time, const T & msg)
   {
+    std::lock_guard<std::mutex> guard(mutex);
+
+    // Ensure size msgMap is less than capacity
+    if (msgMap.size() == capacity) {
+      msgMap.erase(msgTimeDeque.front());
+      msgTimeDeque.pop_front();
+    }
+
     msgMap.insert(make_pair(time, msg));
     msgTimeDeque.push_back(time);
   }
 
   void clear()
   {
+    std::lock_guard<std::mutex> guard(mutex);
     msgMap.clear();
     msgTimeDeque.clear();
   }
 
 private:
+  mutable std::mutex mutex;
+
   // msgMap and msgTimeDeque two together, create a FIFO Map, as described in
   // https://stackoverflow.com/a/21315813
   std::map<const rclcpp::Time, const T> msgMap;
   std::deque<rclcpp::Time> msgTimeDeque;
+
+  const unsigned capacity;
 };
 
 }  // namespace rqt_image_overlay

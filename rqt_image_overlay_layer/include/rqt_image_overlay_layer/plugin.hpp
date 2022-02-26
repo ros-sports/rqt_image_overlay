@@ -22,6 +22,7 @@
 #include "rclcpp/serialization.hpp"
 #include "rosidl_runtime_cpp/traits.hpp"
 #include "rcpputils/asserts.hpp"
+#include "message_filters/message_traits.h"
 
 namespace rqt_image_overlay_layer
 {
@@ -46,6 +47,26 @@ public:
     }
   }
 
+  bool hasMsgHeader() const override
+  {
+    return message_filters::message_traits::HasHeader<T>::value;
+  }
+
+  rclcpp::Time getHeaderTime(const std::shared_ptr<rclcpp::SerializedMessage> & msg) const override
+  {
+    if (hasMsgHeader()) {
+      auto time = message_filters::message_traits::TimeStamp<T>::value(deserialize(msg));
+
+      // Must convert the time from RCL_SYSTEM_TIME to RCL_ROS_TIME. Remove the line below when
+      // changes sugggested in https://github.com/ros2/message_filters/issues/32 get merged.
+      time = rclcpp::Time{time.nanoseconds(), RCL_ROS_TIME};
+
+      return time;
+    } else {
+      throw std::runtime_error("Calling getHeaderTime on msg type with no header");
+    }
+  }
+
   virtual ~Plugin() {}
 
 protected:
@@ -63,7 +84,7 @@ protected:
     const T & msg) = 0;
 
 private:
-  T deserialize(const std::shared_ptr<rclcpp::SerializedMessage> & msg)
+  T deserialize(const std::shared_ptr<rclcpp::SerializedMessage> & msg) const
   {
     T des;
     base.deserialize_message(msg.get(), &des);
