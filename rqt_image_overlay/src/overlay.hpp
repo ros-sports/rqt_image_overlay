@@ -17,6 +17,8 @@
 
 #include <memory>
 #include <string>
+// #include <queue>
+// #include <map>
 #include "pluginlib/class_loader.hpp"
 
 // Forward Declaration
@@ -60,6 +62,13 @@ private:
   const std::shared_ptr<rclcpp::Node> & node;
   std::shared_ptr<rclcpp::SerializedMessage> lastMsg;
   std::shared_ptr<rclcpp::Time> timeLastMsgReceived;
+
+  // bool useHeaderTimestamp;
+
+  // // msgMap and msgTimeQueue two together, create a FIFO Map, as described in
+  // // https://stackoverflow.com/a/21315813
+  // std::map<const rclcpp::Time, std::shared_ptr<rclcpp::SerializedMessage>> msgMap;
+  // std::deque<rclcpp::Time> msgTimeDeque;
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
 };

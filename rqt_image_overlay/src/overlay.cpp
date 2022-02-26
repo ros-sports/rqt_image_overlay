@@ -30,7 +30,7 @@ Overlay::Overlay(
   pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
   const std::shared_ptr<rclcpp::Node> & node)
 : pluginClass(pluginClass), instance(pluginLoader.createSharedInstance(pluginClass)),
-  msgType(instance->getTopicType()), node(node)
+  msgType(instance->getTopicType()), node(node)  //, useHeaderTimeatamp(instance->hasTime())
 {
 }
 
@@ -42,7 +42,8 @@ void Overlay::setTopic(std::string topic)
         topic, msgType, rclcpp::QoS(10),
         std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;
-      std::atomic_store(&lastMsg, std::make_shared<rclcpp::SerializedMessage>());
+      // msgMap.clear();
+      // msgTimeDeque = {};
     } catch (const std::exception & e) {
       qWarning("(Overlay) Failed to change subscription topic: %s", e.what());
       rcutils_reset_error();
@@ -100,8 +101,18 @@ bool Overlay::isEnabled() const
 
 void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
-  std::atomic_store(&lastMsg, msg);
-  std::atomic_store(&timeLastMsgReceived, std::make_shared<rclcpp::Time>(node->now()));
+  // rclcpp::Time time;
+  // if (useHeaderTimestamp) {
+  //   time = instance->getTime(msg).value();
+  //   // Must convert the time from RCL_SYSTEM_TIME to RCL_ROS_TIME. Remove the line below when
+  //   // changes sugggested in https://github.com/ros2/message_filters/issues/32 get merged.
+  //   time = rclcpp::Time{time.nanoseconds(), RCL_ROS_TIME};
+  // } else {
+  //   time = node->now();
+  // }
+
+  // msgMap.insert(make_pair(time, msg));
+  // msgTimeDeque.push(time);
 }
 
 }  // namespace rqt_image_overlay

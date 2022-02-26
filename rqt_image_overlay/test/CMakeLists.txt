@@ -4,7 +4,7 @@ find_package(theora_image_transport REQUIRED)
 find_package(std_msgs REQUIRED)
 
 ament_add_gtest(test_list_image_topics
-test_list_image_topics.cpp)
+  test_list_image_topics.cpp)
 
 target_link_libraries(test_list_image_topics
   rqt_image_overlay
@@ -14,3 +14,11 @@ ament_target_dependencies(test_list_image_topics
   rclcpp
   theora_image_transport
   std_msgs)
+
+# Build test_msg_storage
+ament_add_gtest(test_msg_storage
+  test_msg_storage.cpp)
+
+target_link_libraries(test_msg_storage
+  rqt_image_overlay
+)
