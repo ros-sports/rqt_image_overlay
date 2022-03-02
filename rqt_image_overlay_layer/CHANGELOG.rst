@@ -2,6 +2,12 @@
 Changelog for package rqt_image_overlay_layer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add message collection window, and synchronize image and layers using header timestamp if available
+* implement overlay using msg_storage and use mutexes to handle multithreading
+* Contributors: Kenji Brameld
+
 0.0.3 (2022-02-26)
 ------------------
 

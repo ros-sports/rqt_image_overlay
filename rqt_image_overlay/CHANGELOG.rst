@@ -2,6 +2,15 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+  Add message collection window, and synchronize image and layers using header timestamp if available
+* use present tense for getReceivedStatus
+* implement overlay using msg_storage and use mutexes to handle multithreading
+* start implementing msg storage
+* add msg storage class
+* Contributors: Kenji Brameld
+
 0.0.3 (2022-02-26)
 ------------------
 * Replace #!/usr/bin/env python with #!/usr/bin/env python3
