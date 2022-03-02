@@ -2,8 +2,8 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.4 (2022-03-02)
+------------------
 
 * Add message collection window, and synchronize image and layers using header timestamp if available
 * use present tense for getReceivedStatus
