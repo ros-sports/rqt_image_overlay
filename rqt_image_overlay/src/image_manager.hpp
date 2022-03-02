@@ -20,8 +20,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <tuple>
 #include "image_transport/subscriber.hpp"
 #include "image_topic.hpp"
+#include "msg_storage.hpp"
+#include "overlay_time_info.hpp"
 
 namespace rclcpp {class Node;}
 
@@ -34,7 +37,13 @@ class ImageManager : public QAbstractListModel
 
 public:
   explicit ImageManager(const std::shared_ptr<rclcpp::Node> & node);
-  std::shared_ptr<QImage> getImage() const;
+
+  bool imageAvailable() const;
+
+  // throws StorageEmptyException if storage is empty
+  std::tuple<std::shared_ptr<QImage>, rclcpp::Time> getClosestImageAndHeaderTime(
+    const rclcpp::Time & targetTimeReceived) const;
+
   std::optional<ImageTopic> getImageTopic(unsigned index);
   void addImageTopicExplicitly(ImageTopic imageTopic);
 
@@ -51,7 +60,8 @@ private:
 
   image_transport::Subscriber subscriber;
   const std::shared_ptr<rclcpp::Node> & node;
-  sensor_msgs::msg::Image::ConstSharedPtr lastMsg;
+  MsgStorage<sensor_msgs::msg::Image::ConstSharedPtr> msgStorage;
+  rclcpp::Clock systemClock{RCL_SYSTEM_TIME};
 
   std::vector<ImageTopic> imageTopics;
 };

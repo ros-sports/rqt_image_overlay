@@ -18,6 +18,8 @@
 #include <memory>
 #include <string>
 #include "pluginlib/class_loader.hpp"
+#include "rclcpp/clock.hpp"
+#include "msg_storage.hpp"
 
 // Forward Declaration
 namespace rclcpp
@@ -29,6 +31,7 @@ class Time;
 }
 class QImage;
 namespace rqt_image_overlay_layer {class PluginInterface;}
+namespace rqt_image_overlay {class OverlayTimeInfo;}
 
 namespace rqt_image_overlay
 {
@@ -41,7 +44,6 @@ public:
     pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
     const std::shared_ptr<rclcpp::Node> & node);
   void setTopic(std::string topic);
-  void overlay(QImage & image);
   void setEnabled(bool enabled);
 
   std::string getTopic() const;
@@ -49,6 +51,8 @@ public:
   std::string getMsgType() const;
   std::string getReceivedStatus() const;
   bool isEnabled() const;
+
+  void overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const;
 
 private:
   const std::string pluginClass;
@@ -58,8 +62,10 @@ private:
   bool enabled = true;
   std::shared_ptr<rclcpp::GenericSubscription> subscription;
   const std::shared_ptr<rclcpp::Node> & node;
-  std::shared_ptr<rclcpp::SerializedMessage> lastMsg;
-  std::shared_ptr<rclcpp::Time> timeLastMsgReceived;
+
+  bool useHeaderTimestamp;
+  MsgStorage<std::shared_ptr<rclcpp::SerializedMessage>> msgStorage;
+  rclcpp::Clock systemClock{RCL_SYSTEM_TIME};
 
   void msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg);
 };

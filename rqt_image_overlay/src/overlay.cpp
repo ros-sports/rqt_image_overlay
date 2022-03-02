@@ -21,6 +21,7 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/time.hpp"
 #include "rqt_image_overlay_layer/plugin_interface.hpp"
+#include "overlay_time_info.hpp"
 
 namespace rqt_image_overlay
 {
@@ -30,7 +31,7 @@ Overlay::Overlay(
   pluginlib::ClassLoader<rqt_image_overlay_layer::PluginInterface> & pluginLoader,
   const std::shared_ptr<rclcpp::Node> & node)
 : pluginClass(pluginClass), instance(pluginLoader.createSharedInstance(pluginClass)),
-  msgType(instance->getTopicType()), node(node)
+  msgType(instance->getTopicType()), node(node), useHeaderTimestamp(instance->hasMsgHeader())
 {
 }
 
@@ -42,7 +43,7 @@ void Overlay::setTopic(std::string topic)
         topic, msgType, rclcpp::QoS(10),
         std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;
-      std::atomic_store(&lastMsg, std::make_shared<rclcpp::SerializedMessage>());
+      msgStorage.clear();
     } catch (const std::exception & e) {
       qWarning("(Overlay) Failed to change subscription topic: %s", e.what());
       rcutils_reset_error();
@@ -50,13 +51,26 @@ void Overlay::setTopic(std::string topic)
   }
 }
 
-void Overlay::overlay(QImage & image)
+void Overlay::overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const
 {
-  // Create a new shared_ptr, since lastMsg may change if a new message arrives.
-  const std::shared_ptr<rclcpp::SerializedMessage> lastMsgCopy(std::atomic_load(&lastMsg));
+  if (msgStorage.empty()) {
+    return;
+  }
 
-  if (lastMsgCopy) {
-    instance->overlay(image, lastMsgCopy);
+  std::shared_ptr<rclcpp::SerializedMessage> msg;
+  if (useHeaderTimestamp) {
+    try {
+      msg = msgStorage.getMsg(overlayTimeInfo.timeFromHeader);
+    } catch (const std::out_of_range & e) {
+      // Matching time didn't exist in the msgStorage, continue
+    }
+  } else {
+    auto closestTime = msgStorage.getClosestTime(overlayTimeInfo.timeReceived);
+    msg = msgStorage.getMsg(closestTime);
+  }
+
+  if (msg) {
+    instance->overlay(image, msg);
   }
 }
 
@@ -77,15 +91,7 @@ std::string Overlay::getMsgType() const
 
 std::string Overlay::getReceivedStatus() const
 {
-  std::shared_ptr<rclcpp::Time> timeLastMsgReceivedCopy(std::atomic_load(&timeLastMsgReceived));
-  if (timeLastMsgReceivedCopy) {
-    rclcpp::Duration diff = node->now() - *timeLastMsgReceivedCopy;
-    char msg[50];
-    snprintf(msg, sizeof(msg), "%.4fs ago", diff.nanoseconds() / 1000000000.0);
-    return msg;
-  } else {
-    return "Not received yet";
-  }
+  return msgStorage.empty() ? "Not received" : "Received";
 }
 
 void Overlay::setEnabled(bool enabled)
@@ -100,8 +106,8 @@ bool Overlay::isEnabled() const
 
 void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
-  std::atomic_store(&lastMsg, msg);
-  std::atomic_store(&timeLastMsgReceived, std::make_shared<rclcpp::Time>(node->now()));
+  rclcpp::Time time = useHeaderTimestamp ? instance->getHeaderTime(msg) : systemClock.now();
+  msgStorage.store(time, msg);
 }
 
 }  // namespace rqt_image_overlay

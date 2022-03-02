@@ -14,6 +14,7 @@
   <depend>rcpputils</depend>
   <depend>pluginlib</depend>
   <depend>qtbase5-dev</depend>
+  <depend>message_filters</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

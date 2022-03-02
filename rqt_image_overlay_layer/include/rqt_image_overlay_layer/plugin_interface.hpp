@@ -18,6 +18,7 @@
 #include <QImage>
 #include <string>
 #include <memory>
+#include "rclcpp/time.hpp"
 
 // forward declaration
 namespace rclcpp {class SerializedMessage;}
@@ -32,6 +33,12 @@ public:
   virtual void overlay(
     QImage & layer,
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;
+  virtual bool hasMsgHeader() const = 0;
+
+  // Throws std::runtime_error if called on msg type with no header
+  virtual rclcpp::Time getHeaderTime(
+    const std::shared_ptr<rclcpp::SerializedMessage> & msg) const = 0;
+
   virtual ~PluginInterface() {}
 
 protected:
