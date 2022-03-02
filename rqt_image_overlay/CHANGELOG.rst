@@ -4,7 +4,8 @@ Changelog for package rqt_image_overlay
 
 Forthcoming
 -----------
-  Add message collection window, and synchronize image and layers using header timestamp if available
+
+* Add message collection window, and synchronize image and layers using header timestamp if available
 * use present tense for getReceivedStatus
 * implement overlay using msg_storage and use mutexes to handle multithreading
 * start implementing msg storage
