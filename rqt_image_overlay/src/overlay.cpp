@@ -91,7 +91,7 @@ std::string Overlay::getMsgType() const
 
 std::string Overlay::getReceivedStatus() const
 {
-  return msgStorage.empty() ? "Not receiving" : "Receiving";
+  return msgStorage.empty() ? "Not received" : "Received";
 }
 
 void Overlay::setEnabled(bool enabled)
