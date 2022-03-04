@@ -29,7 +29,7 @@ class CompositionFrame
   Q_OBJECT
 
 public:
-  explicit CompositionFrame(QWidget * parent, Qt::WindowFlags flags = 0);
+  explicit CompositionFrame(QWidget * parent, Qt::WindowFlags flags = Qt::WindowFlags());
   void setImage(std::shared_ptr<QImage> image);
 
 signals:
