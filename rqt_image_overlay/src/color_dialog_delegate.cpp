@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <QSpinBox>
 #include <QColorDialog>
-#include <QDebug>
 #include "color_dialog_delegate.hpp"
 
 namespace rqt_image_overlay
