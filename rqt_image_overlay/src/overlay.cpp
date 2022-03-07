@@ -94,6 +94,11 @@ std::string Overlay::getReceivedStatus() const
   return msgStorage.empty() ? "Not received" : "Received";
 }
 
+QColor Overlay::getColor() const
+{
+  return color;
+}
+
 void Overlay::setEnabled(bool enabled)
 {
   this->enabled = enabled;
@@ -108,6 +113,11 @@ void Overlay::msgCallback(std::shared_ptr<rclcpp::SerializedMessage> msg)
 {
   rclcpp::Time time = useHeaderTimestamp ? instance->getHeaderTime(msg) : systemClock.now();
   msgStorage.store(time, msg);
+}
+
+void Overlay::setColor(QColor color)
+{
+  this->color = color;
 }
 
 }  // namespace rqt_image_overlay

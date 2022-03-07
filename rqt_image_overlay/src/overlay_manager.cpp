@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <QColor>
 #include <string>
 #include <memory>
 #include <vector>
@@ -29,7 +30,7 @@ OverlayManager::OverlayManager(const std::shared_ptr<rclcpp::Node> & node)
 : pluginLoader("rqt_image_overlay_layer", "rqt_image_overlay_layer::PluginInterface"),
   declaredPluginClasses(pluginLoader.getDeclaredClasses()),
   node(node),
-  columns{"Topic", "Type", "Plugin", "Status"},
+  columns{"Topic", "Type", "Plugin", "Status", "Color"},
   statusIndex(findStatusIndex())
 {
   startTimer(STATUS_UPDATE_MS);
@@ -99,6 +100,12 @@ QVariant OverlayManager::data(const QModelIndex & index, int role) const
     }
   }
 
+  if (role == Qt::BackgroundRole) {
+    if (column == "Color") {
+      return overlays.at(index.row())->getColor();
+    }
+  }
+
   return QVariant();
 }
 
@@ -106,8 +113,10 @@ bool OverlayManager::setData(
   const QModelIndex & index, const QVariant & value,
   int role)
 {
+  std::string column = columns.at(index.column());
+
   if (role == Qt::EditRole) {
-    if (columns.at(index.column()) == "Topic") {
+    if (column == "Topic") {
       overlays.at(index.row())->setTopic(value.toString().toStdString());
     }
     emit dataChanged(index, index);
@@ -115,12 +124,21 @@ bool OverlayManager::setData(
   }
 
   if (role == Qt::CheckStateRole) {
-    if (columns.at(index.column()) == "Topic") {
+    if (column == "Topic") {
       overlays.at(index.row())->setEnabled(value.toBool());
     }
     emit dataChanged(index, index);
     return true;
   }
+
+  if (role == Qt::BackgroundRole) {
+    if (column == "Color") {
+      overlays.at(index.row())->setColor(value.value<QColor>());
+    }
+    emit dataChanged(index, index);
+    return true;
+  }
+
   return false;
 }
 
@@ -129,6 +147,8 @@ Qt::ItemFlags OverlayManager::flags(const QModelIndex & index) const
   std::string column = columns.at(index.column());
   if (column == "Topic") {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
+  } else if (column == "Color") {
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
   }
   return QAbstractItemModel::flags(index) | Qt::ItemIsEnabled;
 }
