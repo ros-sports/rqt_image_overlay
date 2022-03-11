@@ -205,6 +205,7 @@ void OverlayManager::saveSettings(qt_gui_cpp::Settings & settings) const
     map.insert("Topic", QString::fromStdString(overlay->getTopic()));
     map.insert("Plugin", QString::fromStdString(overlay->getPluginClass()));
     map.insert("Enabled", overlay->isEnabled());
+    map.insert("Color", overlay->getColor());
     list.append(QVariant(map));
   }
 
@@ -232,6 +233,11 @@ void OverlayManager::restoreSettings(const qt_gui_cpp::Settings & settings)
       if (map.contains("Enabled")) {
         bool enabled = map.value("Enabled").toBool();
         overlays.back()->setEnabled(enabled);
+      }
+
+      if (map.contains("Color")) {
+        QColor color = map.value("Color").value<QColor>();
+        overlays.back()->setColor(color);
       }
     }
   }
