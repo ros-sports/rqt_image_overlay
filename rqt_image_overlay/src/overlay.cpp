@@ -51,7 +51,7 @@ void Overlay::setTopic(std::string topic)
   }
 }
 
-void Overlay::overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const
+void Overlay::overlay(QPainter & painter, const OverlayTimeInfo & overlayTimeInfo) const
 {
   if (msgStorage.empty()) {
     return;
@@ -70,7 +70,7 @@ void Overlay::overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) c
   }
 
   if (msg) {
-    instance->overlay(image, msg);
+    instance->overlay(painter, msg);
   }
 }
 

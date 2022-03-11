@@ -184,9 +184,14 @@ bool OverlayManager::removeRows(int row, int, const QModelIndex & parent)
 
 void OverlayManager::overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const
 {
+  QPainter painter(&image);
   for (auto & overlay : overlays) {
     if (overlay->isEnabled()) {
-      overlay->overlay(image, overlayTimeInfo);
+      painter.save();
+      QPen pen(overlay->getColor());
+      painter.setPen(pen);
+      overlay->overlay(painter, overlayTimeInfo);
+      painter.restore();
     }
   }
 }

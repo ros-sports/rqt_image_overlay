@@ -15,7 +15,7 @@
 #ifndef RQT_IMAGE_OVERLAY_LAYER__PLUGIN_INTERFACE_HPP_
 #define RQT_IMAGE_OVERLAY_LAYER__PLUGIN_INTERFACE_HPP_
 
-#include <QImage>
+#include <QPainter>
 #include <string>
 #include <memory>
 #include "rclcpp/time.hpp"
@@ -31,7 +31,7 @@ class PluginInterface
 public:
   virtual std::string getTopicType() const = 0;
   virtual void overlay(
-    QImage & layer,
+    QPainter & painter,
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) = 0;
   virtual bool hasMsgHeader() const = 0;
 

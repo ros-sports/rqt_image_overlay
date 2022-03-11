@@ -30,7 +30,7 @@ class GenericSubscription;
 class SerializedMessage;
 class Time;
 }
-class QImage;
+class QPainter;
 namespace rqt_image_overlay_layer {class PluginInterface;}
 namespace rqt_image_overlay {class OverlayTimeInfo;}
 
@@ -55,7 +55,7 @@ public:
   QColor getColor() const;
   bool isEnabled() const;
 
-  void overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const;
+  void overlay(QPainter & painter, const OverlayTimeInfo & overlayTimeInfo) const;
 
 private:
   const std::string pluginClass;
