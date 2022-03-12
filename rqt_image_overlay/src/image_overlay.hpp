@@ -26,7 +26,6 @@ namespace rqt_image_overlay
 class ImageManager;
 class OverlayManager;
 class Compositor;
-class ColorDialogDelegate;
 
 class ImageOverlay : public rqt_gui_cpp::Plugin
 {
@@ -55,7 +54,6 @@ private:
   std::shared_ptr<ImageManager> imageManager;
   std::shared_ptr<OverlayManager> overlayManager;
   std::unique_ptr<Compositor> compositor;
-  std::unique_ptr<ColorDialogDelegate> colorDialogDelegate;
 };
 
 }  // namespace rqt_image_overlay

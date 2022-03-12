@@ -100,7 +100,7 @@ QVariant OverlayManager::data(const QModelIndex & index, int role) const
     }
   }
 
-  if (role == Qt::BackgroundRole) {
+  if (role == Qt::DecorationRole) {
     if (column == "Color") {
       return overlays.at(index.row())->getColor();
     }
@@ -157,11 +157,24 @@ QVariant OverlayManager::headerData(
   int section, Qt::Orientation orientation,
   int role) const
 {
+  std::string column = columns.at(section);
+
   if (role == Qt::DisplayRole) {
     if (orientation == Qt::Horizontal) {
-      return QString::fromStdString(columns.at(section));
+      if (column == "Color") {
+        // Don't display column name for color, because it's self-explanatory
+        return QVariant();
+      } else {
+        return QString::fromStdString(columns.at(section));
+      }
     } else if (orientation == Qt::Vertical) {
       return QVariant();
+    }
+  }
+
+  if (role == Qt::SizeHintRole) {
+    if (column == "Color") {
+      return QVariant(24);
     }
   }
 

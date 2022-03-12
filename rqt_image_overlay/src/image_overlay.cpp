@@ -21,7 +21,6 @@
 #include "overlay_manager.hpp"
 #include "image_manager.hpp"
 #include "pluginlib/class_list_macros.hpp"
-#include "color_dialog_delegate.hpp"
 
 namespace rqt_image_overlay
 {
@@ -40,15 +39,12 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   imageManager = std::make_shared<ImageManager>(node_);
   overlayManager = std::make_shared<OverlayManager>(node_);
   compositor = std::make_unique<Compositor>(*imageManager, *overlayManager, 30.0);
-  colorDialogDelegate = std::make_unique<ColorDialogDelegate>();
 
   QWidget * widget = new QWidget();
   ui->setupUi(widget);
   context.addWidget(widget);  // transfer ownership
 
-  ui->overlay_table->setModel(overlayManager.get());
-  ui->overlay_table->setItemDelegateForColumn(
-    4, reinterpret_cast<QAbstractItemDelegate *>(colorDialogDelegate.get()));
+  ui->overlay_manager_view->setModel(overlayManager.get());
   ui->image_topics_combo_box->setModel(imageManager.get());
 
   fillOverlayMenu();
@@ -82,7 +78,7 @@ void ImageOverlay::shutdownPlugin()
 
 void ImageOverlay::removeOverlay()
 {
-  QItemSelectionModel * select = ui->overlay_table->selectionModel();
+  QItemSelectionModel * select = ui->overlay_manager_view->selectionModel();
   if (select) {
     for (auto const & index : select->selectedRows()) {
       overlayManager->removeOverlay(index.row());

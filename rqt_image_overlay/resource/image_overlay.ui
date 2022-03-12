@@ -79,7 +79,7 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <widget class="QTableView" name="overlay_table">
+     <widget class="rqt_image_overlay::OverlayManagerView" name="overlay_manager_view">
       <property name="dragEnabled">
        <bool>false</bool>
       </property>
@@ -92,11 +92,8 @@
       <property name="selectionBehavior">
        <enum>QAbstractItemView::SelectRows</enum>
       </property>
-      <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>150</number>
-      </attribute>
-      <attribute name="horizontalHeaderStretchLastSection">
-       <bool>true</bool>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>0</number>
       </attribute>
       <attribute name="verticalHeaderCascadingSectionResizes">
        <bool>true</bool>
@@ -132,6 +129,11 @@
    <extends>QFrame</extends>
    <header>src/composition_frame.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>rqt_image_overlay::OverlayManagerView</class>
+   <extends>QTableView</extends>
+   <header>src/overlay_manager_view.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
