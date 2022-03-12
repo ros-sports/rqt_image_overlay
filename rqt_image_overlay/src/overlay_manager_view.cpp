@@ -16,6 +16,7 @@
 #include <memory>
 #include "overlay_manager_view.hpp"
 #include "color_dialog_delegate.hpp"
+#include "user_roles.hpp"
 
 namespace rqt_image_overlay
 {
@@ -32,17 +33,20 @@ void OverlayManagerView::setModel(QAbstractItemModel * model)
   QTableView::setModel(model);
   horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-  // Hacky way to find which column in the table contains the color information,
-  // by checking the SizeHintRole.
-  // Treat is specially, by using a delegate and having a specific fixed column width
   for (int i = 0; i < model->columnCount(); ++i) {
-    QVariant variant = model->headerData(i, Qt::Horizontal, Qt::SizeHintRole);
-    if (variant.isValid()) {
-      int columnWidth = variant.toInt();
+    // Check whether a color dialog delegate should be used for the column
+    // using user_roles::UseColorDialogRole
+    QVariant useColorDialog = model->headerData(i, Qt::Horizontal, user_roles::UseColorDialogRole);
+    if (useColorDialog.isValid() && useColorDialog.toBool()) {
       setItemDelegateForColumn(
         i, reinterpret_cast<QAbstractItemDelegate *>(colorDialogDelegate.get()));
+    }
+
+    // Check whether the column should have a specific fixed size, using Qt::SizeHintRole
+    QVariant sizeHint = model->headerData(i, Qt::Horizontal, Qt::SizeHintRole);
+    if (sizeHint.isValid()) {
       horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
-      setColumnWidth(i, columnWidth);
+      setColumnWidth(i, sizeHint.toInt());
     }
   }
 }

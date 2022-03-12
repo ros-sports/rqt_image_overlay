@@ -19,6 +19,7 @@
 #include "overlay_manager.hpp"
 #include "overlay.hpp"
 #include "qt_gui_cpp/settings.h"
+#include "user_roles.hpp"
 
 #define STATUS_UPDATE_MS 200
 #define STATUS_INDEX_UNFOUND -1
@@ -175,6 +176,12 @@ QVariant OverlayManager::headerData(
   if (role == Qt::SizeHintRole) {
     if (column == "Color") {
       return QVariant(24);
+    }
+  }
+
+  if (role == user_roles::UseColorDialogRole) {
+    if (column == "Color") {
+      return QVariant(true);
     }
   }
 
