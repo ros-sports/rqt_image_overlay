@@ -37,11 +37,11 @@ public:
   }
 
   void overlay(
-    QImage & layer,
+    QPainter & painter,
     const std::shared_ptr<rclcpp::SerializedMessage> & msg) override
   {
     try {
-      overlay(layer, deserialize(msg));
+      overlay(painter, deserialize(msg));
     } catch (const rcpputils::IllegalStateException & ex) {
       // ignore exception
     }
@@ -80,7 +80,7 @@ protected:
   }
 
   virtual void overlay(
-    QImage & layer,
+    QPainter & painter,
     const T & msg) = 0;
 
 private:

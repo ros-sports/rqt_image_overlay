@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <QColor>
 #include <string>
 #include <memory>
 #include <vector>
 #include "overlay_manager.hpp"
 #include "overlay.hpp"
 #include "qt_gui_cpp/settings.h"
+#include "user_roles.hpp"
 
 #define STATUS_UPDATE_MS 200
 #define STATUS_INDEX_UNFOUND -1
@@ -29,7 +31,7 @@ OverlayManager::OverlayManager(const std::shared_ptr<rclcpp::Node> & node)
 : pluginLoader("rqt_image_overlay_layer", "rqt_image_overlay_layer::PluginInterface"),
   declaredPluginClasses(pluginLoader.getDeclaredClasses()),
   node(node),
-  columns{"Topic", "Type", "Plugin", "Status"},
+  columns{"Topic", "Type", "Plugin", "Status", "Color"},
   statusIndex(findStatusIndex())
 {
   startTimer(STATUS_UPDATE_MS);
@@ -99,6 +101,12 @@ QVariant OverlayManager::data(const QModelIndex & index, int role) const
     }
   }
 
+  if (role == Qt::DecorationRole) {
+    if (column == "Color") {
+      return overlays.at(index.row())->getColor();
+    }
+  }
+
   return QVariant();
 }
 
@@ -106,8 +114,10 @@ bool OverlayManager::setData(
   const QModelIndex & index, const QVariant & value,
   int role)
 {
+  std::string column = columns.at(index.column());
+
   if (role == Qt::EditRole) {
-    if (columns.at(index.column()) == "Topic") {
+    if (column == "Topic") {
       overlays.at(index.row())->setTopic(value.toString().toStdString());
     }
     emit dataChanged(index, index);
@@ -115,12 +125,21 @@ bool OverlayManager::setData(
   }
 
   if (role == Qt::CheckStateRole) {
-    if (columns.at(index.column()) == "Topic") {
+    if (column == "Topic") {
       overlays.at(index.row())->setEnabled(value.toBool());
     }
     emit dataChanged(index, index);
     return true;
   }
+
+  if (role == Qt::DecorationRole) {
+    if (column == "Color") {
+      overlays.at(index.row())->setColor(value.value<QColor>());
+    }
+    emit dataChanged(index, index);
+    return true;
+  }
+
   return false;
 }
 
@@ -129,6 +148,8 @@ Qt::ItemFlags OverlayManager::flags(const QModelIndex & index) const
   std::string column = columns.at(index.column());
   if (column == "Topic") {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
+  } else if (column == "Color") {
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
   }
   return QAbstractItemModel::flags(index) | Qt::ItemIsEnabled;
 }
@@ -137,11 +158,30 @@ QVariant OverlayManager::headerData(
   int section, Qt::Orientation orientation,
   int role) const
 {
+  std::string column = columns.at(section);
+
   if (role == Qt::DisplayRole) {
     if (orientation == Qt::Horizontal) {
-      return QString::fromStdString(columns.at(section));
+      if (column == "Color") {
+        // Don't display column name for color, because it's self-explanatory
+        return QVariant();
+      } else {
+        return QString::fromStdString(columns.at(section));
+      }
     } else if (orientation == Qt::Vertical) {
       return QVariant();
+    }
+  }
+
+  if (role == Qt::SizeHintRole) {
+    if (column == "Color") {
+      return QVariant(24);
+    }
+  }
+
+  if (role == user_roles::UseColorDialogRole) {
+    if (column == "Color") {
+      return QVariant(true);
     }
   }
 
@@ -164,9 +204,14 @@ bool OverlayManager::removeRows(int row, int, const QModelIndex & parent)
 
 void OverlayManager::overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const
 {
+  QPainter painter(&image);
   for (auto & overlay : overlays) {
     if (overlay->isEnabled()) {
-      overlay->overlay(image, overlayTimeInfo);
+      painter.save();
+      QPen pen(overlay->getColor());
+      painter.setPen(pen);
+      overlay->overlay(painter, overlayTimeInfo);
+      painter.restore();
     }
   }
 }
@@ -180,6 +225,7 @@ void OverlayManager::saveSettings(qt_gui_cpp::Settings & settings) const
     map.insert("Topic", QString::fromStdString(overlay->getTopic()));
     map.insert("Plugin", QString::fromStdString(overlay->getPluginClass()));
     map.insert("Enabled", overlay->isEnabled());
+    map.insert("Color", overlay->getColor());
     list.append(QVariant(map));
   }
 
@@ -207,6 +253,11 @@ void OverlayManager::restoreSettings(const qt_gui_cpp::Settings & settings)
       if (map.contains("Enabled")) {
         bool enabled = map.value("Enabled").toBool();
         overlays.back()->setEnabled(enabled);
+      }
+
+      if (map.contains("Color")) {
+        QColor color = map.value("Color").value<QColor>();
+        overlays.back()->setColor(color);
       }
     }
   }

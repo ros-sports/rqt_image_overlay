@@ -15,6 +15,7 @@
 #ifndef OVERLAY_HPP_
 #define OVERLAY_HPP_
 
+#include <QColor>
 #include <memory>
 #include <string>
 #include "pluginlib/class_loader.hpp"
@@ -29,7 +30,7 @@ class GenericSubscription;
 class SerializedMessage;
 class Time;
 }
-class QImage;
+class QPainter;
 namespace rqt_image_overlay_layer {class PluginInterface;}
 namespace rqt_image_overlay {class OverlayTimeInfo;}
 
@@ -45,14 +46,16 @@ public:
     const std::shared_ptr<rclcpp::Node> & node);
   void setTopic(std::string topic);
   void setEnabled(bool enabled);
+  void setColor(QColor color);
 
   std::string getTopic() const;
   std::string getPluginClass() const;
   std::string getMsgType() const;
   std::string getReceivedStatus() const;
+  QColor getColor() const;
   bool isEnabled() const;
 
-  void overlay(QImage & image, const OverlayTimeInfo & overlayTimeInfo) const;
+  void overlay(QPainter & painter, const OverlayTimeInfo & overlayTimeInfo) const;
 
 private:
   const std::string pluginClass;
@@ -60,6 +63,7 @@ private:
   const std::string msgType;
   std::string topic;
   bool enabled = true;
+  QColor color;
   std::shared_ptr<rclcpp::GenericSubscription> subscription;
   const std::shared_ptr<rclcpp::Node> & node;
 

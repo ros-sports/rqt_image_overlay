@@ -44,7 +44,7 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
   ui->setupUi(widget);
   context.addWidget(widget);  // transfer ownership
 
-  ui->overlay_table->setModel(overlayManager.get());
+  ui->overlay_manager_view->setModel(overlayManager.get());
   ui->image_topics_combo_box->setModel(imageManager.get());
 
   fillOverlayMenu();
@@ -78,7 +78,7 @@ void ImageOverlay::shutdownPlugin()
 
 void ImageOverlay::removeOverlay()
 {
-  QItemSelectionModel * select = ui->overlay_table->selectionModel();
+  QItemSelectionModel * select = ui->overlay_manager_view->selectionModel();
   if (select) {
     for (auto const & index : select->selectedRows()) {
       overlayManager->removeOverlay(index.row());
