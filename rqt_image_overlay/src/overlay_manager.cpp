@@ -131,7 +131,7 @@ bool OverlayManager::setData(
     return true;
   }
 
-  if (role == Qt::BackgroundRole) {
+  if (role == Qt::DecorationRole) {
     if (column == "Color") {
       overlays.at(index.row())->setColor(value.value<QColor>());
     }

@@ -37,7 +37,7 @@ void ColorDialogDelegate::setEditorData(
   QWidget * editor,
   const QModelIndex & index) const
 {
-  auto color = index.data(Qt::BackgroundRole).value<QColor>();
+  auto color = index.data(Qt::DecorationRole).value<QColor>();
   QColorDialog * dialog = reinterpret_cast<QColorDialog *>(editor);
   dialog->setCurrentColor(color);
 }
@@ -48,7 +48,7 @@ void ColorDialogDelegate::setModelData(
 {
   QColorDialog * dialog = reinterpret_cast<QColorDialog *>(editor);
   auto color = dialog->currentColor();
-  model->setData(index, color, Qt::BackgroundRole);
+  model->setData(index, color, Qt::DecorationRole);
 }
 
 }  // namespace rqt_image_overlay
