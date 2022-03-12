@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <QHeaderView>
+#include <memory>
 #include "overlay_manager_view.hpp"
 #include "color_dialog_delegate.hpp"
 
