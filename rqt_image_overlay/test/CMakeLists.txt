@@ -1,7 +1,8 @@
 # Build test_list_image_topics
 find_package(rclcpp REQUIRED)
-find_package(theora_image_transport REQUIRED)
+find_package(compressed_image_transport REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 ament_add_gtest(test_list_image_topics
   test_list_image_topics.cpp)
@@ -12,8 +13,9 @@ target_link_libraries(test_list_image_topics
 
 ament_target_dependencies(test_list_image_topics
   rclcpp
-  theora_image_transport
-  std_msgs)
+  compressed_image_transport
+  std_msgs
+  sensor_msgs)
 
 # Build test_msg_storage
 ament_add_gtest(test_msg_storage

@@ -19,11 +19,11 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "image_transport/image_transport.hpp"
-#include "theora_image_transport/msg/packet.hpp"
+#include "sensor_msgs/msg/compressed_image.hpp"
 #include "std_msgs/msg/string.hpp"
 
-// In this test, there's two types of transports (ie. "raw" and "theora") available.
-// The "theora" transport is declared as a test dependency so we can write tests for
+// In this test, there's two types of transports (ie. "raw" and "compressed") available.
+// The "compressed" transport is declared as a test dependency so we can write tests for
 // image_transport plugins.
 class TestListImageTopics : public ::testing::Test
 {
@@ -71,7 +71,8 @@ TEST_F(TestListImageTopics, TestOne)
   auto imageTopics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(imageTopics.size(), 2u);
   EXPECT_TRUE(checkContains(imageTopics, rqt_image_overlay::ImageTopic{"/test_topic", "raw"}));
-  EXPECT_TRUE(checkContains(imageTopics, rqt_image_overlay::ImageTopic{"/test_topic", "theora"}));
+  EXPECT_TRUE(
+    checkContains(imageTopics, rqt_image_overlay::ImageTopic{"/test_topic", "compressed"}));
 }
 
 TEST_F(TestListImageTopics, TestThree)
@@ -95,7 +96,7 @@ TEST_F(TestListImageTopics, TestThree)
   EXPECT_TRUE(
     checkContains(
       imageTopics,
-      rqt_image_overlay::ImageTopic{"/test_ns1/test_topic1", "theora"}));
+      rqt_image_overlay::ImageTopic{"/test_ns1/test_topic1", "compressed"}));
   EXPECT_TRUE(
     checkContains(
       imageTopics,
@@ -103,7 +104,7 @@ TEST_F(TestListImageTopics, TestThree)
   EXPECT_TRUE(
     checkContains(
       imageTopics,
-      rqt_image_overlay::ImageTopic{"/test_ns2/test_topic2", "theora"}));
+      rqt_image_overlay::ImageTopic{"/test_ns2/test_topic2", "compressed"}));
   EXPECT_TRUE(
     checkContains(
       imageTopics,
@@ -111,15 +112,15 @@ TEST_F(TestListImageTopics, TestThree)
   EXPECT_TRUE(
     checkContains(
       imageTopics,
-      rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "theora"}));
+      rqt_image_overlay::ImageTopic{"/test_ns3/test_topic3", "compressed"}));
 }
 
-TEST_F(TestListImageTopics, TestOnlyTheoraTransport)
+TEST_F(TestListImageTopics, TestOnlyCompressedTransport)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
 
   auto publisher =
-    node->create_publisher<theora_image_transport::msg::Packet>("/test_topic/theora", 1);
+    node->create_publisher<sensor_msgs::msg::CompressedImage>("/test_topic/compressed", 1);
 
   // Give a chance for the topic to be picked up
   rclcpp::sleep_for(std::chrono::milliseconds(10));
@@ -130,17 +131,17 @@ TEST_F(TestListImageTopics, TestOnlyTheoraTransport)
   EXPECT_TRUE(
     checkContains(
       imageTopics,
-      rqt_image_overlay::ImageTopic{"/test_topic", "theora"}));
+      rqt_image_overlay::ImageTopic{"/test_topic", "compressed"}));
 }
 
-TEST_F(TestListImageTopics, TestFakeTheoraTransport)
+TEST_F(TestListImageTopics, TestFakeCompressedTransport)
 {
   // In this example, we test a case where the topic name ends with a transport type, but the msg
-  // type is not theora_image_transport::msg::Packet.
+  // type is not sensor_msgs::msg::CompressedImage.
   auto node = std::make_shared<rclcpp::Node>("test_node");
 
   auto publisher =
-    node->create_publisher<std_msgs::msg::String>("/test_topic/theora", 1);
+    node->create_publisher<std_msgs::msg::String>("/test_topic/compressed", 1);
 
   // Give a chance for the topic to be picked up
   rclcpp::sleep_for(std::chrono::milliseconds(10));
