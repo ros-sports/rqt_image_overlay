@@ -71,7 +71,8 @@ TEST_F(TestListImageTopics, TestOne)
   auto imageTopics = rqt_image_overlay::ListImageTopics(*node);
   ASSERT_EQ(imageTopics.size(), 2u);
   EXPECT_TRUE(checkContains(imageTopics, rqt_image_overlay::ImageTopic{"/test_topic", "raw"}));
-  EXPECT_TRUE(checkContains(imageTopics, rqt_image_overlay::ImageTopic{"/test_topic", "compressed"}));
+  EXPECT_TRUE(
+    checkContains(imageTopics, rqt_image_overlay::ImageTopic{"/test_topic", "compressed"}));
 }
 
 TEST_F(TestListImageTopics, TestThree)
