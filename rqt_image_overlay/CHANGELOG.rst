@@ -2,6 +2,12 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix up test
+* change theora transport dependency to compressed transport
+* Contributors: Kenji Brameld
+
 0.0.5 (2022-03-12)
 ------------------
 * remove unused dependencies
