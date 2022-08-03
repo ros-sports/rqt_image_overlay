@@ -15,6 +15,8 @@
 #include <string>
 #include <memory>
 #include <tuple>
+#include "./ui_depth_image_display_options_dialog.h"
+#include "cv_bridge/cv_bridge.h"
 #include "image_manager.hpp"
 #include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
@@ -74,6 +76,33 @@ void ImageManager::updateImageTopicList()
   endResetModel();
 }
 
+void ImageManager::updateDepthImageDisplayOptions()
+{
+  QDialog * dialog = new QDialog();
+  auto ui = std::make_unique<Ui::DepthImageDisplayOptionsDialog>();
+  ui->setupUi(dialog);
+
+  // Place current settings into Dialog
+  const std::shared_ptr<cv_bridge::CvtColorForDisplayOptions> options(
+    std::atomic_load(&depthImageDisplayOptions));
+  if (options) {
+    ui->dynamic_scaling_check_box->setChecked(options->do_dynamic_scaling);
+    ui->minimum_value_spin_box->setValue(options->min_image_value);
+    ui->maximum_value_spin_box->setValue(options->max_image_value);
+    ui->colormap_spin_box->setValue(options->colormap);
+    ui->background_label_spin_box->setValue(options->bg_label);
+  }
+
+  if (dialog->exec() == QDialog::Accepted) {
+    std::shared_ptr<cv_bridge::CvtColorForDisplayOptions> newOptions;
+    newOptions->do_dynamic_scaling = ui->dynamic_scaling_check_box->isChecked();
+    newOptions->min_image_value = ui->minimum_value_spin_box->value();
+    newOptions->max_image_value = ui->maximum_value_spin_box->value();
+    newOptions->colormap = ui->colormap_spin_box->value();
+    newOptions->bg_label = ui->background_label_spin_box->value();
+    std::atomic_store(&depthImageDisplayOptions, newOptions);
+  }
+}
 
 int ImageManager::rowCount(const QModelIndex &) const
 {
@@ -99,7 +128,8 @@ std::tuple<std::shared_ptr<QImage>, rclcpp::Time> ImageManager::getClosestImageA
 {
   auto closestTime = msgStorage.getClosestTime(targetTimeReceived);
   auto msg = msgStorage.getMsg(closestTime);
-  auto image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*msg));
+  auto image = std::make_shared<QImage>(
+    ros_image_to_qimage::Convert(*msg), *std::atomic_load(&depthImageDisplayOptions));
   return std::make_tuple(image, rclcpp::Time{msg->header.stamp});
 }
 

@@ -26,6 +26,7 @@
 #include "msg_storage.hpp"
 #include "overlay_time_info.hpp"
 
+namespace cv_bridge {struct CvtColorForDisplayOptions;}
 namespace rclcpp {class Node;}
 
 namespace rqt_image_overlay
@@ -54,6 +55,7 @@ protected:
 public slots:
   void onTopicChanged(int index);
   void updateImageTopicList();
+  void updateDepthImageDisplayOptions();
 
 private:
   void callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
@@ -64,6 +66,7 @@ private:
   rclcpp::Clock systemClock{RCL_SYSTEM_TIME};
 
   std::vector<ImageTopic> imageTopics;
+  std::shared_ptr<cv_bridge::CvtColorForDisplayOptions> depthImageDisplayOptions;
 };
 
 }  // namespace rqt_image_overlay

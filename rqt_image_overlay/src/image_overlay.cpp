@@ -58,6 +58,10 @@ void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
     ui->refresh_image_topics_button, SIGNAL(pressed()), imageManager.get(),
     SLOT(updateImageTopicList()));
 
+  connect(
+    ui->depth_image_display_options_button, SIGNAL(pressed()), imageManager.get(),
+    SLOT(updateDepthImageDisplayOptions()));
+
   connect(ui->remove_overlay_button, SIGNAL(pressed()), this, SLOT(removeOverlay()));
 
   compositor->setCallableSetImage(
