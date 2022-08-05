@@ -94,7 +94,7 @@ void ImageManager::updateDepthImageDisplayOptions()
   }
 
   if (dialog->exec() == QDialog::Accepted) {
-    std::shared_ptr<cv_bridge::CvtColorForDisplayOptions> newOptions;
+    auto newOptions = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
     newOptions->do_dynamic_scaling = ui->dynamic_scaling_check_box->isChecked();
     newOptions->min_image_value = ui->minimum_value_spin_box->value();
     newOptions->max_image_value = ui->maximum_value_spin_box->value();
@@ -129,7 +129,7 @@ std::tuple<std::shared_ptr<QImage>, rclcpp::Time> ImageManager::getClosestImageA
   auto closestTime = msgStorage.getClosestTime(targetTimeReceived);
   auto msg = msgStorage.getMsg(closestTime);
   auto image = std::make_shared<QImage>(
-    ros_image_to_qimage::Convert(*msg), *std::atomic_load(&depthImageDisplayOptions));
+    ros_image_to_qimage::Convert(*msg, *std::atomic_load(&depthImageDisplayOptions)));
   return std::make_tuple(image, rclcpp::Time{msg->header.stamp});
 }
 
