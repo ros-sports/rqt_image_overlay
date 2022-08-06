@@ -28,6 +28,9 @@ namespace rqt_image_overlay
 ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node)
 : node(node)
 {
+  // Set initial depthImageDisplayOptions
+  depthImageDisplayOptions = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
+  depthImageDisplayOptions->max_image_value = 10.0;
 }
 
 void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
@@ -85,13 +88,11 @@ void ImageManager::updateDepthImageDisplayOptions()
   // Place current settings into Dialog
   const std::shared_ptr<cv_bridge::CvtColorForDisplayOptions> options(
     std::atomic_load(&depthImageDisplayOptions));
-  if (options) {
-    ui->dynamic_scaling_check_box->setChecked(options->do_dynamic_scaling);
-    ui->minimum_value_spin_box->setValue(options->min_image_value);
-    ui->maximum_value_spin_box->setValue(options->max_image_value);
-    ui->colormap_spin_box->setValue(options->colormap);
-    ui->background_label_spin_box->setValue(options->bg_label);
-  }
+  ui->dynamic_scaling_check_box->setChecked(options->do_dynamic_scaling);
+  ui->minimum_value_spin_box->setValue(options->min_image_value);
+  ui->maximum_value_spin_box->setValue(options->max_image_value);
+  ui->colormap_spin_box->setValue(options->colormap);
+  ui->background_label_spin_box->setValue(options->bg_label);
 
   if (dialog->exec() == QDialog::Accepted) {
     auto newOptions = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
