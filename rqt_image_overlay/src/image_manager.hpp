@@ -27,6 +27,7 @@
 #include "overlay_time_info.hpp"
 
 namespace cv_bridge {struct CvtColorForDisplayOptions;}
+namespace qt_gui_cpp {class Settings;}
 namespace rclcpp {class Node;}
 
 namespace rqt_image_overlay
@@ -47,6 +48,9 @@ public:
 
   std::optional<ImageTopic> getImageTopic(unsigned index);
   void addImageTopicExplicitly(ImageTopic imageTopic);
+
+  void saveSettings(qt_gui_cpp::Settings & settings) const;
+  void restoreSettings(const qt_gui_cpp::Settings & settings);
 
 protected:
   int rowCount(const QModelIndex & parent = QModelIndex()) const override;

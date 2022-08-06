@@ -18,8 +18,9 @@
 #include "./ui_depth_image_display_options_dialog.h"
 #include "cv_bridge/cv_bridge.h"
 #include "image_manager.hpp"
-#include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
+#include "list_image_topics.hpp"
+#include "qt_gui_cpp/settings.h"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
 
 namespace rqt_image_overlay
@@ -28,7 +29,8 @@ namespace rqt_image_overlay
 ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node)
 : node(node)
 {
-  // Set initial depthImageDisplayOptions
+  // Set initial depthImageDisplayOptions (setting max_image_value to 10.0 by default to match
+  // behavior from rqt_image_view)
   depthImageDisplayOptions = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
   depthImageDisplayOptions->max_image_value = 10.0;
 }
@@ -154,6 +156,33 @@ void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
   imageTopics.clear();
   imageTopics.push_back(imageTopic);
   endResetModel();
+}
+
+void ImageManager::saveSettings(qt_gui_cpp::Settings & settings) const
+{
+  QMap<QString, QVariant> map;
+  const std::shared_ptr<cv_bridge::CvtColorForDisplayOptions> options(
+    std::atomic_load(&depthImageDisplayOptions));
+  map.insert("do_dynamic_scaling", options->do_dynamic_scaling);
+  map.insert("min_image_value", options->min_image_value);
+  map.insert("max_image_value", options->max_image_value);
+  map.insert("colormap", options->colormap);
+  map.insert("bg_label", options->bg_label);
+  settings.setValue("DepthImageDisplayOptions", QVariant(map));
+}
+
+void ImageManager::restoreSettings(const qt_gui_cpp::Settings & settings)
+{
+  if (settings.contains("DepthImageDisplayOptions")) {
+    QMap<QString, QVariant> map = settings.value("DepthImageDisplayOptions").toMap();
+    auto options = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
+    options->do_dynamic_scaling = map.value("do_dynamic_scaling").toBool();
+    options->min_image_value = map.value("min_image_value").toDouble();
+    options->max_image_value = map.value("max_image_value").toDouble();
+    options->colormap = map.value("colormap").toInt();
+    options->bg_label = map.value("bg_label").toInt();
+    std::atomic_store(&depthImageDisplayOptions, options);
+  }
 }
 
 }  // namespace rqt_image_overlay

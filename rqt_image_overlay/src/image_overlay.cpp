@@ -95,6 +95,8 @@ void ImageOverlay::saveSettings(
   qt_gui_cpp::Settings &,
   qt_gui_cpp::Settings & instance_settings) const
 {
+  imageManager->saveSettings(instance_settings);
+
   auto optionalImageTopic = imageManager->getImageTopic(ui->image_topics_combo_box->currentIndex());
   if (optionalImageTopic.has_value()) {
     auto imageTopic = optionalImageTopic.value();
@@ -109,6 +111,8 @@ void ImageOverlay::restoreSettings(
   const qt_gui_cpp::Settings &,
   const qt_gui_cpp::Settings & instance_settings)
 {
+  imageManager->restoreSettings(instance_settings);
+
   if (instance_settings.contains("image_topic") && instance_settings.contains("image_transport")) {
     std::string topic = instance_settings.value("image_topic").toString().toStdString();
     std::string transport = instance_settings.value("image_transport").toString().toStdString();
