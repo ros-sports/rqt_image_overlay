@@ -2,8 +2,8 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2022-08-07)
+------------------
 * use sensor qos for overlays too
 * Contributors: Kenji Brameld
 
