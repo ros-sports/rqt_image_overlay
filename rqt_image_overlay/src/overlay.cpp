@@ -19,6 +19,7 @@
 #include "overlay.hpp"
 #include "rclcpp/create_generic_subscription.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp/qos.hpp"
 #include "rclcpp/time.hpp"
 #include "rqt_image_overlay_layer/plugin_interface.hpp"
 #include "overlay_time_info.hpp"
@@ -40,7 +41,7 @@ void Overlay::setTopic(std::string topic)
   if (topic != "") {
     try {
       subscription = node->create_generic_subscription(
-        topic, msgType, rclcpp::QoS(10),
+        topic, msgType, rclcpp::SensorDataQoS(),
         std::bind(&Overlay::msgCallback, this, std::placeholders::_1));
       this->topic = topic;
       msgStorage.clear();
