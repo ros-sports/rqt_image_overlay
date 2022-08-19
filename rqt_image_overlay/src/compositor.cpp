@@ -24,9 +24,17 @@ namespace rqt_image_overlay
 Compositor::Compositor(
   const ImageManager & imageManager, const OverlayManager & overlayManager,
   float frequency, rclcpp::Duration window)
-: imageManager(imageManager), overlayManager(overlayManager), window(window)
+: imageManager(imageManager), overlayManager(overlayManager), window_(window)
 {
   startTimer(1000.0 / frequency);
+}
+
+void Compositor::setWindow(rclcpp::Duration window) {
+  window_ = window;
+}
+
+rclcpp::Duration Compositor::window() const {
+  return window_;
 }
 
 void Compositor::setCallableSetImage(std::function<void(std::shared_ptr<QImage>)> setImage)
@@ -40,7 +48,7 @@ std::shared_ptr<QImage> Compositor::compose()
     return nullptr;
   }
 
-  rclcpp::Time targetTime = systemClock.now() - window;
+  rclcpp::Time targetTime = systemClock.now() - window_;
   auto [composition, imageHeaderTime] = imageManager.getClosestImageAndHeaderTime(targetTime);
   OverlayTimeInfo overlayTimeInfo{targetTime, imageHeaderTime};
   overlayManager.overlay(*composition, overlayTimeInfo);
