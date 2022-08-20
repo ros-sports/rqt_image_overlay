@@ -20,7 +20,7 @@
 #include <memory>
 #include "rqt_gui_cpp/plugin.h"
 
-namespace Ui {class ImageOverlay;class ConfigurationDialog;}
+namespace Ui {class ImageOverlay;}
 namespace rqt_image_overlay
 {
 class ImageManager;
@@ -52,12 +52,10 @@ private:
   void fillOverlayMenu();
 
   std::unique_ptr<Ui::ImageOverlay> ui;
-  std::unique_ptr<Ui::ConfigurationDialog> ui_configuration_dialog;
   std::unique_ptr<QMenu> menu;
   std::shared_ptr<ImageManager> imageManager;
   std::shared_ptr<OverlayManager> overlayManager;
   std::unique_ptr<Compositor> compositor;
-  std::unique_ptr<QDialog> configuration_dialog;
 };
 
 }  // namespace rqt_image_overlay
