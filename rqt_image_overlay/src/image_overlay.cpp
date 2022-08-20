@@ -145,9 +145,9 @@ bool ImageOverlay::hasConfiguration() const
 
 void ImageOverlay::triggerConfiguration()
 {
-  QDialog * configuration_dialog = new QDialog();
+  auto configuration_dialog = std::make_unique<QDialog>();
   auto ui_configuration_dialog = std::make_unique<Ui::ConfigurationDialog>();
-  ui_configuration_dialog->setupUi(configuration_dialog);
+  ui_configuration_dialog->setupUi(configuration_dialog.get());
   ui_configuration_dialog->window->setValue(compositor->getWindow().seconds());
 
   if (configuration_dialog->exec() == QDialog::Accepted) {
