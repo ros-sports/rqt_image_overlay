@@ -16,6 +16,7 @@
 #include <string>
 #include <memory>
 #include "./ui_image_overlay.h"
+#include "./ui_configuration_dialog.h"
 #include "image_overlay.hpp"
 #include "compositor.hpp"
 #include "overlay_manager.hpp"
@@ -97,7 +98,7 @@ void ImageOverlay::saveSettings(
     instance_settings.setValue("image_topic", QString::fromStdString(imageTopic.topic));
     instance_settings.setValue("image_transport", QString::fromStdString(imageTopic.transport));
   }
-
+  instance_settings.setValue("compositor_window", compositor->getWindow().seconds());
   overlayManager->saveSettings(instance_settings);
 }
 
@@ -112,6 +113,11 @@ void ImageOverlay::restoreSettings(
     ui->image_topics_combo_box->setCurrentIndex(1);
   }
 
+  if (instance_settings.contains("compositor_window")) {
+    auto window_double = instance_settings.value("compositor_window").toDouble();
+    auto duration = rclcpp::Duration::from_seconds(window_double);
+    compositor->setWindow(duration);
+  }
   overlayManager->restoreSettings(instance_settings);
 }
 
@@ -130,6 +136,24 @@ void ImageOverlay::fillOverlayMenu()
   }
 
   ui->add_overlay_button->setMenu(menu.get());
+}
+
+bool ImageOverlay::hasConfiguration() const
+{
+  return true;
+}
+
+void ImageOverlay::triggerConfiguration()
+{
+  auto configuration_dialog = std::make_unique<QDialog>();
+  auto ui_configuration_dialog = std::make_unique<Ui::ConfigurationDialog>();
+  ui_configuration_dialog->setupUi(configuration_dialog.get());
+  ui_configuration_dialog->window->setValue(compositor->getWindow().seconds());
+
+  if (configuration_dialog->exec() == QDialog::Accepted) {
+    auto window_seconds = ui_configuration_dialog->window->value();
+    compositor->setWindow(rclcpp::Duration::from_seconds(window_seconds));
+  }
 }
 
 

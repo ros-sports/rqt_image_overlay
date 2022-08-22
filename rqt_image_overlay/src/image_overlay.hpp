@@ -42,6 +42,8 @@ public:
   void restoreSettings(
     const qt_gui_cpp::Settings &,
     const qt_gui_cpp::Settings & instanceSettings) override;
+  bool hasConfiguration() const override;
+  void triggerConfiguration() override;
 
 public slots:
   void removeOverlay();

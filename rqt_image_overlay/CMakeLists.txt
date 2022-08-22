@@ -36,7 +36,7 @@ qt5_wrap_cpp(SOURCES    # Must do this for qt's Meta-Object Compiler.
   src/image_manager.hpp
   src/color_dialog_delegate.hpp
   src/overlay_manager_view.hpp)
-qt5_wrap_ui(UIS resource/image_overlay.ui)
+qt5_wrap_ui(UIS resource/image_overlay.ui resource/configuration_dialog.ui)
 add_library(rqt_image_overlay SHARED
   ${SOURCES}
   ${UIS})
