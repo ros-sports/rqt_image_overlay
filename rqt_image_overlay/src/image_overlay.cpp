@@ -36,7 +36,6 @@ ImageOverlay::~ImageOverlay() = default;
 void ImageOverlay::initPlugin(qt_gui_cpp::PluginContext & context)
 {
   ui = std::make_unique<Ui::ImageOverlay>();
-  ui_configuration_dialog = std::make_unique<Ui::ConfigurationDialog>();
   menu = std::make_unique<QMenu>();
   imageManager = std::make_shared<ImageManager>(node_);
   overlayManager = std::make_shared<OverlayManager>(node_);
@@ -99,8 +98,7 @@ void ImageOverlay::saveSettings(
     instance_settings.setValue("image_topic", QString::fromStdString(imageTopic.topic));
     instance_settings.setValue("image_transport", QString::fromStdString(imageTopic.transport));
   }
-  instance_settings.setValue("window", compositor->window().seconds());
-
+  instance_settings.setValue("compositor_window", compositor->getWindow().seconds());
   overlayManager->saveSettings(instance_settings);
 }
 
@@ -114,16 +112,11 @@ void ImageOverlay::restoreSettings(
     imageManager->addImageTopicExplicitly(ImageTopic{topic, transport});
     ui->image_topics_combo_box->setCurrentIndex(1);
   }
-  auto window_setting = instance_settings.value("window");
-  if (!window_setting.isNull()) {
-    auto window_string = window_setting.toString().toStdString();
-    char * err;
-    double window = std::strtod(window_string.c_str(), &err);
-    if (err == window_string.c_str()) {
-      // double conversion error
-    } else {
-      compositor->setWindow(rclcpp::Duration::from_seconds(window));
-    }
+
+  if (instance_settings.contains("compositor_window")) {
+    auto window_double = instance_settings.value("compositor_window").toDouble();
+    auto duration = rclcpp::Duration::from_seconds(window_double);
+    compositor->setWindow(duration);
   }
   overlayManager->restoreSettings(instance_settings);
 }
@@ -152,22 +145,15 @@ bool ImageOverlay::hasConfiguration() const
 
 void ImageOverlay::triggerConfiguration()
 {
-  if (configuration_dialog) {
-    return;
-  }
-  configuration_dialog = std::make_unique<QDialog>();
-  configuration_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  auto configuration_dialog = std::make_unique<QDialog>();
+  auto ui_configuration_dialog = std::make_unique<Ui::ConfigurationDialog>();
   ui_configuration_dialog->setupUi(configuration_dialog.get());
-  ui_configuration_dialog->window->setValue(compositor->window().seconds());
-  auto connection = connect(
-    configuration_dialog.get(), &QDialog::finished, [this](int result) {
-      if (result == QDialog::Accepted) {
-        auto window_seconds = ui_configuration_dialog->window->value();
-        compositor->setWindow(rclcpp::Duration::from_seconds(window_seconds));
-      }
-      configuration_dialog.reset();
-    });
-  configuration_dialog->open();
+  ui_configuration_dialog->window->setValue(compositor->getWindow().seconds());
+
+  if (configuration_dialog->exec() == QDialog::Accepted) {
+    auto window_seconds = ui_configuration_dialog->window->value();
+    compositor->setWindow(rclcpp::Duration::from_seconds(window_seconds));
+  }
 }
 
 
