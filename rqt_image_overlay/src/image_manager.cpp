@@ -26,6 +26,10 @@ namespace rqt_image_overlay
 ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node)
 : node(node)
 {
+  // Set initial cvtColorForDisplayOptions_ (setting max_image_value to 10.0 by default to match
+  // behavior from rqt_image_view)
+  cvtColorForDisplayOptions_ = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
+  cvtColorForDisplayOptions_->max_image_value = 10.0;
 }
 
 void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
@@ -99,7 +103,8 @@ std::tuple<std::shared_ptr<QImage>, rclcpp::Time> ImageManager::getClosestImageA
 {
   auto closestTime = msgStorage.getClosestTime(targetTimeReceived);
   auto msg = msgStorage.getMsg(closestTime);
-  auto image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*msg));
+  auto image = std::make_shared<QImage>(
+    ros_image_to_qimage::Convert(*msg, getCvtColorForDisplayOptions()));
   return std::make_tuple(image, rclcpp::Time{msg->header.stamp});
 }
 
@@ -123,6 +128,24 @@ void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
   imageTopics.clear();
   imageTopics.push_back(imageTopic);
   endResetModel();
+}
+
+void ImageManager::setCvtColorForDisplayOptions(
+  const cv_bridge::CvtColorForDisplayOptions & options)
+{
+  auto cvtColorForDisplayOptions = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
+  cvtColorForDisplayOptions->do_dynamic_scaling = options.do_dynamic_scaling;
+  cvtColorForDisplayOptions->min_image_value = options.min_image_value;
+  cvtColorForDisplayOptions->max_image_value = options.max_image_value;
+  cvtColorForDisplayOptions->colormap = options.colormap;
+  cvtColorForDisplayOptions->bg_label = options.bg_label;
+  std::atomic_store(&cvtColorForDisplayOptions_, cvtColorForDisplayOptions);
+}
+
+cv_bridge::CvtColorForDisplayOptions ImageManager::getCvtColorForDisplayOptions() const
+{
+  auto cvtColorForDisplayOptions = std::atomic_load(&cvtColorForDisplayOptions_);
+  return *cvtColorForDisplayOptions;
 }
 
 }  // namespace rqt_image_overlay
