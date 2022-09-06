@@ -1,0 +1,9 @@
+repositories:
+  vision_opencv:
+    type: git
+    url: https://github.com/ros-perception/vision_opencv.git
+    version: ros2
+  ros_image_to_qimage:
+    type: git
+    url: https://github.com/ros-sports/ros_image_to_qimage.git
+    version: rolling
