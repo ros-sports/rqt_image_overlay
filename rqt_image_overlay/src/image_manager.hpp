@@ -28,6 +28,7 @@
 #include "cv_bridge/cv_bridge.h"
 
 namespace rclcpp {class Node;}
+namespace qt_gui_cpp {class Settings;}
 
 namespace rqt_image_overlay
 {
@@ -47,6 +48,9 @@ public:
 
   std::optional<ImageTopic> getImageTopic(unsigned index);
   void addImageTopicExplicitly(ImageTopic imageTopic);
+
+  void saveSettings(qt_gui_cpp::Settings & settings) const;
+  void restoreSettings(const qt_gui_cpp::Settings & settings);
 
   // Thread safe setter/getter for cvtColorDisplayOptions
   void setCvtColorForDisplayOptions(

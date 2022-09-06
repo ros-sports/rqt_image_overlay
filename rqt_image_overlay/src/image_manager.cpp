@@ -18,6 +18,7 @@
 #include "image_manager.hpp"
 #include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
+#include "qt_gui_cpp/settings.h"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
 
 namespace rqt_image_overlay
@@ -78,6 +79,31 @@ void ImageManager::updateImageTopicList()
   endResetModel();
 }
 
+void ImageManager::saveSettings(qt_gui_cpp::Settings & settings) const
+{
+  QMap<QString, QVariant> map;
+  auto options = getCvtColorForDisplayOptions();
+  map.insert("do_dynamic_scaling", options.do_dynamic_scaling);
+  map.insert("min_image_value", options.min_image_value);
+  map.insert("max_image_value", options.max_image_value);
+  map.insert("colormap", options.colormap);
+  map.insert("bg_label", options.bg_label);
+  settings.setValue("cvtColorForDisplayOptions", QVariant(map));
+}
+
+void ImageManager::restoreSettings(const qt_gui_cpp::Settings & settings)
+{
+  if (settings.contains("cvtColorForDisplayOptions")) {
+    QMap<QString, QVariant> map = settings.value("cvtColorForDisplayOptions").toMap();
+    auto cvtColorForDisplayOptions = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
+    cvtColorForDisplayOptions->do_dynamic_scaling = map.value("do_dynamic_scaling").toBool();
+    cvtColorForDisplayOptions->min_image_value = map.value("min_image_value").toDouble();
+    cvtColorForDisplayOptions->max_image_value = map.value("max_image_value").toDouble();
+    cvtColorForDisplayOptions->colormap = map.value("colormap").toInt();
+    cvtColorForDisplayOptions->bg_label = map.value("bg_label").toInt();
+    std::atomic_store(&cvtColorForDisplayOptions_, cvtColorForDisplayOptions);
+  }
+}
 
 int ImageManager::rowCount(const QModelIndex &) const
 {

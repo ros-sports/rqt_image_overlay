@@ -99,6 +99,7 @@ void ImageOverlay::saveSettings(
     instance_settings.setValue("image_transport", QString::fromStdString(imageTopic.transport));
   }
   instance_settings.setValue("compositor_window", compositor->getWindow().seconds());
+  imageManager->saveSettings(instance_settings);
   overlayManager->saveSettings(instance_settings);
 }
 
@@ -118,6 +119,7 @@ void ImageOverlay::restoreSettings(
     auto duration = rclcpp::Duration::from_seconds(window_double);
     compositor->setWindow(duration);
   }
+  imageManager->restoreSettings(instance_settings);
   overlayManager->restoreSettings(instance_settings);
 }
 
@@ -148,11 +150,28 @@ void ImageOverlay::triggerConfiguration()
   auto configuration_dialog = std::make_unique<QDialog>();
   auto ui_configuration_dialog = std::make_unique<Ui::ConfigurationDialog>();
   ui_configuration_dialog->setupUi(configuration_dialog.get());
-  ui_configuration_dialog->window->setValue(compositor->getWindow().seconds());
+
+  // Load current configurations
+  ui_configuration_dialog->window_spin_box->setValue(compositor->getWindow().seconds());
+  auto options = imageManager->getCvtColorForDisplayOptions();
+  ui_configuration_dialog->dynamic_scaling_check_box->setChecked(options.do_dynamic_scaling);
+  ui_configuration_dialog->minimum_value_spin_box->setValue(options.min_image_value);
+  ui_configuration_dialog->maximum_value_spin_box->setValue(options.max_image_value);
+  ui_configuration_dialog->colormap_spin_box->setValue(options.colormap);
+  ui_configuration_dialog->bg_label_spin_box->setValue(options.bg_label);
 
   if (configuration_dialog->exec() == QDialog::Accepted) {
-    auto window_seconds = ui_configuration_dialog->window->value();
+    // Set configurations
+    auto window_seconds = ui_configuration_dialog->window_spin_box->value();
     compositor->setWindow(rclcpp::Duration::from_seconds(window_seconds));
+
+    cv_bridge::CvtColorForDisplayOptions options;
+    options.do_dynamic_scaling = ui_configuration_dialog->dynamic_scaling_check_box->isChecked();
+    options.min_image_value = ui_configuration_dialog->minimum_value_spin_box->value();
+    options.max_image_value = ui_configuration_dialog->maximum_value_spin_box->value();
+    options.colormap = ui_configuration_dialog->colormap_spin_box->value();
+    options.bg_label = ui_configuration_dialog->bg_label_spin_box->value();
+    imageManager->setCvtColorForDisplayOptions(options);
   }
 }
 
