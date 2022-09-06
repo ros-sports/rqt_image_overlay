@@ -81,7 +81,7 @@ TEST_F(TestImageManager, getHeaderTime)
   auto publisher = node->create_publisher<sensor_msgs::msg::Image>("test_topic", 1);
   auto msg = sensor_msgs::msg::Image{};
   msg.header.stamp = time;
-  msg.encoding = "rgb8";
+  msg.encoding = sensor_msgs::image_encodings::RGB8;
   publisher->publish(msg);
 
   // Give a chance for the topic to be picked up
