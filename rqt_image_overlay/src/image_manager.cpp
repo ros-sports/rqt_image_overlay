@@ -54,7 +54,7 @@ void ImageManager::onTopicChanged(int index)
         std::bind(&ImageManager::callbackImage, this, std::placeholders::_1),
         imageTopic.transport, rmw_qos_profile_sensor_data);
       qDebug(
-        "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
+        "ImageManager::onTopicChanged() to topic '%s' with transport '%s'",
         imageTopic.topic.c_str(), imageTopic.transport.c_str());
     } catch (image_transport::TransportLoadException & e) {
       qWarning("(ImageManager) Loading image transport plugin failed");
