@@ -1,66 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>ConfigurationDialog</class>
-  <widget class="QDialog" name="configuration_dialog">
-    <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-      </sizepolicy>
-    </property>
-    <property name="windowTitle">
-      <string>Image Overlay configuration</string>
-    </property>
-    <layout class="QVBoxLayout" name="window_layout">
-      <item>
-        <layout class="QFormLayout" name="input_layout">
-          <item row="0" column="0">
-            <widget class="QLabel" name="windowLabel">
-              <property name="text">
-                <string>Waiting &amp;window (sec)</string>
-              </property>
-              <property name="toolTip">
-                <string>Time to wait before composing an image. If overlay messages arrive much later than the image, increase this value.</string>
-              </property>
-              <property name="buddy">
-                <cstring>window</cstring>
-              </property>
-            </widget>
-          </item>
-          <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="window">
-              <property name="decimals">
-                <number>3</number>
-              </property>
-            </widget>
-          </item>
-        </layout>
-      </item>
-      <item>
-        <widget class="QDialogButtonBox" name="dialog_button_box">
-          <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="standardButtons">
-            <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-          </property>
-        </widget>
-      </item>
+ <class>ConfigurationDialog</class>
+ <widget class="QDialog" name="configuration_dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>307</width>
+    <height>228</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Image Overlay configuration</string>
+  </property>
+  <layout class="QVBoxLayout" name="window_layout">
+   <item>
+    <layout class="QFormLayout" name="input_layout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="windowLabel">
+       <property name="toolTip">
+        <string>Time to wait before composing an image. If overlay messages arrive much later than the image, increase this value.</string>
+       </property>
+       <property name="text">
+        <string>Waiting &amp;window (sec)</string>
+       </property>
+       <property name="buddy">
+        <cstring>window_spin_box</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QDoubleSpinBox" name="window_spin_box">
+       <property name="decimals">
+        <number>3</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="dynamic_scaling_label">
+       <property name="text">
+        <string>Dynamic Scaling</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="minimum_value_label">
+       <property name="text">
+        <string>Minimum Value</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="maximum_value_label">
+       <property name="text">
+        <string>Maximum Value</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="minimum_value_spin_box">
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="minimum">
+        <double>-10000000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="dynamic_scaling_check_box">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QDoubleSpinBox" name="maximum_value_spin_box">
+       <property name="decimals">
+        <number>4</number>
+       </property>
+       <property name="minimum">
+        <double>-10000000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000000.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="colormap_label">
+       <property name="text">
+        <string>Colormap</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QSpinBox" name="colormap_spin_box">
+       <property name="minimum">
+        <number>-1</number>
+       </property>
+       <property name="value">
+        <number>-1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="bg_label_label">
+       <property name="text">
+        <string>Background Label</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QSpinBox" name="bg_label_spin_box">
+       <property name="minimum">
+        <number>-1</number>
+       </property>
+       <property name="value">
+        <number>-1</number>
+       </property>
+      </widget>
+     </item>
     </layout>
-  </widget>
-  <resources/>
-  <connections>
-    <connection>
-      <sender>dialog_button_box</sender>
-      <signal>accepted()</signal>
-      <receiver>configuration_dialog</receiver>
-      <slot>accept()</slot>
-    </connection>
-    <connection>
-      <sender>dialog_button_box</sender>
-      <signal>rejected()</signal>
-      <receiver>configuration_dialog</receiver>
-      <slot>reject()</slot>
-    </connection>
-  </connections>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="dialog_button_box">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>dialog_button_box</sender>
+   <signal>accepted()</signal>
+   <receiver>configuration_dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dialog_button_box</sender>
+   <signal>rejected()</signal>
+   <receiver>configuration_dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

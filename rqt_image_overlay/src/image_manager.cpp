@@ -18,6 +18,7 @@
 #include "image_manager.hpp"
 #include "list_image_topics.hpp"
 #include "image_transport/image_transport.hpp"
+#include "qt_gui_cpp/settings.h"
 #include "ros_image_to_qimage/ros_image_to_qimage.hpp"
 
 namespace rqt_image_overlay
@@ -26,6 +27,10 @@ namespace rqt_image_overlay
 ImageManager::ImageManager(const std::shared_ptr<rclcpp::Node> & node)
 : node(node)
 {
+  // Set initial cvtColorForDisplayOptions_ (setting max_image_value to 10.0 by default to match
+  // behavior from rqt_image_view)
+  cvtColorForDisplayOptions_ = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
+  cvtColorForDisplayOptions_->max_image_value = 10.0;
 }
 
 void ImageManager::callbackImage(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
@@ -49,7 +54,7 @@ void ImageManager::onTopicChanged(int index)
         std::bind(&ImageManager::callbackImage, this, std::placeholders::_1),
         imageTopic.transport, rmw_qos_profile_sensor_data);
       qDebug(
-        "ImageView::onTopicChanged() to topic '%s' with transport '%s'",
+        "ImageManager::onTopicChanged() to topic '%s' with transport '%s'",
         imageTopic.topic.c_str(), imageTopic.transport.c_str());
     } catch (image_transport::TransportLoadException & e) {
       qWarning("(ImageManager) Loading image transport plugin failed");
@@ -74,6 +79,31 @@ void ImageManager::updateImageTopicList()
   endResetModel();
 }
 
+void ImageManager::saveSettings(qt_gui_cpp::Settings & settings) const
+{
+  QMap<QString, QVariant> map;
+  auto options = getCvtColorForDisplayOptions();
+  map.insert("do_dynamic_scaling", options.do_dynamic_scaling);
+  map.insert("min_image_value", options.min_image_value);
+  map.insert("max_image_value", options.max_image_value);
+  map.insert("colormap", options.colormap);
+  map.insert("bg_label", options.bg_label);
+  settings.setValue("cvtColorForDisplayOptions", QVariant(map));
+}
+
+void ImageManager::restoreSettings(const qt_gui_cpp::Settings & settings)
+{
+  if (settings.contains("cvtColorForDisplayOptions")) {
+    QMap<QString, QVariant> map = settings.value("cvtColorForDisplayOptions").toMap();
+    auto cvtColorForDisplayOptions = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
+    cvtColorForDisplayOptions->do_dynamic_scaling = map.value("do_dynamic_scaling").toBool();
+    cvtColorForDisplayOptions->min_image_value = map.value("min_image_value").toDouble();
+    cvtColorForDisplayOptions->max_image_value = map.value("max_image_value").toDouble();
+    cvtColorForDisplayOptions->colormap = map.value("colormap").toInt();
+    cvtColorForDisplayOptions->bg_label = map.value("bg_label").toInt();
+    std::atomic_store(&cvtColorForDisplayOptions_, cvtColorForDisplayOptions);
+  }
+}
 
 int ImageManager::rowCount(const QModelIndex &) const
 {
@@ -99,7 +129,8 @@ std::tuple<std::shared_ptr<QImage>, rclcpp::Time> ImageManager::getClosestImageA
 {
   auto closestTime = msgStorage.getClosestTime(targetTimeReceived);
   auto msg = msgStorage.getMsg(closestTime);
-  auto image = std::make_shared<QImage>(ros_image_to_qimage::Convert(*msg));
+  auto image = std::make_shared<QImage>(
+    ros_image_to_qimage::Convert(*msg, getCvtColorForDisplayOptions()));
   return std::make_tuple(image, rclcpp::Time{msg->header.stamp});
 }
 
@@ -123,6 +154,24 @@ void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
   imageTopics.clear();
   imageTopics.push_back(imageTopic);
   endResetModel();
+}
+
+void ImageManager::setCvtColorForDisplayOptions(
+  const cv_bridge::CvtColorForDisplayOptions & options)
+{
+  auto cvtColorForDisplayOptions = std::make_shared<cv_bridge::CvtColorForDisplayOptions>();
+  cvtColorForDisplayOptions->do_dynamic_scaling = options.do_dynamic_scaling;
+  cvtColorForDisplayOptions->min_image_value = options.min_image_value;
+  cvtColorForDisplayOptions->max_image_value = options.max_image_value;
+  cvtColorForDisplayOptions->colormap = options.colormap;
+  cvtColorForDisplayOptions->bg_label = options.bg_label;
+  std::atomic_store(&cvtColorForDisplayOptions_, cvtColorForDisplayOptions);
+}
+
+cv_bridge::CvtColorForDisplayOptions ImageManager::getCvtColorForDisplayOptions() const
+{
+  auto cvtColorForDisplayOptions = std::atomic_load(&cvtColorForDisplayOptions_);
+  return *cvtColorForDisplayOptions;
 }
 
 }  // namespace rqt_image_overlay
