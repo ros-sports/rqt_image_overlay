@@ -94,3 +94,18 @@ TEST_F(TestImageManager, getHeaderTime)
   EXPECT_EQ(headerTime, time);
   EXPECT_NE(image, nullptr);
 }
+
+TEST_F(TestImageManager, TestGetImageTopic)
+{
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+  rqt_image_overlay::ImageManager imageManager{node};
+
+  auto imageTopic1 = rqt_image_overlay::ImageTopic{"topic_1", "raw"};
+  imageManager.addImageTopicExplicitly(imageTopic1);
+  auto imageTopic2 = rqt_image_overlay::ImageTopic{"topic_2", "raw"};
+  imageManager.addImageTopicExplicitly(imageTopic2);
+
+  EXPECT_EQ(imageManager.getImageTopic(0), std::nullopt);
+  EXPECT_EQ(imageManager.getImageTopic(1).value(), imageTopic1);
+  EXPECT_EQ(imageManager.getImageTopic(2).value(), imageTopic2);
+}
