@@ -154,7 +154,6 @@ std::optional<ImageTopic> ImageManager::getImageTopic(unsigned index)
 void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
 {
   beginResetModel();
-  imageTopics.clear();
   imageTopics.push_back(imageTopic);
   endResetModel();
 }
