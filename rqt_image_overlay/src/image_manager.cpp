@@ -110,9 +110,12 @@ bool ImageManager::imageAvailable() const
 
 std::optional<ImageTopic> ImageManager::getImageTopic(unsigned index)
 {
-  if (index > 0 && index < imageTopics.size()) {
-    const ImageTopic & it = imageTopics.at(index);
-    return std::make_optional<ImageTopic>(it);
+  if (index > 0) {
+    auto topic_index = index - 1;
+    if (topic_index < imageTopics.size()) {
+      const ImageTopic & it = imageTopics.at(topic_index);
+      return std::make_optional<ImageTopic>(it);
+    }
   }
   return std::nullopt;
 }
@@ -120,7 +123,6 @@ std::optional<ImageTopic> ImageManager::getImageTopic(unsigned index)
 void ImageManager::addImageTopicExplicitly(ImageTopic imageTopic)
 {
   beginResetModel();
-  imageTopics.clear();
   imageTopics.push_back(imageTopic);
   endResetModel();
 }
