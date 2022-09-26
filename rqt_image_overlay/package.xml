@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rqt_image_overlay</name>
-  <version>0.0.7</version>
+  <version>0.0.8</version>
   <description>An rqt plugin to display overlays for custom msgs on an image using plugins.</description>
   <maintainer email="kenjibrameld@gmail.com">ijnek</maintainer>
   <license>Apache License 2.0</license>
