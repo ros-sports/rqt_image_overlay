@@ -25,7 +25,7 @@
 #include "image_topic.hpp"
 #include "msg_storage.hpp"
 #include "overlay_time_info.hpp"
-#include "cv_bridge/cv_bridge.h"
+#include "cv_bridge/cv_bridge.hpp"
 
 namespace rclcpp {class Node;}
 namespace qt_gui_cpp {class Settings;}
