@@ -2,8 +2,8 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2022-09-26)
+------------------
 * Correctly map ImageManager list model index to topic vector (`#48 <https://github.com/ros-sports/rqt_image_overlay/issues/48>`_)
 * Contributors: Kenji Brameld, Marcel Zeilinger
 

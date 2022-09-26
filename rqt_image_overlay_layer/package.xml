@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rqt_image_overlay_layer</name>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <description>Provides an rqt_image_overlay_layer plugin interface, and a template impelementation class</description>
   <maintainer email="kenjibrameld@gmail.com">ijnek</maintainer>
   <license>Apache License 2.0</license>
