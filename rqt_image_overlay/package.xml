@@ -11,6 +11,7 @@
 
   <depend>rclcpp</depend>
   <depend>pluginlib</depend>
+  <depend>rqt_gui</depend>
   <depend>rqt_gui_cpp</depend>
   <depend>image_transport</depend>
   <depend>qtbase5-dev</depend>
