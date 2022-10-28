@@ -2,6 +2,11 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add rqt_gui to package.xml (`#54 <https://github.com/ros-sports/rqt_image_overlay/issues/54>`_)
+* Contributors: Kenji Brameld
+
 0.0.8 (2022-09-26)
 ------------------
 * Correctly map ImageManager list model index to topic vector (#47 <https://github.com/ros-sports/rqt_image_overlay/issues/47>)
