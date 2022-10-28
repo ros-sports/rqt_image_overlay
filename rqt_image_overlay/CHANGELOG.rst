@@ -2,8 +2,8 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.3 (2022-10-29)
+------------------
 * Add rqt_gui to package.xml (`#55 <https://github.com/ros-sports/rqt_image_overlay/issues/55>`_)
 * Contributors: Kenji Brameld
 
