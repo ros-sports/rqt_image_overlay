@@ -2,6 +2,11 @@
 Changelog for package rqt_image_overlay
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add rqt_gui to package.xml (`#53 <https://github.com/ros-sports/rqt_image_overlay/issues/53>`_)
+* Contributors: Kenji Brameld
+
 0.3.0 (2022-10-03)
 ------------------
 * Change #include of cv_bridge.h to cv_bridge.hpp (`#51 <https://github.com/ros-sports/rqt_image_overlay/issues/51>`_)

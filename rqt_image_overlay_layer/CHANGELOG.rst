@@ -2,6 +2,9 @@
 Changelog for package rqt_image_overlay_layer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.3.0 (2022-10-03)
 ------------------
 
