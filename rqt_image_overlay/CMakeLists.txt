@@ -42,14 +42,15 @@ add_library(rqt_image_overlay SHARED
   ${UIS})
 target_include_directories(rqt_image_overlay PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(rqt_image_overlay
-  rclcpp
-  rqt_gui_cpp
-  image_transport
+  $<INSTALL_INTERFACE:include>
+  ${rqt_image_overlay_layer_INCLUDE_DIRS}
+  )
+target_link_libraries(rqt_image_overlay
+  rclcpp::rclcpp
+  rqt_gui_cpp::rqt_gui_cpp
+  image_transport::image_transport
   Qt5Widgets
-  ros_image_to_qimage
-  rqt_image_overlay_layer)
+  ros_image_to_qimage::ros_image_to_qimage)
 
 pluginlib_export_plugin_description_file(rqt_gui plugin.xml)  # This must be rqt_gui and not rqt_gui_cpp
 

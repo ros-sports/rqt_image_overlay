@@ -11,11 +11,10 @@ target_link_libraries(test_list_image_topics
   rqt_image_overlay
 )
 
-ament_target_dependencies(test_list_image_topics
-  rclcpp
-  compressed_image_transport
-  std_msgs
-  sensor_msgs)
+target_link_libraries(test_list_image_topics
+  rclcpp::rclcpp
+  ${std_msgs_TARGETS}
+  ${sensor_msgs_TARGETS})
 
 # Build test_msg_storage
 ament_add_gtest(test_msg_storage
